@@ -10,6 +10,8 @@ UIBase is a framework that makes development of modern web applications hasslefr
 - Support for application and user themes
 - Finally the most important one - Development mode for easy debugging and Production mode for most optimal performance
 
+The framework uses primary motivation from Nicholas Zakas's [SlideShare presentation](http://www.slideshare.net/nzakas/scalable-javascript-application-architecture) and the configuration based view creation from ExtJS/Sencha.
+
 ### Utilizes
 * [jQuery](http://www.jquery.com) - as base library
 * [Node.js](http://nodejs.org) - for building production deployment
