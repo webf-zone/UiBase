@@ -13,7 +13,6 @@ Some key featuers:
 - Seamless integration with basic development best practices - JSLinting, Unit Testing, Code Formatting, SVN pre-commit hooks etc.
 - Form validation framework
 - Rich UI Component Library
-- 
 - Support for Keyboard shortcuts for smooth user interaction
 - Finally the most important one - Development mode for easy debugging and Production mode for most optimal performance
 
