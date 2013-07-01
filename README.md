@@ -1,4 +1,4 @@
-# [UIBase](http://www.uibase.net)
+# [UiBase](http://www.uibase.net)
 
 Some key featuers:
 
