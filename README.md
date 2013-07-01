@@ -25,5 +25,3 @@ The framework uses primary motivation from Nicholas Zakas's [SlideShare presenta
 * [jQuery](http://www.jquery.com) - as base library
 * [Node.js](http://nodejs.org) - for building production deployment
 * [Modernizr](http://modernizr.com) - HTML5/CSS3 feature detection
-
-Copyright 2009-2013 Usable Bytes Pvt Ltd
