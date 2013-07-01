@@ -1,6 +1,6 @@
 # [UIBase](http://www.uibase.net)
 
-UIBase is a framework that makes development of modern web applications hasslefree through an approach that's based on MVC architecture. It not only provides most common utilities and components to the UI developers, but also encourages development best practices. Here are some important and unique featuers:
+Some key featuers:
 
 - In-built seamless support for "Access Control"
 - Very easy to learn and use, yet not losing on flexibility and power
@@ -8,7 +8,17 @@ UIBase is a framework that makes development of modern web applications hasslefr
 - Totally centralized control for views, models, components and events - enables complex application level changes in minutes
 - Natural ability to engine multiple applications simultaneously
 - Support for application and user themes
+- Dynamic Package Loader
+- Responsive Layout Matrix and Sets
+- Seamless integration with basic development best practices - JSLinting, Unit Testing, Code Formatting, SVN pre-commit hooks etc.
+- Form validation framework
+- Rich UI Component Library
+- 
+- Support for Keyboard shortcuts for smooth user interaction
 - Finally the most important one - Development mode for easy debugging and Production mode for most optimal performance
+
+And huge thanks to Debjit for bringing in his baby:
+- The GUI builder
 
 The framework uses primary motivation from Nicholas Zakas's [SlideShare presentation](http://www.slideshare.net/nzakas/scalable-javascript-application-architecture) and the configuration based view creation from ExtJS/Sencha.
 
@@ -17,10 +27,4 @@ The framework uses primary motivation from Nicholas Zakas's [SlideShare presenta
 * [Node.js](http://nodejs.org) - for building production deployment
 * [Modernizr](http://modernizr.com) - HTML5/CSS3 feature detection
 
-## Author
-**Kumar Bhot**
-+ https://twitter.com/usablebytes
-+ https://github.com/uiarchitect
-+ http://www.webuiarchitect.com
-
-Copyright 2009-2013 Kumar Bhot
+Copyright 2009-2013 Usable Bytes Pvt Ltd
