@@ -1,0 +1,23 @@
+{
+    "basePath": "/predeect.app/",
+    
+    "m.visitor": {
+        "scripts": "models/visitor.js"
+    },
+    
+    "v.login": {
+        "markup": "components/login.html",
+        "scripts": "components/login.js",
+        "styles": "components/login.css"
+    },
+    
+    "default": {
+        "dependencies": "login"
+    },
+        
+    "login": {
+        "dependencies": ["m.visitor", "v.login"],
+        "scripts": "login.js",
+        "styles": "login.css"
+    }
+}
