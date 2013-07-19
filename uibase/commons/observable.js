@@ -21,6 +21,17 @@
         });
     };
 
+
+    Observable.prototype.map = function(mapper) {
+        var o = this;
+        return new Observable(function(observer) {
+            var ob = new ub.Observer(function(event) {
+                observer.onNext(mapper.call(o, event));
+            });
+            o.subscribe(ob);
+        });
+    };
+
     ub.Observable = Observable;
 
 })(window.uibase);

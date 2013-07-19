@@ -17,8 +17,10 @@
     Component.connect = function(comp, inPort, observable) {
         if (!comp instanceof Component) throw new Error("expected a Component as first argument");
 
-        var observer = comp.inPorts[inPort];
-        return observable.subscribe(observer);
+        var observer = comp._inPorts[inPort];
+
+        if (observer instanceof ub.Observer) return observable.subscribe(observer);
+        else return observer(observable);
     };
 
     Component.extend = function(constructor) {

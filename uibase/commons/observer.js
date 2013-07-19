@@ -6,4 +6,8 @@
         this._onError = onError;
         this._onCompleted = onCompleted;
     };
+
+    ub.Observer.prototype.onNext = function() {
+        this._onNext.apply(this, arguments);
+    };
 })(window.uibase);

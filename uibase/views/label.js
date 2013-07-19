@@ -4,17 +4,24 @@
     ub.Views = ub.Views || {};
 
     var Label = ub.Component.extend(function(config) {
-        this._el = $("<span>");
-        this._text = config.text || "";
+        var v = this;
 
-        this._inPorts.text = new ub.Observer(function(text) {
-            this._text = text;
-            this._el.text(text);
-        });
+        v._text = config.text || "";
+        v._el = $("<span>").text(v._text);
+
+        v._inPorts.text = function(observable) {
+            v._outPorts.text = observable; //observable.clone()
+            var ob = new ub.Observer(function(text) {
+                v._text = text;
+                v._el.text(text);
+            });
+            observable.subscribe(ob);
+            return ob;
+        };
     });
 
     Label.prototype.render = function() {
-        return this._el.text(this._text);
+        return this._el;
     };
 
     ub.Views.Label = Label;
