@@ -15,8 +15,7 @@
                 v._text = text;
                 v._el.text(text);
             });
-            observable.subscribe(ob);
-            return ob;
+            return observable.subscribe(ob);
         };
     });
 
