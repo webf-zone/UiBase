@@ -3,6 +3,21 @@
 
     var utils = ub.Utils;
 
+    var getClassName = Function.prototype.call.bind({}.toString);
+
+    var classOf = function(s) {
+        return function(v) {
+            if (getClassName(v) !== "[object " + s + "]") {
+                throw new TypeError("Expected " + s);
+            }
+            return v;
+        };
+    };
+
+    utils.arr = classOf("Array");
+    utils.date = classOf("Date");
+    utils.re = classOf("RegExp");
+
     // Creates a contract for a value of type s
     var typeOf = function(s) {
         return function(v) {
