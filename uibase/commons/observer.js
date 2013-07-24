@@ -6,8 +6,8 @@
     var Observer = utils.Class({
         construct: function(onNext, onError, onCompleted) {
             this._onNext = utils.func(onNext);
-            this._onError = utils.func(onError);
-            this._onCompleted = utils.func(onCompleted);
+            this._onError = onError;
+            this._onCompleted = onCompleted;
         },
 
         onNext: function() {
