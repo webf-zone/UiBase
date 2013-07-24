@@ -1,39 +1,32 @@
 ;(function(ub) {
     "use strict";
 
-    var Component = function() {
-        this._inPorts = {};
-        this._outPorts = {};
-    };
+    var Component = ub.Utils.Class({
 
-    Component.prototype.get = function(outPort) {
-        var comp = this;
+        construct: function() {
+            this._inPorts = {};
+            this._outPorts = {};
+        },
 
-        if (!comp._outPorts[outPort]) return new ub.Observable(function() {});
+        get: function(outPort) {
+            var comp = this;
 
-        return comp._outPorts[outPort];
-    };
+            if (!comp._outPorts[outPort]) return new ub.Observable(function() {});
 
-    Component.connect = function(comp, inPort, observable) {
-        if (!comp instanceof Component) throw new Error("expected a Component as first argument");
+            return comp._outPorts[outPort];
+        },
 
-        var observer = comp._inPorts[inPort];
+        static: {
+            connect: function(comp, inPort, observable) {
+                if (!comp instanceof Component) throw new Error("expected a Component as first argument");
 
-        if (observer instanceof ub.Observer) return observable.subscribe(observer);
-        else return observer(observable);
-    };
+                var observer = comp._inPorts[inPort];
 
-    Component.extend = function(constructor) {
-        var Child = function(config) {
-            Component.call(this);
-            constructor.call(this, config);
-        };
-
-        Child.prototype = Object.create(Component.prototype);
-        Child.prototype.constructor = Child;
-
-        return Child;
-    };
+                if (observer instanceof ub.Observer) return observable.subscribe(observer);
+                else return observer(observable);
+            }
+        }
+    });
 
     ub.Component = Component;
 

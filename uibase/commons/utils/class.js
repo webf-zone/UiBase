@@ -49,9 +49,9 @@
         // The dummy class constructor
 
         function Class() {
-            // All construction is actually done in the init method
-            if ( !initializing && this.init )
-                this.init.apply(this, arguments);
+            // All construction is actually done in the construct method
+            if ( !initializing && this.construct )
+                this.construct.apply(this, arguments);
         }
 
         // Populate our constructed prototype object

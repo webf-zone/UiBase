@@ -1,13 +1,18 @@
 ;(function(ub) {
     "use strict";
 
-    ub.Observer = function(onNext, onError, onCompleted) {
-        this._onNext = onNext;
-        this._onError = onError;
-        this._onCompleted = onCompleted;
-    };
+    var Observer = ub.Utils.Class({
+        construct: function(onNext, onError, onCompleted) {
+            this._onNext = onNext;
+            this._onError = onError;
+            this._onCompleted = onCompleted;
+        },
 
-    ub.Observer.prototype.onNext = function() {
-        this._onNext.apply(this, arguments);
-    };
+        onNext: function() {
+            this._onNext.apply(this, arguments);
+        }
+    });
+
+    ub.Observer = Observer;
+
 })(window.uibase);
