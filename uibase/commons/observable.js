@@ -1,7 +1,9 @@
 ;(function(ub) {
     "use strict";
 
-    var Observable = ub.Utils.Class({
+    var utils = ub.Utils;
+
+    var Observable = utils.Class({
         construct: function(subscribe) {
             this._subscribe = subscribe;
         },
@@ -11,8 +13,21 @@
         map: function(mapper) {
             var o = this;
             return new Observable(function(observer) {
-                var ob = new ub.Observer(function(event) {
-                    observer.onNext(mapper.call(o, event));
+                observer = observer;
+                var ob = new ub.Observer(function(val) {
+                    observer.onNext(mapper.call(o, val));
+                });
+                o.subscribe(ob);
+            });
+        },
+        accumulate: function(seed, op) {
+            var o = this,
+                acc = seed;
+
+            return new Observable(function(observer) {
+                var ob = new ub.Observer(function(val) {
+                    acc = op(val, acc);
+                    observer.onNext(acc);
                 });
                 o.subscribe(ob);
             });
