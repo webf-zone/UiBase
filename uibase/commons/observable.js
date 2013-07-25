@@ -5,17 +5,29 @@
 
     var Observable = utils.Class({
         construct: function(subscribe) {
-            this._subscribe = utils.func(subscribe);
+            this._subscribe = subscribe;
         },
         subscribe: function(observer) {
-            return this._subscribe(utils.instanceOf(ub.Observer)(observer));
+            return this._subscribe(observer);
         },
         map: function(mapper) {
             var o = this;
             return new Observable(function(observer) {
-                observer = utils.instanceOf(ub.Observer)(observer);
-                var ob = new ub.Observer(function(event) {
-                    observer.onNext(mapper.call(o, event));
+                observer = observer;
+                var ob = new ub.Observer(function(val) {
+                    observer.onNext(mapper.call(o, val));
+                });
+                o.subscribe(ob);
+            });
+        },
+        accumulate: function(seed, op) {
+            var o = this,
+                acc = seed;
+
+            return new Observable(function(observer) {
+                var ob = new ub.Observer(function(val) {
+                    acc = op(val, acc);
+                    observer.onNext(acc);
                 });
                 o.subscribe(ob);
             });

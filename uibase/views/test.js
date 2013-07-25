@@ -12,28 +12,20 @@
 
             this._super();
 
-            v.select = new ub.Views.Selectbox({
-                items: [{
-                    value: 1,
-                    text: "One"
-                }, {
-                    value: 2,
-                    text: "Two"
-                }]
+            v.textbox = new ub.Views.Textbox();
+            v.lbl = new ub.Views.Label({ text: "No Value" });
+
+            var values = v.textbox.get("value").accumulate("", function(v, vpast) {
+                return vpast + " " + v;
             });
 
-            v.lbl = new ub.Views.Label({ text: "No Value" });
-            v.anotherLbl = new ub.Views.Label({ text: "No Value" });
-
-            ub.Component.connect(v.lbl, "text", v.select.get("value"));
-            ub.Component.connect(v.anotherLbl, "text", v.select.get("value").map(function(v) { return parseInt(v,10) + 1; }));
+            ub.Component.connect(v.lbl, "text", values);
         },
 
         render: function() {
             return $("<div>")
-                .append(this.select.render())
-                .append(this.lbl.render())
-                .append(this.anotherLbl.render());
+                .append(this.textbox.render())
+                .append(this.lbl.render());
         }
     });
 
