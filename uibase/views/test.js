@@ -19,7 +19,7 @@
                 return vpast + " " + v;
             });
 
-            ub.Component.connect(v.lbl, "text", values);
+            var dispose = ub.Component.connect(v.lbl, "text", values);
         },
 
         render: function() {
