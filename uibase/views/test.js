@@ -16,18 +16,18 @@
             }]
         });
 
-        v.lbl = new ub.Views.Label({ text: "No Value" });
-        v.anotherLbl = new ub.Views.Label({ text: "No Value" });
+        v.txtFld = new ub.Views.TextField({ value: "No Value" });
+        v.anotherTxtFld = new ub.Views.TextField({ value: "No Value" });
 
-        ub.Component.connect(v.lbl, "text", v.select.get("value"));
-        ub.Component.connect(v.anotherLbl, "text", v.select.get("value").map(function(v) { return parseInt(v,10) + 1; }));
+        ub.Component.connect(v.txtFld, "value", v.select.get("value"));
+        ub.Component.connect(v.anotherTxtFld, "value", v.select.get("value").map(function(v) { return parseInt(v,10) + 1; }));
     });
 
     Test.prototype.render = function() {
         return $("<div>")
             .append(this.select.render())
-            .append(this.lbl.render())
-            .append(this.anotherLbl.render());
+            .append(this.txtFld.render())
+            .append(this.anothertxtFld.render());
     };
 
     ub.Views.Test = Test;
