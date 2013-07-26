@@ -17,7 +17,7 @@
                 var ob = new ub.Observer(function(val) {
                     observer.onNext(mapper.call(o, val));
                 });
-                return o.subscribe(ob);
+                o.subscribe(ob);
             });
         },
         accumulate: function(seed, op) {
@@ -29,7 +29,7 @@
                     acc = op(val, acc);
                     observer.onNext(acc);
                 });
-                return o.subscribe(ob);
+                o.subscribe(ob);
             });
         },
         static: {

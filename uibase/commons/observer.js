@@ -1,11 +1,9 @@
 ;(function(ub) {
     "use strict";
 
-    var utils = ub.Utils;
-
-    var Observer = utils.Class({
+    var Observer = ub.Utils.Class({
         construct: function(onNext, onError, onCompleted) {
-            this._onNext = utils.func(onNext);
+            this._onNext = onNext;
             this._onError = onError;
             this._onCompleted = onCompleted;
         },
