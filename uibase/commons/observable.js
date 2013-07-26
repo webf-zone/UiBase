@@ -26,7 +26,7 @@
 
             return new Observable(function(observer) {
                 var ob = new ub.Observer(function(val) {
-                    acc = op(val, acc);
+                    acc = op(acc, val);
                     observer.onNext(acc);
                 });
                 return o.subscribe(ob);
