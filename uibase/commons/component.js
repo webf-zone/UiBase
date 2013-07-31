@@ -18,7 +18,7 @@
 
         static: {
             connect: function(comp, inPort, observable) {
-                if (!comp instanceof Component) throw new Error("expected a Component as first argument");
+                if (!(comp instanceof Component)) throw new Error("expected a Component as first argument");
 
                 var observer = comp._inPorts[inPort];
 
