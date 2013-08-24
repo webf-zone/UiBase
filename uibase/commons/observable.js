@@ -20,7 +20,7 @@
                 return o.subscribe(ob);
             });
         },
-        accumulate: function(seed, op) {
+        collate: function(seed, op) {
             var o = this,
                 acc = seed;
 
