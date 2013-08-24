@@ -5,46 +5,25 @@
 
     var Collate = ub.Utils.Class({
 
-        extends: ub.Component,
+        extends: ub.Components.Map,
 
         construct: function(seed, op) {
             this._acc = seed;
             this._op = op;
-            this._observers = [];
-        },
 
-        _setAcc: function(val) {
-            this._acc = val;
-            this._observers.forEach(function(observer) {
-                setTimeout(function() {
-                    // TODO: Decide the context
-                    observer.onNext.call(observer, this.acc);
-                }, 0);
+            this._super(function(val) {
+                return this._op(this._acc, val);
             });
         },
 
-        inPorts: {
-            input: new ub.Observer(function(val) {
-                this._setAcc(this._op(this._acc, val));
-            },
-            function(errors) {
-                //TODO: Define this function
-                this._error(errors);
-            },
-            function() {
-                //TODO: Define this function
-                this._completed();
-            })
-        },
-
-        outPorts: {
-            output: new ub.Observable(function(observer) {
-                this._observers.push(observer);
-                //TODO: Return a dispose function
-            })
+        _update: function(val) {
+            this._acc = val;
+            this._super(this._acc);
         }
     });
 
     ub.Components.Collate = Collate;
+    ub.Components.Foldp   = Collate;
+    ub.Components.Collect = Collate;
 
 })(window.uibase);
