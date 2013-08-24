@@ -3,7 +3,9 @@
 
     ub.Components = ub.Components || {};
 
-    var Collate = ub.createComponent({
+    var Collate = ub.Utils.Class({
+
+        extends: ub.Component,
 
         construct: function(seed, op) {
             this._acc = seed;
@@ -43,6 +45,6 @@
         }
     });
 
-    ub.Views.Collate = Collate;
+    ub.Components.Collate = Collate;
 
 })(window.uibase);
