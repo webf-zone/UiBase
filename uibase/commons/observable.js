@@ -5,10 +5,10 @@
 
     var Observable = utils.Class({
         construct: function(subscribe) {
-            this._subscribe = subscribe;
-        },
-        subscribe: function(observer) {
-            return this._subscribe(observer);
+            var dispatcher = new ub.Dispatcher(subscribe);
+
+            this.subscribe = dispatcher.subscribe;
+            this.hasObservers = dispatcher.hasObservers;
         },
         map: function(mapper) {
             var o = this;

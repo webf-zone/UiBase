@@ -8,38 +8,35 @@
         extends: ub.Component,
 
         construct: function(mapper) {
-            this._mapper = mapper;
-            this._observers = [];
+            var self = this;
+
+            self._super();
+
+            self._mapper = mapper;
+
+            self._outPorts = {
+                output: new ub.Observable(function(observer) {
+                    self._observer = observer;
+                })
+            };
+
+            self._inPorts = {
+                input: new ub.Observer(function(val) {
+                    self._update(self._mapper.call(self, val));
+                },
+                function(errors) {
+                    //TODO: Define this function
+                    self._error(errors);
+                },
+                function() {
+                    //TODO: Define this function
+                    self._completed();
+                })
+            };
         },
 
         _update: function(val) {
-            this._observers.forEach(function(observer) {
-                setTimeout(function() {
-                    // TODO: Decide the context
-                    observer.onNext.call(observer, val);
-                }, 0);
-            });
-        },
-
-        inPorts: {
-            input: new ub.Observer(function(val) {
-                this._update(this._mapper.call(this, val));
-            },
-            function(errors) {
-                //TODO: Define this function
-                this._error(errors);
-            },
-            function() {
-                //TODO: Define this function
-                this._completed();
-            })
-        },
-
-        outPorts: {
-            output: new ub.Observable(function(observer) {
-                this._observers.push(observer);
-                //TODO: Return a dispose function
-            })
+            this._observer.onNext(val);
         }
     });
 
@@ -47,3 +44,4 @@
     ub.Components.Lift = Map;
 
 })(window.uibase);
+
