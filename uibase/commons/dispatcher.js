@@ -5,7 +5,7 @@
 
     var Dispatcher = utils.Class({
         construct: function(subscribe) {
-            this._subscribe = subscribe;
+            this._subscribe = utils.func(subscribe);
             this._subscriptions = [];
         },
 
@@ -21,14 +21,20 @@
 
         push: function() {
             var args = Array.prototype.slice(arguments, 0);
+
             this._subscriptions.forEach(function(observer) {
-                observer.onNext.apply(observer, args);
+                if (observer) {
+                    setTimeout(function() {
+                        observer.onNext.apply(observer, args);
+                    }, 0);
+                }
             });
         },
 
-        subscribe: function(observer) {
+        subscribe: function(obs) {
             var oThis = this,
                 subscription,
+                observer = utils.instanceOf(ub.Observer)(obs),
                 unsubscribe = function() {};
 
             subscription = {
