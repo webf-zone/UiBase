@@ -17,23 +17,14 @@
         },
 
         static: {
-            connect: function(inComp, inPort, outComp, outPort) {
+            connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
 
-                if (!(inComp instanceof Component)) throw new Error("expected a Component as first argument");
+                sinkComp = ub.Utils.instanceOf(ub.Component)(sinkComp);
+                sourceComp = ub.Utils.instanceOf(ub.Component)(sinkComp);
 
-                var observer = inComp._inPorts[inPort],
-                    observable,
-                    dispose = function() {};
+                var observer = sinkComp._inPorts[sinkPort];
 
-                if (outComp instanceof ub.Observable) {
-                    observable = outComp;
-                } else {
-                    observable = outComp.get(outPort);
-                }
-
-                dispose = observable.subscribe(observer);
-
-                return dispose;
+                return sourceComp.get(sourcePort).subscribe(observer);
             }
         }
     });
