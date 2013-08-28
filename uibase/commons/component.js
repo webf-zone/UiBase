@@ -20,7 +20,7 @@
             connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
 
                 sinkComp = ub.Utils.instanceOf(ub.Component)(sinkComp);
-                sourceComp = ub.Utils.instanceOf(ub.Component)(sinkComp);
+                sourceComp = ub.Utils.instanceOf(ub.Component)(sourceComp);
 
                 var observer = sinkComp._inPorts[sinkPort];
 
