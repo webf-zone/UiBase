@@ -20,8 +20,9 @@
         },
 
         push: function() {
+            var args = Array.prototype.slice(arguments, 0);
             this._subscriptions.forEach(function(observer) {
-                observer.onNext.apply(observer, arguments);
+                observer.onNext.apply(observer, args);
             });
         },
 
