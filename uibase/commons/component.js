@@ -17,13 +17,23 @@
         },
 
         static: {
-            connect: function(comp, inPort, observable) {
-                if (!(comp instanceof Component)) throw new Error("expected a Component as first argument");
+            connect: function(inComp, inPort, outComp, outPort) {
 
-                var observer = comp._inPorts[inPort];
+                if (!(inComp instanceof Component)) throw new Error("expected a Component as first argument");
 
-                if (observer instanceof ub.Observer) return observable.subscribe(observer);
-                else return observer(observable);
+                var observer = inComp._inPorts[inPort],
+                    observable,
+                    dispose = function() {};
+
+                if (outComp instanceof ub.Observable) {
+                    observable = outComp;
+                } else {
+                    observable = outComp.get(outPort);
+                }
+
+                dispose = observable.subscribe(observer);
+
+                return dispose;
             }
         }
     });
