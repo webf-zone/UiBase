@@ -3,12 +3,28 @@
 
     var utils = ub.Utils;
 
+    /**
+     * Notify observers of a new value in an observable sequence. Each
+     * observable has an associated Dispatcher.
+     *
+     * @class Dispatcher
+     */
     var Dispatcher = utils.Class({
+
+        /**
+         * @class Dispatcher
+         * @constructor
+         * @param {Function} subscribe Associated observable's subscribe method.
+         */
         construct: function(subscribe) {
             this._subscribe = utils.func(subscribe);
             this._subscriptions = [];
         },
 
+        /**
+         * @method hasObservers
+         * @return {Boolean}
+         */
         hasObservers: function() {
             return this._subscriptions.length > 0;
         },
