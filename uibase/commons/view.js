@@ -10,6 +10,6 @@
         }
     });
 
-    ub.View = Component;
+    ub.View = View;
 
 })(window.uibase);

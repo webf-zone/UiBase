@@ -15,16 +15,10 @@
             v._text = config.text || "";
             v._el = $("<span>").text(v._text);
 
-            v._inPorts.text = function(observable) {
-                var ob = new ub.Observer(function(text) {
-                    v._text = text;
-                    v._el.text(text);
-                });
-                
-                v._outPorts.text = observable; //observable.clone()
-
-                return observable.subscribe(ob);
-            };
+            v._inPorts.text = new ub.Observer(function(text) {
+                v._text = text;
+                v._el.text(text);
+            });
         }
     });
 

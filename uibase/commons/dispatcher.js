@@ -36,9 +36,11 @@
         },
 
         push: function() {
-            var args = Array.prototype.slice(arguments, 0);
+            var args = Array.prototype.slice.call(arguments, 0);
 
-            this._subscriptions.forEach(function(observer) {
+            this._subscriptions.forEach(function(subscription) {
+                var observer = subscription.observer;
+
                 if (observer) {
                     setTimeout(function() {
                         observer.onNext.apply(observer, args);

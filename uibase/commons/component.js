@@ -11,7 +11,10 @@
         get: function(outPort) {
             var comp = this;
 
-            if (!comp._outPorts[outPort]) return new ub.Observable(function() {});
+            if (!comp._outPorts[outPort]) {
+                console.warn("No output " + outPort + " for component");
+                return new ub.Observable(function() {});
+            }
 
             return comp._outPorts[outPort];
         },

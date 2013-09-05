@@ -22,13 +22,13 @@
             /**
              * @method subscribe
              */
-            this.subscribe = dispatcher.subscribe;
+            this.subscribe = dispatcher.subscribe.bind(dispatcher);
 
             /**
              * @method hasObservers
              * @return {Boolean}
              */
-            this.hasObservers = dispatcher.hasObservers;
+            this.hasObservers = dispatcher.hasObservers.bind(dispatcher);
         },
 
         static: {

@@ -15,11 +15,7 @@
             v.textbox = new ub.Views.Textbox();
             v.lbl = new ub.Views.Label({ text: "No Value" });
 
-            var values = v.textbox.get("value").accumulate("", function(a, b) {
-                return a + " " + b;
-            });
-
-            var dispose = ub.Component.connect(v.lbl, "text", values);
+            var dispose = ub.Component.connect(v.textbox, "value", v.lbl, "text");
         },
 
         render: function() {
