@@ -11,7 +11,7 @@
             this._super(config);
 
             this._el = $("<input type=\"text\">");
-
+console.log(ub.Observable.fromEvent(this._el, "change"));
             this._outPorts.value = ub.Observable.fromEvent(this._el, "change").map(function(event) {
                 return $(event.target).val();
             });

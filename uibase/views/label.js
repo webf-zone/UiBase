@@ -5,7 +5,7 @@
 
     var Label = ub.Utils.Class({
 
-        extends: ub.Component,
+        extends: ub.View,
 
         construct: function(config) {
             var v = this;
@@ -16,17 +16,15 @@
             v._el = $("<span>").text(v._text);
 
             v._inPorts.text = function(observable) {
-                v._outPorts.text = observable; //observable.clone()
                 var ob = new ub.Observer(function(text) {
                     v._text = text;
                     v._el.text(text);
                 });
+                
+                v._outPorts.text = observable; //observable.clone()
+
                 return observable.subscribe(ob);
             };
-        },
-
-        render: function() {
-            return this._el;
         }
     });
 
