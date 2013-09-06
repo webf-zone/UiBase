@@ -1,245 +1,265 @@
-/*
- * UIBase Web Application Front-end Framework - Core
- * <http://www.uibase.net> | License: <http://www.uibase.net/license>
- * Copyright 2009-2013 Usable Bytes Pvt Ltd
- * @author Kumar Bhot <http://www.webuiarchitect.com>
- *
- */
+;(function (ub) {
+    "use strict";
 
-;(function($u) {
-"use strict";
+//http://localhost/UiBase/abc/login/5/
+//http://localhost/predeect/login/
 
-var UIBase = function() {};
+    function loadElement(url, isScript, cb) {
+        var el = document.createElement(isScript ? "script" : "link"),
+            headEl = document.head;
 
-if (typeof $u === "undefined") {
-
-    UIBase.prototype = {
-        //set environment
-        initialize: function() {
-            var oThis = this,
-                oUrl = oThis.parseUrl(window.location),
-                corePackages = JSON.parse(oThis.Utils
-                        .readFile("/uibase/packages.json"));
-
-            console.log(oUrl);
-            
-            if (typeof oUrl.path.page !== "undefined") {
-                oThis.pathInfo = oUrl;
-                oThis.prepareBase(corePackages);
-            }
-        },
-
-        prepareBase: function(oPkg) {
-            var oThis = this;
-
-            oThis.Utils.loadPackage(oPkg, "base");
-        },
-
-        onUIBaseReady: function() {
-            //$u;
-        },
-
-        //interpret the url
-        parseUrl: function(loc) {
-            var arrPath = [],
-                lenArrPath = 0,
-                oPath = {},
-                arrParams = [],
-                oParams = {},
-                sUrlParams = '';
-
-            if (typeof loc === "object") {
-                arrPath = $u.ArrayUtils.trimAll(loc.pathname.split('/'));
-                lenArrPath = arrPath.length;
-                sUrlParams = loc.search;
-
-                //path
-                switch (lenArrPath) {
-                    case 0:
-                        oPath = {
-                            "app": "default",
-                            "page": "default"
-                        };
-                        
-                        break;
-                    case 1:
-                        oPath = {
-                            "app": arrPath[0],
-                            "page": "default"
-                        };
-                        
-                        break;
-                    case 2:
-                        oPath = {
-                            "app": arrPath[0],
-                            "page": arrPath[1]
-                        };
-                        
-                        break;
-                    default:
-                        oPath = {
-                            "app": arrPath[0],
-                            "module": arrPath[1],
-                            "page": arrPath[2]
-                        };
-                        
-                        if (lenArrPath > 3) {
-                            arrPath.splice(3).forEach(function(e, i) {
-                                sUrlParams += "&uibase_param_" +
-                                        i + "=" + e + "&";
-                            });
-                        }
-                        
-                        break;
-                }
-                
-                arrParams = $u.ArrayUtils.trimAll
-                                (sUrlParams.replace('?', '').split('&'));
-
-                //query params
-                arrParams.forEach(function(i) {
-                    var arrParam = i.split('='),
-                        sKey = arrParam[0],
-                        sVal = arrParam[1];
-
-                    oParams[sKey] = sVal;
-                });
-
-                return {
-                    "path": oPath,
-                    "params": oParams
+        if (isScript) {
+            el.type = "text/javascript";
+            el.src = url;
+            if (typeof cb  === "function") {
+                el.onreadystatechange = function() {
+                    if (this.readyState === 'complete' || this.readyState === 'loaded') {
+                        cb();
+                    }
                 };
-            }/* else if (typeof loc === "string") {
-                //TODO:
-            } else {
-                //TODO: throw exception
-            }*/
+                el.onload = cb;
+            }
+        } else {
+            el.type = "text/css";
+            el.rel = "stylesheet";
+            el.href = url;
         }
-    };
 
-    $u = new UIBase();
+        headEl.appendChild(el);
+    }
 
-    $u.ArrayUtils = {
-        "trimAll": function(arr) {
-            var retArr = [];
+    function mergePackages(pkg1, pkg2) {
+        var packages = {},
+            pkgName,
+            props;
 
-            arr.forEach(function(i) {
-                if (typeof i !== "undefined" && i !== '') {
-                    retArr.push(i);
+        for (pkgName in pkg1) {
+            if (pkg1.hasOwnProperty(pkgName)) {
+                packages[pkgName] = pkg1[pkgName];
+            }
+        }
+
+        for (pkgName in pkg2) {
+            if (pkg2.hasOwnProperty(pkgName)) {
+                if (packages.hasOwnProperty(pkgName)) {
+                    //merging properties
+                    for (props in pkg2[pkgName]) {
+                        packages[pkgName][props] = pkg2[pkgName][props];
+                    }
+                }  else {
+                    packages[pkgName] = pkg2[pkgName];
                 }
-            });
-
-            return retArr;
+            }
         }
-    };
-    
-    $u.Utils = {
-        "readFile": function(sPath) {
-            var xhr = new XMLHttpRequest();
-            
-            xhr.open("GET", sPath, false);
-            xhr.send();
-            
-            return xhr.responseText;
+
+        return packages;
+    }
+
+    Object.defineProperties(ub, {
+        init: {
+            value: function () {
+                this.router = new ub.Router();
+                try {
+                    this.apps = JSON.parse(this.loadFile("/uibase/apps.json"));
+                    this.configApps();
+                    this.prepareBase();
+                } catch (ex) {
+                    throw new Error("Invalid application config");
+                }
+            }
         },
-        
-        "loadPackage": function(oPkg, sPkg) {
-            //var scripts, markup, styles, dependencies,
-            var    curPkg, targetPkg, basePath;
-                
-            if (typeof oPkg === "object") {
-                basePath = oPkg.basePath;
-                targetPkg = oPkg[sPkg];
-                
-                //basePath, targetPkg must exist
-                if (typeof basePath !== "undefined" &&
-                        typeof targetPkg === "object") {
-                        
-                    Object.keys(targetPkg).forEach(function(i) {
-                        curPkg = targetPkg[i];
-                        
-                        switch (i) {
-                            case "dependencies":
-                                if (typeof curPkg === "string") {
-                                    $u.Utils.loadPackage(oPkg, curPkg);
-                                } else if (Array.isArray(curPkg)) {
-                                    curPkg.forEach(function(p) {
-                                        $u.Utils.loadPackage(oPkg, p);
-                                    });
-                                }
-                                
-                                break;
-                            case "markup":
-                                
-                                
-                                break;
-                            case "scripts":
-                                if (typeof curPkg === "string") {
-                                    $u.Utils.loadScript(curPkg, basePath);
-                                } else if (Array.isArray(curPkg)) {
-                                    curPkg.forEach(function(p) {
-                                        $u.Utils.loadScript(p, basePath);
-                                    });
-                                }
-                            
-                                break;
-                            case "styles":
-                                if (typeof curPkg === "string") {
-                                    $u.Utils.loadStyle(curPkg, basePath);
-                                } else if (Array.isArray(curPkg)) {
-                                    curPkg.forEach(function(p) {
-                                        $u.Utils.loadStyle(p, basePath);
-                                    });
-                                }
-                                
-                                break;
-                            default:
-                                break;
+
+        configApps: {
+            value: function () {
+                var oThis = this,
+                    apps = oThis.apps,
+                    router = oThis.router;
+
+                Object.keys(apps).forEach(function (app) {
+                    router.bind(apps[app].url, function () {
+                        router.unbind(this.apps[app].url);
+                        this.loadApplication(app);
+                    }, oThis);
+                });
+            }
+        },
+
+        loadApplication: {
+            value: function (name) {
+                var oThis = this,
+                    app = oThis.apps[name];
+
+                oThis.loadFile(app.appFolder + "packages.json", true, function (resp) {
+                    try {
+                        oThis.configApplication(JSON.parse(resp));
+                    } catch (ex) {
+                        console.log(ex);
+                        throw new Error("Invalid application package");
+                    }
+                });
+            }
+        },
+
+        configApplication: {
+            value: function (appPkgs) {
+                var oThis = this,
+                    router = oThis.router;
+
+                Object.keys(appPkgs).forEach(function (packageName) {
+                    var pkg = appPkgs[packageName];
+                    pkg.basePath = appPkgs.basePath;
+                    if (pkg.hasOwnProperty("url")) {
+                        router.bind(pkg.url, function (params) {
+                            this.loadView(packageName, params);
+                        }, oThis);
+                    }
+                });
+                this.packageLoaded(mergePackages(this.basePackages, appPkgs));
+            }
+        },
+
+        loadView: {
+            value: function (pkgName, params) {
+                var oThis = this;
+
+                this.resolvePackage(pkgName, this.packages, function () {
+                    console.log("view loaded with params ", params);
+                    oThis.onLoad(params);
+                });
+            }
+        },
+
+        packageLoaded: {
+            value: function (packages) {
+                var oThis = this;
+
+                oThis.packages = packages;
+                oThis.resolvePackage("base", packages, function () {
+                    console.log("base loaded... routing now");
+                    oThis.router.route();
+                });
+            }
+        },
+
+        prepareBase: {
+            value: function () {
+                try {
+                    this.basePackages = JSON.parse(this.loadFile("/uibase/packages.json"));
+                    this.router.route();
+                } catch (ex) {
+                    throw new Error("Invalid base package");
+                }
+            }
+        },
+
+        loadFile: {
+            value: function (url, async, cb) {
+                var xhr = new XMLHttpRequest();
+
+                async = (async && typeof cb === "function");
+                xhr.open("GET", url, async);
+                if (async) {
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            cb(xhr.responseText);
                         }
-                    });
+                    };
                 }
+                xhr.send();
+                return xhr.responseText;
             }
         },
-        
-        //load single script file
-        "loadScript": function(file, sPath) {
-            var eleScript = document.createElement("script"),
-                docHead = document.getElementsByTagName("head")[0];
-                
-            if (typeof file === "string") {
-                eleScript.src = sPath + file;
-                docHead.appendChild(eleScript);
-            } else if (Array.isArray(file)) {
-                file.forEach(function(f) {
-                    eleScript.src = sPath + f;
-                    docHead.appendChild(eleScript);
+
+        loadCSSFiles: {
+            value: function (css) {
+                var loadedCSSFiles = {};
+
+                css.forEach(function (path) {
+                    if (!loadedCSSFiles[path]) {
+                        loadElement(path);
+                        loadedCSSFiles[path] = true;
+                    }
                 });
             }
         },
-        
-        //load single stylesheet
-        "loadStyle": function(file, sPath) {
-            var eleStyle = document.createElement("link"),
-                docHead = document.getElementsByTagName("head")[0];
-                
-            if (typeof file === "string") {
-                eleStyle.type = "text/css";
-                eleStyle.rel = "stylesheet";
-                eleStyle.href = sPath + file;
-                docHead.appendChild(eleStyle);
-            } else if (Array.isArray(file)) {
-                file.forEach(function(f) {
-                    eleStyle.type = "text/css";
-                    eleStyle.rel = "stylesheet";
-                    eleStyle.href = sPath + f;
-                    docHead.appendChild(eleStyle);
-                });
+
+        loadJSFiles: {
+            value: function (js, callback) {
+                var loadedjsFiles = {},
+                    i = 0,
+                    onFileLoad;
+
+                js = js.reverse();
+
+                onFileLoad = function() {
+                    i++;
+                    if (i < js.length) {
+                        if (loadedjsFiles[js[i]]) {
+                            onFileLoad();
+                        } else {
+                            loadElement(js[i], true, onFileLoad);
+                        }
+                    } else {
+                        callback();
+                    }
+                };
+
+                loadElement(js[i], true, onFileLoad);
             }
+        },
+
+        resolvePackage: {
+            value: function (pkgName, packages, callback) {
+                var js = [],
+                    css = [],
+                    resolvedNodes = {};
+
+                function resolveNode(nodeName) {
+                    var node = packages[nodeName],
+                        path = node.basePath || packages.basePath;
+
+                    if (Array.isArray(node.scripts)) {
+                        js.concat(node.scripts);
+                    } else if (typeof node.scripts === "string") {
+                        js.push(path + node.scripts);
+                    }
+
+                    if (Array.isArray(node.styles)) {
+                        css.concat(node.styles);
+                    } else if (typeof node.styles === "string") {
+                        css.push(path + node.styles);
+                    }
+
+                    resolvedNodes[nodeName] = true;
+
+                    if (Array.isArray(node.dependencies)) {
+                        node.dependencies.forEach(function (dependency) {
+                            if (!resolvedNodes[dependency] && packages[dependency]) {
+                                resolveNode(dependency);
+                            }
+                        });
+                    }
+                }
+
+                if (packages[pkgName]) {
+                    resolveNode(pkgName);
+                } else {
+                    throw new Error("Failed to resolve " + pkgName);
+                }
+                console.log(css, js, resolvedNodes);
+                this.loadCSSFiles(css);
+                this.loadJSFiles(js, callback);
+            }
+        },
+
+        onLoad: {
+            value: function (params) {
+                loginView(params);
+            },
+            writable: true
         }
-    };
+    });
 
-    window.uibase = $u;
-    $u.initialize();
+    ub.init();
 
-}
-})(window.uibase);
+})(window.UIBase);
