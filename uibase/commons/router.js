@@ -27,7 +27,7 @@
             });
 
             if (pattern !== '^') {
-                pattern += '$';
+                pattern += '/?$';
             } else {
                 pattern += '\\/';
             }
