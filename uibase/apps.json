@@ -1,0 +1,13 @@
+{
+    "predeect": {
+        "url": "/UiBase/.*",
+        "appFolder": "/default.app/"
+    },
+    "test": {
+        "url": "/test/abc/.*",
+        "appFolder": "/predeect.app/"
+    },
+    "main": {
+        "url": "main/.*"
+    }
+}

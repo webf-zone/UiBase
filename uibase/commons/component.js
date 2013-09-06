@@ -11,19 +11,23 @@
         get: function(outPort) {
             var comp = this;
 
-            if (!comp._outPorts[outPort]) return new ub.Observable(function() {});
+            if (!comp._outPorts[outPort]) {
+                console.warn("No output " + outPort + " for component");
+                return new ub.Observable(function() {});
+            }
 
             return comp._outPorts[outPort];
         },
 
         static: {
-            connect: function(comp, inPort, observable) {
-                if (!(comp instanceof Component)) throw new Error("expected a Component as first argument");
+            connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
 
-                var observer = comp._inPorts[inPort];
+                sinkComp = ub.Utils.instanceOf(ub.Component)(sinkComp);
+                sourceComp = ub.Utils.instanceOf(ub.Component)(sourceComp);
 
-                if (observer instanceof ub.Observer) return observable.subscribe(observer);
-                else return observer(observable);
+                var observer = sinkComp._inPorts[sinkPort];
+
+                return sourceComp.get(sourcePort).subscribe(observer);
             }
         }
     });
