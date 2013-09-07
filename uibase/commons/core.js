@@ -119,13 +119,13 @@
                 path = node.basePath || packages.basePath;
 
             if (Array.isArray(node.scripts)) {
-                js.concat(node.scripts);
+                js.concat(node.scripts); //TODO: handle path
             } else if (typeof node.scripts === "string") {
                 js.push(path + node.scripts);
             }
 
             if (Array.isArray(node.styles)) {
-                css.concat(node.styles);
+                css.concat(node.styles); //TODO: handle path
             } else if (typeof node.styles === "string") {
                 css.push(path + node.styles);
             }
