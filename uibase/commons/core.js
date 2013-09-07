@@ -28,6 +28,40 @@
         headEl.appendChild(el);
     }
 
+    function loadCSSFiles(css) {
+        var loadedCSSFiles = {};
+
+        css.forEach(function (path) {
+            if (!loadedCSSFiles[path]) {
+                loadElement(path);
+                loadedCSSFiles[path] = true;
+            }
+        });
+    }
+
+    function loadJSFiles(js, callback) {
+        var loadedjsFiles = {},
+            i = 0,
+            onFileLoad;
+
+        js = js.reverse();
+
+        onFileLoad = function() {
+            i++;
+            if (i < js.length) {
+                if (loadedjsFiles[js[i]]) {
+                    onFileLoad();
+                } else {
+                    loadElement(js[i], true, onFileLoad);
+                }
+            } else {
+                callback();
+            }
+        };
+
+        loadElement(js[i], true, onFileLoad);
+    }
+
     function mergePackages(pkg1, pkg2) {
         var packages = {},
             pkgName,
@@ -55,43 +89,102 @@
         return packages;
     }
 
+    function loadFile(url, async, cb) {
+        var xhr = new XMLHttpRequest();
+
+        async = (async && typeof cb === "function");
+        xhr.open("GET", url, async);
+        if (async) {
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    cb(xhr.responseText);
+                }
+            };
+        }
+        xhr.send();
+        return xhr.responseText;
+    }
+
+    function resolvePackage(pkgName, packages, callback) {
+        var js = [],
+            css = [],
+            resolvedNodes = {};
+
+        if (!packages.hasOwnProperty(pkgName)) {
+            throw new Error("cannot find package --> " + pkgName);
+        }
+
+        function resolveNode(nodeName) {
+            var node = packages[nodeName],
+                path = node.basePath || packages.basePath;
+
+            if (Array.isArray(node.scripts)) {
+                js.concat(node.scripts);
+            } else if (typeof node.scripts === "string") {
+                js.push(path + node.scripts);
+            }
+
+            if (Array.isArray(node.styles)) {
+                css.concat(node.styles);
+            } else if (typeof node.styles === "string") {
+                css.push(path + node.styles);
+            }
+
+            resolvedNodes[nodeName] = true;
+
+            if (Array.isArray(node.dependencies)) {
+                node.dependencies.forEach(function (dependency) {
+                    if (!resolvedNodes[dependency] && packages[dependency]) {
+                        resolveNode(dependency);
+                    }
+                });
+            }
+        }
+
+        if (packages[pkgName]) {
+            resolveNode(pkgName);
+        } else {
+            throw new Error("Failed to resolve " + pkgName);
+        }
+        loadCSSFiles(css);
+        loadJSFiles(js, callback);
+    }
+
+
     Object.defineProperties(ub, {
         init: {
             value: function () {
                 this.router = new ub.Router();
                 try {
-                    this.apps = JSON.parse(this.loadFile("/uibase/apps.json"));
-                    this.configApps();
-                    this.prepareBase();
+                    this.apps = JSON.parse(loadFile("/uibase/apps.json"));
+                    this._configApps();
+                    this._loadBasePackages();
                 } catch (ex) {
                     throw new Error("Invalid application config");
                 }
             }
         },
 
-        configApps: {
+        _loadBasePackages: {
             value: function () {
-                var oThis = this,
-                    apps = oThis.apps,
-                    router = oThis.router;
-
-                Object.keys(apps).forEach(function (app) {
-                    router.bind(apps[app].url, function () {
-                        router.unbind(this.apps[app].url);
-                        this.loadApplication(app);
-                    }, oThis);
-                });
+                try {
+                    this.packages = JSON.parse(loadFile("/uibase/packages.json"));
+                    console.log("application config loaded... routing now");
+                    this.router.route();
+                } catch (ex) {
+                    throw new Error("Invalid base package");
+                }
             }
         },
 
-        loadApplication: {
+        _loadApplicationPackages: {
             value: function (name) {
                 var oThis = this,
                     app = oThis.apps[name];
 
-                oThis.loadFile(app.appFolder + "packages.json", true, function (resp) {
+                loadFile(app.appFolder + "packages.json", true, function (resp) {
                     try {
-                        oThis.configApplication(JSON.parse(resp));
+                        oThis._initApplication(JSON.parse(resp));
                     } catch (ex) {
                         console.log(ex);
                         throw new Error("Invalid application package");
@@ -100,155 +193,53 @@
             }
         },
 
-        configApplication: {
+        _configApps: {
+            value: function () {
+                var oThis = this,
+                    apps = oThis.apps,
+                    router = oThis.router;
+
+                Object.keys(apps).forEach(function (app) {
+                    router.bind(apps[app].url, function () {
+                        router.unbind(this.apps[app].url);
+                        this._loadApplicationPackages(app);
+                    }, oThis);
+                });
+            }
+        },
+
+        _initApplication: {
             value: function (appPkgs) {
                 var oThis = this,
                     router = oThis.router;
 
                 Object.keys(appPkgs).forEach(function (packageName) {
                     var pkg = appPkgs[packageName];
+
                     pkg.basePath = appPkgs.basePath;
+
                     if (pkg.hasOwnProperty("url")) {
                         router.bind(pkg.url, function (params) {
-                            this.loadView(packageName, params);
+                            this._loadView(packageName, params);
                         }, oThis);
                     }
                 });
-                this.packageLoaded(mergePackages(this.basePackages, appPkgs));
-            }
-        },
-
-        loadView: {
-            value: function (pkgName, params) {
-                var oThis = this;
-
-                this.resolvePackage(pkgName, this.packages, function () {
-                    console.log("view loaded with params ", params);
-                    oThis.onLoad(params);
-                });
-            }
-        },
-
-        packageLoaded: {
-            value: function (packages) {
-                var oThis = this;
-
-                oThis.packages = packages;
-                oThis.resolvePackage("base", packages, function () {
+                this.packages = mergePackages(this.packages, appPkgs);
+                resolvePackage("base", this.packages, function () {
                     console.log("base loaded... routing now");
                     oThis.router.route();
                 });
             }
         },
 
-        prepareBase: {
-            value: function () {
-                try {
-                    this.basePackages = JSON.parse(this.loadFile("/uibase/packages.json"));
-                    this.router.route();
-                } catch (ex) {
-                    throw new Error("Invalid base package");
-                }
-            }
-        },
+        _loadView: {
+            value: function (pkgName, params) {
+                var oThis = this;
 
-        loadFile: {
-            value: function (url, async, cb) {
-                var xhr = new XMLHttpRequest();
-
-                async = (async && typeof cb === "function");
-                xhr.open("GET", url, async);
-                if (async) {
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState === 4 && xhr.status === 200) {
-                            cb(xhr.responseText);
-                        }
-                    };
-                }
-                xhr.send();
-                return xhr.responseText;
-            }
-        },
-
-        loadCSSFiles: {
-            value: function (css) {
-                var loadedCSSFiles = {};
-
-                css.forEach(function (path) {
-                    if (!loadedCSSFiles[path]) {
-                        loadElement(path);
-                        loadedCSSFiles[path] = true;
-                    }
+                resolvePackage(pkgName, this.packages, function () {
+                    console.log("view loaded with params ", params);
+                    oThis.onLoad(params);
                 });
-            }
-        },
-
-        loadJSFiles: {
-            value: function (js, callback) {
-                var loadedjsFiles = {},
-                    i = 0,
-                    onFileLoad;
-
-                js = js.reverse();
-
-                onFileLoad = function() {
-                    i++;
-                    if (i < js.length) {
-                        if (loadedjsFiles[js[i]]) {
-                            onFileLoad();
-                        } else {
-                            loadElement(js[i], true, onFileLoad);
-                        }
-                    } else {
-                        callback();
-                    }
-                };
-
-                loadElement(js[i], true, onFileLoad);
-            }
-        },
-
-        resolvePackage: {
-            value: function (pkgName, packages, callback) {
-                var js = [],
-                    css = [],
-                    resolvedNodes = {};
-
-                function resolveNode(nodeName) {
-                    var node = packages[nodeName],
-                        path = node.basePath || packages.basePath;
-
-                    if (Array.isArray(node.scripts)) {
-                        js.concat(node.scripts);
-                    } else if (typeof node.scripts === "string") {
-                        js.push(path + node.scripts);
-                    }
-
-                    if (Array.isArray(node.styles)) {
-                        css.concat(node.styles);
-                    } else if (typeof node.styles === "string") {
-                        css.push(path + node.styles);
-                    }
-
-                    resolvedNodes[nodeName] = true;
-
-                    if (Array.isArray(node.dependencies)) {
-                        node.dependencies.forEach(function (dependency) {
-                            if (!resolvedNodes[dependency] && packages[dependency]) {
-                                resolveNode(dependency);
-                            }
-                        });
-                    }
-                }
-
-                if (packages[pkgName]) {
-                    resolveNode(pkgName);
-                } else {
-                    throw new Error("Failed to resolve " + pkgName);
-                }
-                console.log(css, js, resolvedNodes);
-                this.loadCSSFiles(css);
-                this.loadJSFiles(js, callback);
             }
         },
 
