@@ -78,7 +78,8 @@
                 if (packages.hasOwnProperty(pkgName)) {
                     //merging properties
                     for (props in pkg2[pkgName]) {
-                        packages[pkgName][props] = pkg2[pkgName][props];
+                        if (pkgName !== "basePath")
+                            packages[pkgName][props] = pkg2[pkgName][props];
                     }
                 }  else {
                     packages[pkgName] = pkg2[pkgName];

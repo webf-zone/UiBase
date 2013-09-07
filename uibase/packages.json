@@ -2,11 +2,11 @@
     "basePath": "/uibase/",
     
     "jQuery": {
-        "scripts": "commons/external/jquery.js"
+        "scripts": "/commons/external/jquery.js"
     },
     
     "base": {
-        "styles": "commons/core.css",
+        "styles": "/commons/core.css",
         "dependencies": ["jQuery"]
     }
 }
