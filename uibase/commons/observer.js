@@ -20,7 +20,7 @@
          *   sequence ends.
          */
         construct: function(onNext, onError, onCompleted) {
-            this._onNext = onNext;
+            this._onNext = utils.func(onNext);
             this._onError = onError;
             this._onCompleted = onCompleted;
         },
@@ -37,4 +37,4 @@
 
     ub.Observer = Observer;
 
-}) (window.uibase);
+})(window.uibase);
