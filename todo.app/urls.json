@@ -1,0 +1,6 @@
+{
+    "app": {
+        "view": "TodoApp",
+        "package": "v.todoapp"
+    }
+}

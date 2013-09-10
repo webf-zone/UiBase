@@ -14,6 +14,10 @@
         };
     };
 
+    utils.error = function(e) {
+        return (console && typeof console.error === "function") ? console.error(e.message) : 0;
+    };
+
     utils.arr = classOf("Array");
     utils.date = classOf("Date");
     utils.re = classOf("RegExp");
@@ -22,7 +26,7 @@
     var typeOf = function(s) {
         return function(v) {
             if (typeof v !== s) {
-                throw new TypeError("Expected a" + (s === "object" ? "n" : "") + s + ".");
+                utils.error(new TypeError("Expected a " + (s === "object" ? "n" : "") + s + "."));
             }
             return v;
         };
@@ -37,8 +41,9 @@
     // Creates a contract for an object inheriting from ctor
     utils.instanceOf = function(ctor) {
         return function(inst) {
+            var msg = msg || "Expected an instance of " + ctor.prototype.constructor;
             if (!(inst instanceof ctor)) {
-                throw new TypeError("Expected an instance of " + ctor);
+                utils.error(new TypeError(msg));
             }
             return inst;
         };
@@ -47,7 +52,7 @@
     // Asserts n is a signed 32-bit number
     utils.int32 = function(n) {
         if ((n | 0) !== n) {
-            throw new TypeError("Expected a 32-bit integer.");
+            utils.error(new TypeError("Expected a 32-bit integer."));
         }
         return n;
     };
@@ -55,7 +60,7 @@
     // Asserts int32 and nonnegative
     utils.nat32 = function(n) {
         if ((n | 0) !== n || n < 0) {
-            throw new TypeError("Expected a 32-bit natural.");
+            utils.error(new TypeError("Expected a 32-bit natural."));
         }
         return n;
     };

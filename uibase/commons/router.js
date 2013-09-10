@@ -2,7 +2,7 @@
     "use strict";
 
     /* jshint boss:true */
-    ub = ub || (window.UIBase = Object.create(null));
+    ub = ub || (window.uibase = Object.create(null));
 
     function pathToRegEx (path) {
         var regX,

@@ -1,0 +1,9 @@
+{
+    "predeect/": {
+        "include": "/predeect.app/"
+    },
+
+    "todos/": {
+        "include": "/todo.app/"
+    }
+}

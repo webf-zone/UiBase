@@ -120,7 +120,9 @@
                 path = node.basePath || packages.basePath;
 
             if (Array.isArray(node.scripts)) {
-                js.concat(node.scripts); //TODO: handle path
+                js = js.concat(node.scripts.map(function(script) {
+                    return path + script;
+                })); //TODO: handle path
             } else if (typeof node.scripts === "string") {
                 js.push(path + node.scripts);
             }
@@ -155,14 +157,65 @@
     Object.defineProperties(ub, {
         init: {
             value: function () {
+                var oThis = this;
                 this.router = new ub.Router();
                 try {
-                    this.apps = JSON.parse(loadFile("/uibase/apps.json"));
-                    this._configApps();
                     this._loadBasePackages();
+                    resolvePackage("base", this.packages, function () {
+                        console.log("base loaded...");
+                        oThis._readUrls(JSON.parse(loadFile("/uibase/urls.json")));
+                    });
                 } catch (ex) {
                     throw new Error("Invalid application config");
                 }
+            }
+        },
+
+        _readUrls: {
+            value: function(urls, parentUrl) {
+                var oThis = this,
+                    router = this.router;
+
+                Object.keys(urls).forEach(function(url) {
+                    var routeUrl = (parentUrl ? parentUrl : "") + url;
+
+                    if (urls[url].include) {
+                        router.bind(routeUrl + ".*", function() {
+                            router.unbind(routeUrl + ".*");
+
+                            loadFile(urls[url].include + "packages.json", true, function (resp) {
+                                try {
+                                    oThis._readPackages(JSON.parse(resp));
+                                } catch (ex) {
+                                    console.log(ex);
+                                    throw new Error("Invalid application package");
+                                }
+                            });
+
+                            loadFile(urls[url].include + "urls.json", true, function (urls) {
+                                oThis._readUrls(JSON.parse(urls), routeUrl);
+                            });
+                        });
+                    } else {
+                        router.bind(routeUrl, function (params) {
+                            this._loadView(urls[url], params);
+                        }, oThis);
+                    }
+                    router.route();
+                });
+            }
+        },
+
+        _readPackages: {
+            value: function (appPkgs) {
+                var oThis = this;
+
+                Object.keys(appPkgs).forEach(function (packageName) {
+                    var pkg = appPkgs[packageName];
+
+                    pkg.basePath = appPkgs.basePath;
+                });
+                this.packages = mergePackages(this.packages, appPkgs);
             }
         },
 
@@ -170,83 +223,33 @@
             value: function () {
                 try {
                     this.packages = JSON.parse(loadFile("/uibase/packages.json"));
-                    console.log("application config loaded... routing now");
-                    this.router.route();
+                    console.log("base package loaded...");
                 } catch (ex) {
                     throw new Error("Invalid base package");
                 }
             }
         },
 
-        _loadApplicationPackages: {
-            value: function (name) {
-                var oThis = this,
-                    app = oThis.apps[name];
-
-                loadFile(app.appFolder + "packages.json", true, function (resp) {
-                    try {
-                        oThis._initApplication(JSON.parse(resp));
-                    } catch (ex) {
-                        console.log(ex);
-                        throw new Error("Invalid application package");
-                    }
-                });
-            }
-        },
-
-        _configApps: {
-            value: function () {
-                var oThis = this,
-                    apps = oThis.apps,
-                    router = oThis.router;
-
-                Object.keys(apps).forEach(function (app) {
-                    router.bind(apps[app].url, function () {
-                        router.unbind(this.apps[app].url);
-                        this._loadApplicationPackages(app);
-                    }, oThis);
-                });
-            }
-        },
-
-        _initApplication: {
-            value: function (appPkgs) {
-                var oThis = this,
-                    router = oThis.router;
-
-                Object.keys(appPkgs).forEach(function (packageName) {
-                    var pkg = appPkgs[packageName];
-
-                    pkg.basePath = appPkgs.basePath;
-
-                    if (pkg.hasOwnProperty("url")) {
-                        router.bind(pkg.url, function (params) {
-                            this._loadView(packageName, params);
-                        }, oThis);
-                    }
-                });
-                this.packages = mergePackages(this.packages, appPkgs);
-                resolvePackage("base", this.packages, function () {
-                    console.log("base loaded... routing now");
-                    oThis.router.route();
-                });
-            }
-        },
-
         _loadView: {
-            value: function (pkgName, params) {
+            value: function (urlEntry, params) {
                 var oThis = this;
+
+                var pkgName = urlEntry.package;
 
                 resolvePackage(pkgName, this.packages, function () {
                     console.log("view loaded with params ", params);
-                    oThis.onLoad(params);
+                    oThis.onLoad(urlEntry.view, params);
                 });
             }
         },
 
         onLoad: {
-            value: function (params) {
-                loginView(params);
+            value: function (view, params) {
+                var ViewName = ub.Views[view];
+
+                var currentView = new ViewName();
+
+                $("body").append(currentView.render());
             },
             writable: true
         }
@@ -254,4 +257,4 @@
 
     ub.init();
 
-})(window.UIBase);
+})(window.uibase);

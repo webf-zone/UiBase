@@ -64,10 +64,6 @@
         // And make this class extendable
         //Class.extend = arguments.callee;
 
-        Class.prototype.map = function() {
-            Array.prototype.map.apply(this, arguments);
-        }
-
         return Class;
     };
 
@@ -90,6 +86,8 @@
 
         //TODO: Find a better way to inherit static properties
         if (parent) utils.extend(Child, parent);
+
+        Child.prototype.constructor = config.construct;
 
         return Child;
     };

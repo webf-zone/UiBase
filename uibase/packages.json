@@ -4,9 +4,54 @@
     "jQuery": {
         "scripts": "/commons/external/jquery.js"
     },
+
+    "baseUtils": {
+        "dependencies": ["jQuery"],
+        "scripts": "/commons/utils/utils.js"
+    },
+
+    "utils": {
+        "dependencies": ["baseUtils"],
+        "scripts": [
+            "/commons/utils/class.js",
+            "/commons/utils/contracts.js"
+        ]
+    },
+
+    "observer": {
+        "dependencies": ["utils"],
+        "scripts": "/commons/observer.js"
+    },
+
+    "observable": {
+        "dependencies": ["observer"],
+        "scripts": [
+            "/commons/dispatcher.js",
+            "/commons/observable.js"
+        ]
+    },
     
+    "baseComponent": {
+        "dependencies": ["observable"],
+        "scripts": "/commons/component.js"
+    },
+
     "base": {
         "styles": "/commons/core.css",
-        "dependencies": ["jQuery"]
+        "dependencies": ["baseComponent"]
+    },
+
+    "compMap": {
+        "scripts": "/components/map.js"
+    },
+
+    "compCollect": {
+        "dependencies": ["compMap"],
+        "scripts": "/components/collate.js"
+    },
+
+    "compTextbox": {
+        "dependencies": ["compMap"],
+        "scripts": "/views/textbox.js"
     }
 }

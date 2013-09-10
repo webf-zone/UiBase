@@ -15,7 +15,12 @@
             v.textbox = new ub.Views.Textbox();
             v.lbl = new ub.Views.Label({ text: "No Value" });
 
-            var dispose = ub.Component.connect(v.textbox, "value", v.lbl, "text");
+            var collateText = new ub.Components.Collate("", function(acc, val) {
+                return acc + val;
+            });
+
+            ub.Component.connect(v.textbox, "value", collateText, "input");
+            var dispose = ub.Component.connect(collateText, "output", v.lbl, "text");
         },
 
         render: function() {

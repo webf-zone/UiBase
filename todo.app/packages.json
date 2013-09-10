@@ -1,0 +1,24 @@
+{
+    "basePath": "/todo.app/",
+
+    "m.todo": {
+        "scripts": "models/todo.js"
+    },
+
+    "v.todoapp": {
+        "dependencies": ["compCollect", "compTextbox"],
+        "markup": "components/todoapp.html",
+        "scripts": "views/todoapp.js",
+        "styles": "views/todoapp.css"
+    },
+
+    "default": {
+        "dependencies": "todos"
+    },
+
+    "todos": {
+        "dependencies": ["m.todo", "v.todos", "compTextbox"],
+        "scripts": "todoapp.js",
+        "styles": "todoapp.css"
+    }
+}

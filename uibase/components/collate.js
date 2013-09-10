@@ -9,7 +9,7 @@
 
         construct: function(seed, op) {
             this._acc = seed;
-            this._op = op;
+            this._op = ub.Utils.func(op);
 
             this._super(function(val) {
                 return this._op(this._acc, val);
