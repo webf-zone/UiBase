@@ -22,7 +22,9 @@
 
             self._inPorts = {
                 sampleOn: new ub.Observer(function() {
-                    self._update();
+                    if (self._observer) {
+                        self._update();
+                    }
                 },
                 function(errors) {
                     //TODO: Define this function

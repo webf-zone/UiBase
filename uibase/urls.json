@@ -5,5 +5,10 @@
 
     "todos/": {
         "include": "/todo.app/"
+    },
+
+    "textbox": {
+        "view": "Textbox",
+        "package": "compTextbox"
     }
 }

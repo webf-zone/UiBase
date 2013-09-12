@@ -34,7 +34,6 @@
                         // Add a new ._super() method that is the same method
                         // but on the super-class
                         this._super = _super[name];
-                        console.log(_super[name]);
 
                         // The method only need to be bound temporarily, so we
                         // remove it when we're done executing

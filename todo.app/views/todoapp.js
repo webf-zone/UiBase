@@ -15,13 +15,23 @@
             this._super();
 
             v.textbox = new ub.Views.Textbox();
-            v.collectTodo = new ub.Components.Collect([], function(acc, val) {
-                acc.push(val);
+            var enterFilter = new ub.Components.Filter(function(e) {
+                return e.which === 13;
             });
-            //v.todolist = new ub.Collection(ub.Models.Todo);
 
-            comp.connect(v.textbox, "value", v.collectTodo, "input");
-            //comp.connect(v.collectTodo, "output", v.todolistview, "data");
+            var sampleOn = new ub.Components.SampleOn();
+
+            var collectTodo = new ub.Components.Collate([], function(acc, val) {
+                acc.push(val);
+                console.log(acc);
+            });
+
+            ub.Component.connect(v.textbox, "keypress", enterFilter, "input");
+
+            ub.Component.connect(v.textbox, "value", sampleOn, "value");
+            ub.Component.connect(enterFilter, "output", sampleOn, "sampleOn");
+
+            ub.Component.connect(sampleOn, "output", collectTodo, "input");
         },
 
         render: function() {

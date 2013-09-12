@@ -53,5 +53,13 @@
     "compTextbox": {
         "dependencies": ["compMap"],
         "scripts": "/views/textbox.js"
+    },
+
+    "compFilter": {
+        "scripts": "/components/filter.js"
+    },
+
+    "compSampleOn": {
+        "scripts": "/components/sampleOn.js"
     }
 }

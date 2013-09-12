@@ -30,14 +30,16 @@
                     //TODO: Define this function
                     self._completed();
                 }),
-                stream2: new ub.Observer(function(val) {
+                stream2: new ub.Observer(function() {
                     self._update.apply(self, Array.prototype.slice.call(arguments, 0));
                 })
             };
         },
 
         _update: function() {
-            this._observer.onNext.apply(this._observer, Array.prototype.slice.call(arguments, 0));
+            if (this._observer) {
+                this._observer.onNext.apply(this._observer, Array.prototype.slice.call(arguments, 0));
+            }
         }
     });
 

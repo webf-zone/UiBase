@@ -16,13 +16,15 @@
 
             self._outPorts = {
                 output: new ub.Observable(function(observer) {
-                    self._observer = observer;
+                    self._observer = ub.Utils.instanceOf(ub.Observer)(observer);
                 })
             };
 
             self._inPorts = {
                 input: new ub.Observer(function(val) {
-                    self._update(self._mapper.call(self, val));
+                    if (self._observer) {
+                        self._update(self._mapper.call(self, val));
+                    }
                 },
                 function(errors) {
                     //TODO: Define this function

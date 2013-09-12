@@ -6,7 +6,7 @@
     },
 
     "v.todoapp": {
-        "dependencies": ["compCollect", "compTextbox"],
+        "dependencies": ["compCollect", "compTextbox", "compFilter", "compSampleOn"],
         "markup": "components/todoapp.html",
         "scripts": "views/todoapp.js",
         "styles": "views/todoapp.css"

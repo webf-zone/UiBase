@@ -8,11 +8,13 @@
         extends: ub.Components.Map,
 
         construct: function(seed, op) {
+            var oThis = this;
+
             this._acc = seed;
             this._op = ub.Utils.func(op);
 
             this._super(function(val) {
-                return this._op(this._acc, val);
+                return oThis._op(oThis._acc, val);
             });
         },
 
@@ -24,6 +26,5 @@
 
     ub.Components.Collate = Collate;
     ub.Components.Foldp   = Collate;
-    ub.Components.Collect = Collate;
 
 })(window.uibase);
