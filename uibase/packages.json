@@ -2,64 +2,74 @@
     "basePath": "/uibase/",
     
     "jQuery": {
-        "scripts": "/commons/external/jquery.js"
+        "scripts": "commons/external/jquery.js"
     },
 
     "baseUtils": {
         "dependencies": ["jQuery"],
-        "scripts": "/commons/utils/utils.js"
+        "scripts": "commons/utils/utils.js"
     },
 
     "utils": {
         "dependencies": ["baseUtils"],
         "scripts": [
-            "/commons/utils/class.js",
-            "/commons/utils/contracts.js"
+            "commons/utils/class.js",
+            "commons/utils/contracts.js"
         ]
     },
 
     "observer": {
         "dependencies": ["utils"],
-        "scripts": "/commons/observer.js"
+        "scripts": "commons/observer.js"
     },
 
     "observable": {
         "dependencies": ["observer"],
         "scripts": [
-            "/commons/dispatcher.js",
-            "/commons/observable.js"
+            "commons/dispatcher.js",
+            "commons/observable.js"
         ]
     },
     
     "baseComponent": {
         "dependencies": ["observable"],
-        "scripts": "/commons/component.js"
+        "scripts": "commons/component.js"
     },
 
     "base": {
-        "styles": "/commons/core.css",
-        "dependencies": ["baseComponent"]
+        "dependencies": ["baseComponent"],
+        "scripts": "commons/model.js",
+        "styles": "commons/core.css"
     },
 
     "compMap": {
-        "scripts": "/components/map.js"
+        "scripts": "components/map.js"
     },
 
-    "compCollect": {
+    "compCollate": {
         "dependencies": ["compMap"],
-        "scripts": "/components/collate.js"
+        "scripts": "components/collate.js"
     },
 
     "compTextbox": {
         "dependencies": ["compMap"],
-        "scripts": "/views/textbox.js"
+        "scripts": "views/textbox.js"
     },
 
     "compFilter": {
-        "scripts": "/components/filter.js"
+        "scripts": "components/filter.js"
     },
 
     "compSampleOn": {
-        "scripts": "/components/sampleOn.js"
+        "scripts": "components/sampleOn.js"
+    },
+
+    "compMerge": {
+        "scripts": "components/merge.js"
+    },
+
+    "compWrite": {
+        "dependencies": ["compMap"],
+        "scripts": "components/write.js"
     }
 }

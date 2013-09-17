@@ -14,7 +14,7 @@
 
             var value = new ub.Component();
 
-            value._outPorts.output = ub.Observable.fromEvent(this._el, "change");
+            value._outPorts.output = ub.Observable.fromEvent(this._el, "input");
 
             var valueMap = new ub.Components.Map(function(event) {
                 return $(event.target).val();

@@ -1,8 +1,6 @@
 ;(function(ub) {
     "use strict";
 
-    var comp = ub.Component;
-
     ub.Views = ub.Views || {};
 
     var TodoApp = ub.Utils.Class({
@@ -21,17 +19,29 @@
 
             var sampleOn = new ub.Components.SampleOn();
 
+            var todoFactory = new ub.Factories.TodoFactory();
+
             var collectTodo = new ub.Components.Collate([], function(acc, val) {
                 acc.push(val);
-                console.log(acc);
+                return acc;
             });
 
-            ub.Component.connect(v.textbox, "keypress", enterFilter, "input");
+            var serializeTodos = new ub.Components.Map(function(todos) {
+                return JSON.stringify(todos);
+            });
 
-            ub.Component.connect(v.textbox, "value", sampleOn, "value");
-            ub.Component.connect(enterFilter, "output", sampleOn, "sampleOn");
+            var writer = new ub.Components.Write("uibase-todos");
 
-            ub.Component.connect(sampleOn, "output", collectTodo, "input");
+            var mergeWrites = new ub.Components.Merge();
+
+            ub.Component.connect(v.textbox,      "keypress", enterFilter,    "input");
+            ub.Component.connect(v.textbox,      "value",    sampleOn,       "value");
+            ub.Component.connect(enterFilter,    "output",   sampleOn,       "sampleOn");
+            ub.Component.connect(sampleOn,       "output",   todoFactory,    "input");
+            ub.Component.connect(todoFactory,    "output",   collectTodo,    "input");
+            ub.Component.connect(collectTodo,    "output",   serializeTodos, "input");
+            ub.Component.connect(serializeTodos, "output",   writer,         "input");
+            ub.Component.connect(writer,         "output",   mergeWrites,    "stream1");
         },
 
         render: function() {

@@ -16,11 +16,6 @@
             this._super(function(val) {
                 return oThis._op(oThis._acc, val);
             });
-        },
-
-        _update: function(val) {
-            this._acc = val;
-            this._super(this._acc);
         }
     });
 

@@ -44,8 +44,6 @@
             i = 0,
             onFileLoad;
 
-        js = js.reverse();
-
         onFileLoad = function() {
             i++;
             if (i < js.length) {
@@ -119,6 +117,14 @@
             var node = packages[nodeName],
                 path = node.basePath || packages.basePath;
 
+            if (Array.isArray(node.dependencies)) {
+                node.dependencies.forEach(function (dependency) {
+                    if (!resolvedNodes[dependency] && packages[dependency]) {
+                        resolveNode(dependency);
+                    }
+                });
+            }
+
             if (Array.isArray(node.scripts)) {
                 js = js.concat(node.scripts.map(function(script) {
                     return path + script;
@@ -134,14 +140,6 @@
             }
 
             resolvedNodes[nodeName] = true;
-
-            if (Array.isArray(node.dependencies)) {
-                node.dependencies.forEach(function (dependency) {
-                    if (!resolvedNodes[dependency] && packages[dependency]) {
-                        resolveNode(dependency);
-                    }
-                });
-            }
         }
 
         if (packages[pkgName]) {
