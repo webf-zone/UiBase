@@ -1,6 +1,9 @@
 ;(function (ub) {
     "use strict";
 
+    /* jshint boss:true */
+    ub = ub || (window.uibase = Object.create(null));
+
 //http://localhost/UiBase/abc/login/5/
 //http://localhost/predeect/login/
 
@@ -158,12 +161,12 @@
         init: {
             value: function () {
                 var oThis = this;
-                this.router = new ub.Router();
                 try {
-                    this._loadBasePackages();
+                    oThis._readPackages();
                     resolvePackage("base", this.packages, function () {
                         console.log("base loaded...");
-                        oThis._readUrls(JSON.parse(loadFile("/uibase/urls.json")));
+                        oThis.router = new ub.Router();
+                        oThis._parseUrls(JSON.parse(loadFile("/uibase/urls.json")));
                     });
                 } catch (ex) {
                     throw new Error("Invalid application config");
@@ -171,7 +174,7 @@
             }
         },
 
-        _readUrls: {
+        _parseUrls: {
             value: function(urls, parentUrl) {
                 var oThis = this,
                     router = this.router;
@@ -185,7 +188,7 @@
 
                             loadFile(urls[url].include + "packages.json", true, function (resp) {
                                 try {
-                                    oThis._readPackages(JSON.parse(resp));
+                                    oThis._parsePackages(JSON.parse(resp));
                                 } catch (ex) {
                                     console.log(ex);
                                     throw new Error("Invalid application package");
@@ -193,7 +196,7 @@
                             });
 
                             loadFile(urls[url].include + "urls.json", true, function (urls) {
-                                oThis._readUrls(JSON.parse(urls), routeUrl);
+                                oThis._parseUrls(JSON.parse(urls), routeUrl);
                             });
                         });
                     } else {
@@ -206,7 +209,7 @@
             }
         },
 
-        _readPackages: {
+        _parsePackages: {
             value: function (appPkgs) {
                 var oThis = this;
 
@@ -219,7 +222,7 @@
             }
         },
 
-        _loadBasePackages: {
+        _readPackages: {
             value: function () {
                 try {
                     this.packages = JSON.parse(loadFile("/uibase/packages.json"));

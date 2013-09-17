@@ -6,7 +6,6 @@
     },
 
     "baseUtils": {
-        "dependencies": ["jQuery"],
         "scripts": "/commons/utils/utils.js"
     },
 
@@ -37,8 +36,9 @@
     },
 
     "base": {
+        "scripts": ["/commons/router.js", "/commons/view.js"],
         "styles": "/commons/core.css",
-        "dependencies": ["baseComponent"]
+        "dependencies": ["baseComponent", "jQuery"]
     },
 
     "compMap": {
