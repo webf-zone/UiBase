@@ -5,7 +5,7 @@
 
     var Textbox = ub.Utils.Class({
 
-        extends: ub.Component,
+        extends: ub.View,
 
         construct: function(config) {
             this._super(config);
@@ -25,10 +25,6 @@
             this._outPorts.value = valueMap.get("output");
 
             this._outPorts.keypress = ub.Observable.fromEvent(this._el, "keypress");
-        },
-
-        render: function() {
-            return this._el;
         }
     });
 
