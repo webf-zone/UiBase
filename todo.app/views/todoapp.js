@@ -31,8 +31,17 @@
             });
 
             var writer = new ub.Components.Write("uibase-todos");
+            var reader = new ub.Components.Read("uibase-todos");
+
+            var todoListParser = new ub.Components.Map(function(val) {
+                return JSON.parse(val);
+            });
 
             var mergeWrites = new ub.Components.Merge();
+
+            var todolistView = new ub.Views.TodoList();
+
+            this.todolistView = todolistView;
 
             ub.Component.connect(v.textbox,      "keypress", enterFilter,    "input");
             ub.Component.connect(v.textbox,      "value",    sampleOn,       "value");
@@ -42,11 +51,15 @@
             ub.Component.connect(collectTodo,    "output",   serializeTodos, "input");
             ub.Component.connect(serializeTodos, "output",   writer,         "input");
             ub.Component.connect(writer,         "output",   mergeWrites,    "stream1");
+            ub.Component.connect(mergeWrites,    "output",   reader,         "input");
+            ub.Component.connect(reader,         "output",   todoListParser, "input");
+            ub.Component.connect(todoListParser, "output",   todolistView,   "todolist");
         },
 
         render: function() {
             return $("<div>")
-                .append(this.textbox.render());
+                .append(this.textbox.render())
+                .append(this.todolistView.render());
         }
     });
 

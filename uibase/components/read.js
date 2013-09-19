@@ -11,9 +11,7 @@
             var self = this;
 
             self._super(function(key) {
-                key = key || baseKey;
-
-                return localStorage.getItem(key);
+                return localStorage.getItem(baseKey);
             });
         }
     });
@@ -28,6 +26,7 @@
             var self = this,
                 reader;
 
+            /*
             if (ub.Utils.isURL(location)) {
                 reader = new ub.Components.AjaxReader(location);
                 self._type = "ajax";
@@ -35,6 +34,8 @@
                 self._type = "localStorage";
                 reader = new ub.Components.LocalStorageReader(location);
             }
+            */
+            reader = new ub.Components.LocalStorageReader(location);
 
             self._inPorts = reader._inPorts;
             self._outPorts = reader._outPorts;

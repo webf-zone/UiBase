@@ -8,6 +8,7 @@
     "v.todoapp": {
         "dependencies": [
             "compWrite",
+            "compRead",
             "compCollate",
             "compTextbox",
             "compFilter",
@@ -16,7 +17,7 @@
             "m.todo"
         ],
         "markup": "components/todoapp.html",
-        "scripts": "views/todoapp.js",
+        "scripts": ["views/todo.js", "views/todoList.js", "views/todoapp.js"],
         "styles": "views/todoapp.css"
     },
 

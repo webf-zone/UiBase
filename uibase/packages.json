@@ -38,7 +38,7 @@
     "base": {
         "scripts": ["/commons/router.js", "/commons/view.js", "commons/model.js"],
         "styles": "/commons/core.css",
-        "dependencies": ["baseComponent", "jQuery"]
+        "dependencies": ["jQuery", "baseComponent"]
     },
 
     "compMap": {
@@ -70,5 +70,10 @@
     "compWrite": {
         "dependencies": ["compMap"],
         "scripts": "components/write.js"
+    },
+
+    "compRead": {
+        "dependencies": ["compMap"],
+        "scripts": "components/read.js"
     }
 }
