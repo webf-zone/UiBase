@@ -58,7 +58,7 @@
 
                     if (view.parent) {
                         $(view.parent._el).append(el);
-                        view.parent._dom._children.push(dom);
+                        view.parent._dom._children.push(view);
                     } else {
                         $("body").append(el);
                     }
@@ -87,6 +87,7 @@
                     if (dom._text !== compareWithView._dom._text) {
                         $(view._el).text(dom._text);
                     }
+
                     if (Array.isArray(dom._children)) {
                         dom._children.forEach(function(child, i) {
                             child.parent = view;
