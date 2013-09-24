@@ -57,9 +57,13 @@
         },
 
         render: function() {
-            return $("<div>")
-                .append(this.textbox.render())
-                .append(this.todolistView.render());
+            return new ub.Views.HtmlElement({
+                tag: "div",
+                children: [
+                    this.textbox,
+                    this.todolistView
+                ]
+            });
         }
     });
 

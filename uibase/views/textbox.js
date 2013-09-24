@@ -1,4 +1,4 @@
-;(function(ub) {
+(function(ub) {
     "use strict";
 
     ub.Views = ub.Views || {};
@@ -8,23 +8,33 @@
         extends: ub.View,
 
         construct: function(config) {
-            this._super(config);
+            var self = this;
 
-            this._el = $("<input type=\"text\">");
+            self._super(config);
 
-            var value = new ub.Component();
+            self.element = new ub.Views.HtmlElement({
+                tag: "input",
+                props: {
+                    type: "text"
+                },
+                events: [
+                    "input",
+                    "keypress"
+                ]
+            });
 
-            value._outPorts.output = ub.Observable.fromEvent(this._el, "input");
-
-            var valueMap = new ub.Components.Map(function(event) {
+            var mapValue = new ub.Components.Map(function(event) {
                 return $(event.target).val();
             });
 
-            ub.Component.connect(value, "output", valueMap, "input");
+            ub.Component.connect(self.element, "input", mapValue, "input");
 
-            this._outPorts.value = valueMap.get("output");
+            self.addOutPort("value", mapValue.get("output"));
+            self.addOutPort("keypress", self.element.get("keypress"));
+        },
 
-            this._outPorts.keypress = ub.Observable.fromEvent(this._el, "keypress");
+        render: function() {
+            return this.element;
         }
     });
 

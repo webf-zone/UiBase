@@ -19,6 +19,12 @@
             return comp._outPorts[outPort];
         },
 
+        addOutPort: function(name, observable) {
+            var comp = this;
+
+            comp._outPorts[name] = observable;
+        },
+
         static: {
             connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
 

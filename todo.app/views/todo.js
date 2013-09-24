@@ -6,18 +6,27 @@
         
         extends: ub.View,
 
-        construct: function() {
+        construct: function(todo) {
             var self = this;
 
             self._super();
 
-            self._el = $("<li>");
+            self._todo = todo;
 
             self._inPorts.todo = new ub.Observer(function(todo) {
+                self._todo = todo;
+            });
+        },
 
-                if (todo.completed) self._el.addClass("strike");
+        render: function() {
+            var self = this;
 
-                self._el.text(todo.title);
+            return new ub.Views.HtmlElement({
+                tag: "div",
+                props: {
+                    class: self._todo.completed ? "completed" : "active"
+                },
+                text: self._todo.title
             });
         }
     });

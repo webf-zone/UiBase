@@ -11,13 +11,30 @@
 
             self._super();
 
-            self._el = $("<ul>").addClass("todos");
+            self._todoViews = [];
 
-            self._inPorts.todolist = new ub.Observer(function(todos) {
+            self.addInPort("todolist", function(todos) {
                 var todoViews = todos.map(function(todo) {
                     return new ub.Views.Todo(todo);
                 });
-                self._el.html(todoViews.render());
+                self._todoViews = todoViews;
+            });
+        },
+
+        render: function() {
+            var self = this;
+
+            return new ub.Views.HtmlElement({
+                tag: "ul",
+                props: {
+                    class: "todos"
+                },
+                children: self._todoViews.map(function(tv) {
+                    return new ub.Views.HtmlElement({
+                        tag: "li",
+                        children: [tv]
+                    });
+                })
             });
         }
     });

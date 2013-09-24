@@ -250,7 +250,8 @@
 
                 var currentView = new ViewName();
 
-                $("body").append(currentView.render());
+                //$("body").append(currentView.render());
+                ub.View.renderView(currentView);
             },
             writable: true
         }

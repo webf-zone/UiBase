@@ -36,7 +36,7 @@
     },
 
     "base": {
-        "scripts": ["/commons/router.js", "/commons/view.js", "commons/model.js"],
+        "scripts": ["/commons/router.js", "/commons/browserEvent.js", "/commons/view.js", "commons/model.js"],
         "styles": "/commons/core.css",
         "dependencies": ["jQuery", "baseComponent"]
     },
@@ -50,8 +50,12 @@
         "scripts": "components/collate.js"
     },
 
+    "compHtmlElement": {
+        "scripts": "views/htmlElement.js"
+    },
+
     "compTextbox": {
-        "dependencies": ["compMap"],
+        "dependencies": ["compMap", "compHtmlElement"],
         "scripts": "views/textbox.js"
     },
 
