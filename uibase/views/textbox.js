@@ -14,9 +14,9 @@
 
             self.element = new ub.Views.HtmlElement({
                 tag: "input",
-                props: {
+                props: ub.Utils.extend({}, config.props, {
                     type: "text"
-                },
+                }),
                 events: [
                     "input",
                     "keypress"

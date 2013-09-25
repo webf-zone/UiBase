@@ -30,7 +30,7 @@
         },
 
         static: {
-            renderView: function(view, compareWith) {
+            renderView: function(view, compareWith, replaceView) {
                 if (view.isRendered || (compareWith)) {
                     View.updateView(view, compareWith);
                 } else {
@@ -57,8 +57,14 @@
                     view._el = el;
 
                     if (view.parent) {
-                        $(view.parent._el).append(el);
-                        view.parent._dom._children.push(view);
+                        if (replaceView) {
+                            replaceView.replaceWith(view._el);
+                            var idx = view.parent._dom._children.indexOf(replaceView);
+                            view.parent._dom._children.slice(idx, 1, view);
+                        } else {
+                            $(view.parent._el).append(el);
+                            view.parent._dom._children.push(view);
+                        }
                     } else {
                         $("body").append(el);
                     }
@@ -69,6 +75,14 @@
                             ub.View.renderView(child);
                         });
                     }
+
+                    /*
+                    if (Array.isArray(dom._events)) {
+                        dom._events.forEach(function(event) {
+                            view.addOutPort(event, ub.Observable.fromEvent(view._el, event));
+                        });
+                    }
+                    */
 
                     view.isRendered = true;
                 }
@@ -81,8 +95,8 @@
                 compareWithView = compareWithView || view;
                     
                 if (dom._tag !== compareWithView._dom._tag) {
-                    $(view._el).remove();
-                    ub.View.renderView(view);
+                    //$(view._el).remove();
+                    ub.View.renderView(view, undefined, view);
                 } else {
                     if (dom._text !== compareWithView._dom._text) {
                         $(view._el).text(dom._text);

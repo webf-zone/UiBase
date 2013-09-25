@@ -59,6 +59,10 @@
         "scripts": "views/textbox.js"
     },
 
+    "compButton": {
+        "scripts": "views/button.js"
+    },
+
     "compFilter": {
         "scripts": "components/filter.js"
     },

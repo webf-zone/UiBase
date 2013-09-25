@@ -11,14 +11,15 @@
             "compRead",
             "compCollate",
             "compTextbox",
+            "compButton",
             "compFilter",
             "compSampleOn",
             "compMerge",
             "m.todo"
         ],
         "markup": "components/todoapp.html",
-        "scripts": ["views/todo.js", "views/todoList.js", "views/todoapp.js"],
-        "styles": "views/todoapp.css"
+        "styles": ["views/todoapp.css", "views/todo.css"],
+        "scripts": ["views/todo.js", "views/todoList.js", "views/todoapp.js"]
     },
 
     "default": {

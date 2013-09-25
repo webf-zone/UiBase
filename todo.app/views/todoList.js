@@ -27,6 +27,7 @@
             return new ub.Views.HtmlElement({
                 tag: "ul",
                 props: {
+                    id: "todo-list",
                     class: "todos"
                 },
                 children: self._todoViews.map(function(tv) {

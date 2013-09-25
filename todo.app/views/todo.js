@@ -13,9 +13,18 @@
 
             self._todo = todo;
 
+            self._destroyBtn = new ub.Views.Button({
+                text: "✖",
+                props: {
+                    class: "destroy"
+                }
+            });
+
             self._inPorts.todo = new ub.Observer(function(todo) {
                 self._todo = todo;
             });
+
+            self._outPorts.destroy = self._destroy.get("click");
         },
 
         render: function() {
@@ -23,10 +32,19 @@
 
             return new ub.Views.HtmlElement({
                 tag: "div",
+                children:[
+                    new ub.Views.HtmlElement({
+                        tag: "span",
+                        props: {
+                            class: self._todo.completed ? "completed" : "active"
+                        },
+                        text: self._todo.title
+                    }),
+                    self._destroyBtn
+                ],
                 props: {
-                    class: self._todo.completed ? "completed" : "active"
-                },
-                text: self._todo.title
+                    class: "todo"
+                }
             });
         }
     });

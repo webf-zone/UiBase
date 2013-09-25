@@ -137,6 +137,9 @@
             }
 
             if (Array.isArray(node.styles)) {
+                css = css.concat(node.styles.map(function(style) {
+                    return path + style;
+                })); //TODO: handle path
                 css.concat(node.styles); //TODO: handle path
             } else if (typeof node.styles === "string") {
                 css.push(path + node.styles);
@@ -251,6 +254,7 @@
                 var currentView = new ViewName();
 
                 //$("body").append(currentView.render());
+                $("body").html("");
                 ub.View.renderView(currentView);
             },
             writable: true

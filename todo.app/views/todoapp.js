@@ -12,7 +12,12 @@
 
             this._super();
 
-            v.textbox = new ub.Views.Textbox();
+            v.textbox = new ub.Views.Textbox({
+                props: {
+                    id: "new-todo",
+                    placeholder: "What needs to be done?"
+                }
+            });
             var enterFilter = new ub.Components.Filter(function(e) {
                 return e.which === 13;
             });
@@ -58,10 +63,33 @@
 
         render: function() {
             return new ub.Views.HtmlElement({
-                tag: "div",
+                tag: "section",
+                props: {
+                    id: "todoapp"
+                },
                 children: [
-                    this.textbox,
-                    this.todolistView
+                    new ub.Views.HtmlElement({
+                        tag: "header",
+                        props: {
+                            id: "header"
+                        },
+                        children: [
+                            new ub.Views.HtmlElement({
+                                tag: "h1",
+                                text: "todos"
+                            }),
+                            this.textbox
+                        ]
+                    }),
+                    new ub.Views.HtmlElement({
+                        tag: "section",
+                        props: {
+                            id: "main"
+                        },
+                        children: [
+                            this.todolistView
+                        ]
+                    })
                 ]
             });
         }
