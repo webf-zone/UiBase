@@ -24,7 +24,7 @@
                 self._todo = todo;
             });
 
-            self._outPorts.destroy = self._destroy.get("click");
+            self._outPorts.destroy = self._destroyBtn.get("click");
         },
 
         render: function() {
