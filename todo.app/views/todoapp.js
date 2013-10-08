@@ -5,7 +5,7 @@
 
     var TodoApp = ub.Utils.Class({
 
-        extends: ub.Component,
+        extends: ub.View,
 
         construct: function() {
             var v = this;
@@ -24,23 +24,11 @@
 
             var sampleOn = new ub.Components.SampleOn();
 
-            var todoFactory = new ub.Factories.TodoFactory();
-
-            var collectTodo = new ub.Components.Collate([], function(acc, val) {
-                acc.push(val);
-                return acc;
-            });
-
-            var serializeTodos = new ub.Components.Map(function(todos) {
-                return JSON.stringify(todos);
-            });
-
-            var writer = new ub.Components.Write("uibase-todos");
-            var reader = new ub.Components.Read("uibase-todos");
-
-            var todoListParser = new ub.Components.Map(function(val) {
-                return JSON.parse(val);
-            });
+            var todoRepository = new ub.Repository(ub.Models.Todo, "LocalStorage", "uibase-todos");
+            var createTodo = new ub.Services.CreateTodo(todoRepository);
+            //var editTodo = new ub.Models.Todos.EditTodo();
+            var deleteTodo = new ub.Services.DeleteTodo(todoRepository);
+            var queryTodos = new ub.Services.QueryTodos(todoRepository);
 
             var mergeWrites = new ub.Components.Merge();
 
@@ -51,14 +39,12 @@
             ub.Component.connect(v.textbox,      "keypress", enterFilter,    "input");
             ub.Component.connect(v.textbox,      "value",    sampleOn,       "value");
             ub.Component.connect(enterFilter,    "output",   sampleOn,       "sampleOn");
-            ub.Component.connect(sampleOn,       "output",   todoFactory,    "input");
-            ub.Component.connect(todoFactory,    "output",   collectTodo,    "input");
-            ub.Component.connect(collectTodo,    "output",   serializeTodos, "input");
-            ub.Component.connect(serializeTodos, "output",   writer,         "input");
-            ub.Component.connect(writer,         "output",   mergeWrites,    "stream1");
-            ub.Component.connect(mergeWrites,    "output",   reader,         "input");
-            ub.Component.connect(reader,         "output",   todoListParser, "input");
-            ub.Component.connect(todoListParser, "output",   todolistView,   "todolist");
+            ub.Component.connect(sampleOn,       "output",   createTodo,     "description");
+            ub.Component.connect(createTodo,     "output",   mergeWrites,    "input");
+            ub.Component.connect(todolistView,   "destroy",  deleteTodo,     "todo");
+            ub.Component.connect(deleteTodo,     "output",   mergeWrites,    "input");
+            ub.Component.connect(mergeWrites,    "output",   queryTodos,     "filter");
+            ub.Component.connect(queryTodos,     "output",   todolistView,   "todolist");
         },
 
         render: function() {

@@ -2,13 +2,16 @@
     "basePath": "/todo.app/",
 
     "m.todo": {
-        "scripts": "models/todo.js"
+        "scripts": [
+            "domain/models/todo.js",
+            "domain/services/createTodo.js",
+            "domain/services/deleteTodo.js",
+            "domain/services/queryTodos.js"
+        ]
     },
 
     "v.todoapp": {
         "dependencies": [
-            "compWrite",
-            "compRead",
             "compCollate",
             "compTextbox",
             "compButton",

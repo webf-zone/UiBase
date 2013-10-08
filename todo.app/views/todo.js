@@ -24,7 +24,12 @@
                 self._todo = todo;
             });
 
-            self._outPorts.destroy = self._destroyBtn.get("click");
+            var destroyMap = new ub.Components.Map(function() {
+                return self._todo;
+            });
+
+            ub.Component.connect(self._destroyBtn, "click", destroyMap, "input");
+            self._outPorts.destroy = destroyMap.get("output");
         },
 
         render: function() {
@@ -36,9 +41,9 @@
                     new ub.Views.HtmlElement({
                         tag: "span",
                         props: {
-                            class: self._todo.completed ? "completed" : "active"
+                            class: self._todo.get("completed") ? "completed" : "active"
                         },
-                        text: self._todo.title
+                        text: self._todo.get("description")
                     }),
                     self._destroyBtn
                 ],

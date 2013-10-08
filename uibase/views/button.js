@@ -18,6 +18,8 @@
             self.addInPort("text", function(text) {
                 self._text = text;
             });
+
+            self.addOutPort("click", ub.BrowserEvent.addListener("click", self));
         },
 
         render: function() {
@@ -25,6 +27,7 @@
 
             return new ub.Views.HtmlElement({
                 tag: "button",
+                view: self,
                 props: self._props,
                 text: self._text
             });

@@ -20,7 +20,8 @@
                 events: [
                     "input",
                     "keypress"
-                ]
+                ],
+                view: self
             });
 
             var mapValue = new ub.Components.Map(function(event) {

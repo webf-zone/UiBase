@@ -20,7 +20,7 @@
 
             if (Array.isArray(self._events)) {
                 self._events.forEach(function(event) {
-                    self.addOutPort(event, ub.BrowserEvent.addListener(event, self));
+                    self.addOutPort(event, ub.BrowserEvent.addListener(event, config.view));
                 });
             }
         },

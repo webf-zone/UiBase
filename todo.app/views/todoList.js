@@ -13,12 +13,20 @@
 
             self._todoViews = [];
 
+            var merge = new ub.Components.Merge();
+
             self.addInPort("todolist", function(todos) {
                 var todoViews = todos.map(function(todo) {
-                    return new ub.Views.Todo(todo);
+                    var todov = new ub.Views.Todo(todo);
+
+                    ub.Component.connect(todov, "destroy", merge, "input");
+
+                    return todov;
                 });
                 self._todoViews = todoViews;
             });
+
+            self._outPorts.destroy = merge.get("output");
         },
 
         render: function() {

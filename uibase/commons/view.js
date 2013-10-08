@@ -88,6 +88,7 @@
                 }
             },
 
+            /*
             updateView: function(view, compareWithView) {
                 var dom = view.render(),
                     props = dom._props;
@@ -106,6 +107,35 @@
                         dom._children.forEach(function(child, i) {
                             child.parent = view;
                             child.reRender(compareWithView._dom._children && compareWithView._dom._children[i]);
+                        });
+                    }
+                }
+            }
+            */
+            updateView: function(view, newView) {
+                var dom,
+                    props;
+
+                newView = newView || view;
+
+                dom = newView.render();
+                props = dom._props;
+                    
+                if (dom._tag !== view._dom._tag) {
+                    ub.View.renderView(view, undefined, view);
+                } else {
+                    if (dom._text !== view._dom._text) {
+                        $(view._el).text(dom._text);
+                    }
+
+                    if (Array.isArray(dom._children)) {
+                        dom._children.forEach(function(child, i) {
+                            if (view._dom._children && view._dom._children[i]) {
+                                view._dom._children[i].reRender(child);
+                            } else {
+                                child.parent = view;
+                                child.reRender();
+                            }
                         });
                     }
                 }

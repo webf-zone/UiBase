@@ -36,7 +36,14 @@
     },
 
     "base": {
-        "scripts": ["/commons/router.js", "/commons/browserEvent.js", "/commons/view.js", "commons/model.js"],
+        "scripts": [
+            "/commons/router.js",
+            "/commons/browserEvent.js",
+            "/commons/view.js",
+            "commons/model.js",
+            "commons/repository.js",
+            "commons/stores/localstorage.js"
+        ],
         "styles": "/commons/core.css",
         "dependencies": ["jQuery", "baseComponent"]
     },
@@ -83,5 +90,10 @@
     "compRead": {
         "dependencies": ["compMap"],
         "scripts": "components/read.js"
+    },
+
+    "compDelete": {
+        "dependencies": ["compMap"],
+        "scripts": "components/delete.js"
     }
 }

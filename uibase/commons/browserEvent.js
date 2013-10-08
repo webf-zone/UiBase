@@ -10,7 +10,25 @@
         },
 
         addListener: function(event, view) {
-            return registeredEvents[event] || (registeredEvents[event] = ub.Observable.fromEvent("body", event));
+            var topLevelEvent = registeredEvents[event] ||
+                (registeredEvents[event] = new ub.Observable(function(observer) {
+                        var handler = function(event) {
+                            observer.onNext.call(observer, event);
+                        };
+                        document.body.addEventListener(event, handler, true);
+                    }
+                ));
+
+            return (function () {
+                return new ub.Observable(function(observer) {
+                    var ob = new ub.Observer(function(event) {
+                        if (view._el.get(0) === event.target) {
+                            observer.onNext.apply(observer, arguments);
+                        }
+                    });
+                    topLevelEvent.subscribe(ob);
+                });
+            })();
         }
     };
 
