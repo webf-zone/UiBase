@@ -1,0 +1,12 @@
+{
+    "basePath": "render.app/",
+
+    "v.SimpleHtmlElement": {
+        "dependencies": [
+            "compHtmlElement"
+        ],
+        "markup": [],
+        "styles": [],
+        "scripts": "views/simpleHtmlElement.js"
+    }
+}
