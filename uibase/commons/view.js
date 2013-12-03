@@ -1,148 +1,104 @@
 (function(ub) {
-    "use strict";
 
-    var View = ub.Utils.Class({
+    'use strict';
+
+    /**
+     * This is the main View class. It is Component that can be rendered.
+     *
+     * @class View
+     * @extends Component
+     */
+    ub.View = ub.Utils.Class({
 
         extends: ub.Component,
 
-        construct: function() {
+        /**
+         * @constructor
+         */
+        construct: function(config) {
             var self = this;
+
+            config = config || {};
+            self.props = config.props || {};
+            self.parent = null;
+            self._phase = ub.View.ViewPhase.REMOVED;
+            self._futureProps = null;
+            self._futureParent = null;
+            self._events = config.events || [];
+
+            self.children = config.children;
 
             self._super();
         },
 
-        addInPort: function(name, onNext, onError, onCompleted) {
-            var self = this,
-                reRender = self.reRender.bind(self);
+        /**
+         * @method renderView
+         * @param mountDepth
+         * @returns String
+         */
+        renderView: function(mountDepth) {
+            var view = this;
 
-            self._inPorts[name] = new ub.Observer(function() {
-                onNext.apply(self, arguments);
-                reRender();
+            if (view.isRendered()) {
+                throw new Error('renderView: Can only render a un-rendered view');
+            }
+
+            view._phase = ub.View.ViewPhase.RENDERED;
+            view._mountDepth = mountDepth;
+
+            return '';
+        },
+
+        renderChildren: function(childrenToUse) {
+            var view = this;
+            var children = childrenToUse.map(function(child) {
+                return child.render();
+            });
+
+            view._renderedChildren = children;
+
+            return children.map(function(child) {
+                return child.renderView(view._mountDepth + 1);
             });
         },
 
-        reRender: function(compareWithView) {
-            ub.View.renderView(this, compareWithView);
+        addInPort: function(name, onNext, onError, onCompleted) {
+            var self = this;
+
+            self._inPorts[name] = new ub.Observer(function() {
+                onNext.apply(self, arguments);
+                self.performUpdateIfRequired();
+            });
         },
 
-        render: function() {
-            return this._el;
+        isRendered: function() {
+            return this._phase === ub.View.ViewPhase.RENDERED;
         },
 
         static: {
-            renderView: function(view, compareWith, replaceView) {
-                if (view.isRendered || (compareWith)) {
-                    View.updateView(view, compareWith);
-                } else {
-                    var dom = view.render(),
-                        children = dom._children.slice(),
-                        props = dom._props,
-                        el;
 
-                    view._dom = dom;
-                    view._dom._children = [];
-
-                    el = $("<" + dom._tag + ">").text(dom._text);
-
-                    for (var propName in props) {
-                        if (!props.hasOwnProperty(propName)) {
-                            continue;
-                        }
-
-                        //TODO: Add check for style attribute to be
-                        //a map instead of a string.
-
-                        el.prop(propName, props[propName]);
-                    }
-                    view._el = el;
-
-                    if (view.parent) {
-                        if (replaceView) {
-                            replaceView.replaceWith(view._el);
-                            var idx = view.parent._dom._children.indexOf(replaceView);
-                            view.parent._dom._children.slice(idx, 1, view);
-                        } else {
-                            $(view.parent._el).append(el);
-                            view.parent._dom._children.push(view);
-                        }
-                    } else {
-                        $("body").append(el);
-                    }
-
-                    if (Array.isArray(children)) {
-                        children.forEach(function(child) {
-                            child.parent = view;
-                            ub.View.renderView(child);
-                        });
-                    }
-
-                    /*
-                    if (Array.isArray(dom._events)) {
-                        dom._events.forEach(function(event) {
-                            view.addOutPort(event, ub.Observable.fromEvent(view._el, event));
-                        });
-                    }
-                    */
-
-                    view.isRendered = true;
-                }
+            ViewPhase: {
+                RENDERED: 'RENDERED',
+                REMOVED: 'REMOVED'
             },
 
-            /*
-            updateView: function(view, compareWithView) {
-                var dom = view.render(),
-                    props = dom._props;
+            renderView: function(view, container) {
+                var markup,
+                    nextRenderedView = view.render(),
+                    prevRenderedView = view._dom;
 
-                compareWithView = compareWithView || view;
-                    
-                if (dom._tag !== compareWithView._dom._tag) {
-                    //$(view._el).remove();
-                    ub.View.renderView(view, undefined, view);
+                if (prevRenderedView) {
+
                 } else {
-                    if (dom._text !== compareWithView._dom._text) {
-                        $(view._el).text(dom._text);
-                    }
-
-                    if (Array.isArray(dom._children)) {
-                        dom._children.forEach(function(child, i) {
-                            child.parent = view;
-                            child.reRender(compareWithView._dom._children && compareWithView._dom._children[i]);
-                        });
-                    }
+                    markup = nextRenderedView.renderView(1);
+                    $(container).html(markup);
                 }
-            }
-            */
-            updateView: function(view, newView) {
-                var dom,
-                    props;
 
-                newView = newView || view;
+                view._dom = nextRenderedView;
 
-                dom = newView.render();
-                props = dom._props;
-                    
-                if (dom._tag !== view._dom._tag) {
-                    ub.View.renderView(view, undefined, view);
-                } else {
-                    if (dom._text !== view._dom._text) {
-                        $(view._el).text(dom._text);
-                    }
-
-                    if (Array.isArray(dom._children)) {
-                        dom._children.forEach(function(child, i) {
-                            if (view._dom._children && view._dom._children[i]) {
-                                view._dom._children[i].reRender(child);
-                            } else {
-                                child.parent = view;
-                                child.reRender();
-                            }
-                        });
-                    }
-                }
+                return view;
             }
         }
     });
-
-    ub.View = View;
 
 })(window.uibase);

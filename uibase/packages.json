@@ -1,12 +1,12 @@
 {
-    "basePath": "/uibase/",
+    "basePath": "uibase/",
     
     "jQuery": {
         "scripts": "commons/external/jquery.js"
     },
 
     "baseUtils": {
-        "scripts": "/commons/utils/utils.js"
+        "scripts": "commons/utils/utils.js"
     },
 
     "utils": {
@@ -37,9 +37,10 @@
 
     "base": {
         "scripts": [
-            "/commons/router.js",
-            "/commons/browserEvent.js",
-            "/commons/view.js",
+            "commons/router.js",
+            "commons/browserEvent.js",
+            "commons/view.js",
+            "commons/complexView.js",
             "commons/model.js",
             "commons/repository.js",
             "commons/stores/localstorage.js"

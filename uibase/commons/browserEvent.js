@@ -19,16 +19,14 @@
                     }
                 ));
 
-            return (function () {
-                return new ub.Observable(function(observer) {
-                    var ob = new ub.Observer(function(event) {
-                        if (view._el.get(0) === event.target) {
-                            observer.onNext.apply(observer, arguments);
-                        }
-                    });
-                    topLevelEvent.subscribe(ob);
+            return new ub.Observable(function(observer) {
+                var ob = new ub.Observer(function(event) {
+                    if (view._el.get(0) === event.target) {
+                        observer.onNext.apply(observer, arguments);
+                    }
                 });
-            })();
+                topLevelEvent.subscribe(ob);
+            });
         }
     };
 

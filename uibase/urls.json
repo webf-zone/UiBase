@@ -7,6 +7,10 @@
         "include": "/todo.app/"
     },
 
+    "render/": {
+        "include": "/render.app/"
+    },
+
     "textbox": {
         "view": "Textbox",
         "package": "compTextbox"

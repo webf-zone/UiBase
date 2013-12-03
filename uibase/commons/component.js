@@ -6,6 +6,7 @@
         construct: function() {
             this._inPorts = {};
             this._outPorts = {};
+            this.components = {};
         },
 
         get: function(outPort) {

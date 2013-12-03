@@ -9,7 +9,7 @@
         if (path instanceof RegExp) {
             regX = path;
         } else {
-
+            
             path.split('/').forEach(function (fragment) {
                if (fragment.length > 0) {
                    pattern += '\\/+';
@@ -60,9 +60,22 @@
                 route,
                 params,
                 length,
+                href,
                 i;
 
             url = url || window.location.pathname;
+/*
+            href = window.location.href;
+
+            if (href[href.length - 1] !== '/') {
+                href += '/';
+            }
+*/
+            //url = href.replace(ub.basePath, '');
+
+            if (url[url.length - 1] !== '/') {
+                url += '/';
+            }
 
             for (i = 0, length = keys.length; i < length; i++) {
                 route = routes[keys[i]];
