@@ -33,10 +33,10 @@
 
         /**
          * @method renderView
-         * @param mountDepth
+         * @param depth
          * @returns String
          */
-        renderView: function(mountDepth) {
+        renderView: function(depth) {
             var view = this;
 
             if (view.isRendered()) {
@@ -44,9 +44,28 @@
             }
 
             view._phase = ub.View.ViewPhase.RENDERED;
-            view._mountDepth = mountDepth;
+            view._depth = depth;
 
             return '';
+        },
+
+        updateView: function() {
+            if (!this._futureProps) {
+                return;
+            }
+
+            var prevProps = this.props,
+                prevParent = this.parent;
+
+            this.props = this._futureProps;
+            this.parent = this._futureParent;
+            this._futureProps = null;
+
+            this._updateView(prevProps, prevParent);
+        },
+
+        _updateView: function(prevProps, prevParent) {
+            //TODO: Handle parent reference maintenance
         },
 
         renderChildren: function(childrenToUse) {
@@ -58,7 +77,7 @@
             view._renderedChildren = children;
 
             return children.map(function(child) {
-                return child.renderView(view._mountDepth + 1);
+                return child.renderView(view._depth + 1);
             });
         },
 
@@ -82,21 +101,66 @@
                 REMOVED: 'REMOVED'
             },
 
+            dirtyViews: [],
+
+            isBatching: false,
+
             renderView: function(view, container) {
-                var markup,
-                    nextRenderedView = view.render(),
-                    prevRenderedView = view._dom;
+                var markup;
 
-                if (prevRenderedView) {
+                markup = view.renderView(1);
+                $(container).html(markup);
 
-                } else {
-                    markup = nextRenderedView.renderView(1);
-                    $(container).html(markup);
-                }
-
-                view._dom = nextRenderedView;
+                //view._dom = nextRenderedView;
 
                 return view;
+            },
+
+            enqueueUpdate: function(view) {
+                ub.View.dirtyViews.push(view);
+
+                if (ub.View.dirtyViews.length === 1 && !ub.View.isBatching) {
+                    ub.View.isBatching = true;
+                    ub.View.startTicking();
+                }
+            },
+
+            flushUpdates: function() {
+                try {
+                    ub.View.runUpdates();
+                } catch(e) {
+                    throw e;
+                } finally {
+                    ub.View.clearUpdateQueue();
+                }
+            },
+
+            clearUpdateQueue: function() {
+                ub.View.dirtyViews.length = 0;
+                ub.View.isBatching = false;
+            },
+
+            runUpdates: function() {
+                var views = ub.View.dirtyViews;
+
+                console.log('Dirty Views length: ' + views.length);
+
+                views.sort(function(v1, v2) {
+                    return v1._mountDepth - v2._mountDepth;
+                });
+
+                for (var i = 0; i < views.length; i++) {
+                    var view = views[i];
+                    if (view.isRendered()) {
+                        view.updateView();
+                    }
+                }
+            },
+
+            startTicking: function() {
+                window.requestAnimationFrame(function() {
+                    ub.View.flushUpdates();
+                });
             }
         }
     });

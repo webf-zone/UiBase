@@ -34,13 +34,20 @@
         /**
          * Render this view the first time
          * @method renderView
-         * @param mountDepth Number
+         * @param depth Number
          * @returns String
          */
-        renderView: function(mountDepth) {
-            this._super(mountDepth);
+        renderView: function(depth) {
+            this._super(depth);
             //TODO: Validate props
             return this._createOpenTagMarkup() + this._createContentMarkup() + this._tagClose;
+        },
+
+        _updateView: function(prevProps, prevParent) {
+            this._super(prevProps, prevParent);
+
+            this._updateProps(prevProps);
+            this._updateChildren();
         },
 
         /**
@@ -139,6 +146,81 @@
                 return renderedChildren.join('');
             }
             return '';
+        },
+
+        _updateProps: function(prevProps) {
+            var currentProps = this.props,
+                propKey;
+            var prevStyle;
+            var styleName;
+            var styleUpdates;
+
+            for (propKey in prevProps) {
+                if (currentProps.hasOwnProperty(propKey) ||
+                    !prevProps.hasOwnProperty(propKey)) {
+                    continue;
+                }
+
+                if (propKey === 'style') {
+                    prevStyle = prevProps[propKey];
+                    for (styleName in prevStyle) {
+                        if (prevStyle.hasOwnProperty(styleName)) {
+                            styleUpdates = styleUpdates || {};
+                            styleUpdates[styleName] = '';
+                        }
+                    }
+                } else if (propKey === 'events') {
+                    //Don't know what to do yet
+                } else {
+                    this.removeProperty(propKey);
+                }
+            }
+            for (propKey in currentProps) {
+                var currentProp = currentProps[propKey];
+                var prevProp = prevProps[propKey];
+
+                if (!currentProp.hasOwnProperty(propKey) || currentProp === prevProp) {
+                    continue;
+                }
+
+                if (propKey === 'style') {
+                    if (currentProp) {
+                        currentProps.style = currentProp;
+                    }
+                    if (prevProp) {
+                        for (styleName in prevProp) {
+                            if (prevProp.hasOwnProperty(styleName) &&
+                                !currentProp.hasOwnProperty(styleName)) {
+                                styleUpdates = styleUpdates || {};
+                                styleUpdates[styleName] = '';
+                            }
+                        }
+                        for (styleName in currentProp) {
+                            if (currentProp.hasOwnProperty(styleName) &&
+                                prevProp[styleName] !== prevProp[styleName]) {
+                                styleUpdates = styleUpdates || {};
+                                styleUpdates[styleName] = nextProp[styleName];
+                            }
+                        }
+                    } else {
+                        styleUpdates = currentProp;
+                    }
+                } else if (propKey === 'events') {
+                    currentProp.forEach(function(event) {
+                        self.addOutPort(event, ub.BrowserEvent.addListener(event, self));
+                    });
+                } else {
+                    this.updateProperty(propKey, currentProp);
+                }
+
+                if (styleUpdates) {
+                    this.updatesStyles(styleUpdates);
+                }
+            }
+        },
+
+        _updateChildren: function() {
+
         },
 
         /**
