@@ -147,7 +147,7 @@
                 this._updateChildren(nextChildren);
             } catch (error) {
                 updateDepth -= 1;
-                updateDepth || this.clearChildUpdateQueue();
+                updateDepth || ub.View.clearChildUpdateQueue();
                 throw error;
             }
             updateDepth--;
@@ -248,7 +248,7 @@
                 this.enqueueTextContent(nextContent);
             } catch (error) {
                 updateDepth -= 1;
-                updateDepth || this.clearChildUpdateQueue();
+                updateDepth || ub.View.clearChildUpdateQueue();
             }
 
             updateDepth -= 1;
@@ -256,7 +256,9 @@
         },
 
         enqueueTextContent: function(nextContent) {
-            $('[' + ub.View.UBID_ATTR_NAME + '=' + '"' + this._rootId + '"]').text(nextContent);
+            ub.View.childrenUpdateOpsQueue.push(function() {
+                this.getNode().text(nextContent);
+            }.bind(this));
         },
 
         getKey: function(index) {
@@ -265,6 +267,10 @@
             }
 
             return '[' + index + ']';
+        },
+
+        getNode: function() {
+            return $('[' + ub.View.UBID_ATTR_NAME + '=' + '"' + this._rootId + '"]');
         },
 
         addInPort: function(name, onNext, onError, onCompleted) {
@@ -296,6 +302,8 @@
             dirtyViews: [],
 
             isBatching: false,
+
+            childrenUpdateOpsQueue: [],
 
             renderView: function(view, container) {
                 var markup,
@@ -356,7 +364,15 @@
                 });
             },
 
-            processChildUpdateQueue: function() {}
+            clearChildUpdateQueue: function() {
+                ub.View.childrenUpdateOpsQueue.length = 0;
+            },
+
+            processChildUpdateQueue: function() {
+                ub.View.childrenUpdateOpsQueue.forEach(function(op) {
+                    op();
+                });
+            }
         }
     });
 

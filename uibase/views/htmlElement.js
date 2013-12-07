@@ -205,7 +205,7 @@
                         }
                         for (styleName in nextProp) {
                             if (nextProp.hasOwnProperty(styleName) &&
-                                prevProp[styleName] !== prevProp[styleName]) {
+                                prevProp[styleName] !== nextProp[styleName]) {
                                 styleUpdates = styleUpdates || {};
                                 styleUpdates[styleName] = nextProp[styleName];
                             }
@@ -224,7 +224,7 @@
                 }
 
                 if (styleUpdates) {
-                    this.updatesStyles(styleUpdates);
+                    this.updateStyles(styleUpdates);
                 }
             }
         },
@@ -256,6 +256,22 @@
         },
 
         removeProperty: function(prop) {
+        },
+
+        updateProperty: function(name, value) {
+            var node = this.getNode();
+            if (value != null) {
+                node.prop(name, value);
+            } else {
+                node.removeProp(name);
+            }
+        },
+        
+        updateStyles: function(styles) {
+            var node = this.getNode();
+
+            console.log(styles);
+            node.css(styles);
         },
 
         /**

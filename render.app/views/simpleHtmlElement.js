@@ -49,7 +49,8 @@
                             tag: 'span',
                             props: {
                                 style: {
-                                    'font-weight': 'bold'
+                                    'font-weight': 'bold',
+                                    'color': view.state.seconds < 10 ? '#444' : '#FF0000'
                                 },
                                 children: view.state.seconds
                             }
