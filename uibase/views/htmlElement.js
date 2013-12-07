@@ -1,5 +1,5 @@
 (function(ub) {
-    "use strict";
+    'use strict';
 
     ub.Views = ub.Views || {};
 
@@ -37,17 +37,23 @@
          * @param depth Number
          * @returns String
          */
-        renderView: function(depth) {
-            this._super(depth);
+        renderView: function(rootId, depth) {
+            this._super(rootId, depth);
             //TODO: Validate props
             return this._createOpenTagMarkup() + this._createContentMarkup() + this._tagClose;
         },
 
-        _updateView: function(prevProps, prevParent) {
+        updateView: function(prevProps, prevParent) {
             this._super(prevProps, prevParent);
 
-            this._updateProps(prevProps);
-            this._updateChildren();
+            this._updateDomProps(prevProps);
+            this._updateDomChildren(prevProps);
+        },
+
+        removeView: function() {
+            //TODO: Detach event listeners
+            this._super();
+            this.removeChildren();
         },
 
         /**
@@ -88,7 +94,7 @@
                 }
             }
 
-            return ret + ' >';
+            return ret + ' ' + ub.View.UBID_ATTR_NAME + '="' + this._rootId + '">';
         },
 
         /**
@@ -148,15 +154,16 @@
             return '';
         },
 
-        _updateProps: function(prevProps) {
-            var currentProps = this.props,
-                propKey;
-            var prevStyle;
-            var styleName;
-            var styleUpdates;
+        _updateDomProps: function(prevProps) {
+            var nextProps = this.props,
+                propKey,
+                prevStyle,
+                styleName,
+                styleUpdates;
 
             for (propKey in prevProps) {
-                if (currentProps.hasOwnProperty(propKey) ||
+                // If this property is being added
+                if (nextProps.hasOwnProperty(propKey) ||
                     !prevProps.hasOwnProperty(propKey)) {
                     continue;
                 }
@@ -170,47 +177,50 @@
                         }
                     }
                 } else if (propKey === 'events') {
-                    //Don't know what to do yet
+                    // Don't know what to do yet
                 } else {
                     this.removeProperty(propKey);
                 }
             }
-            for (propKey in currentProps) {
-                var currentProp = currentProps[propKey];
+            for (propKey in nextProps) {
+                var nextProp = nextProps[propKey];
                 var prevProp = prevProps[propKey];
 
-                if (!currentProp.hasOwnProperty(propKey) || currentProp === prevProp) {
+                // If the property value has not changed
+                if (!nextProps.hasOwnProperty(propKey) || nextProp === prevProp) {
                     continue;
                 }
 
                 if (propKey === 'style') {
-                    if (currentProp) {
-                        currentProps.style = currentProp;
+                    if (nextProp) {
+                        nextProps.style = nextProp;
                     }
                     if (prevProp) {
                         for (styleName in prevProp) {
                             if (prevProp.hasOwnProperty(styleName) &&
-                                !currentProp.hasOwnProperty(styleName)) {
+                                !nextProp.hasOwnProperty(styleName)) {
                                 styleUpdates = styleUpdates || {};
                                 styleUpdates[styleName] = '';
                             }
                         }
-                        for (styleName in currentProp) {
-                            if (currentProp.hasOwnProperty(styleName) &&
+                        for (styleName in nextProp) {
+                            if (nextProp.hasOwnProperty(styleName) &&
                                 prevProp[styleName] !== prevProp[styleName]) {
                                 styleUpdates = styleUpdates || {};
                                 styleUpdates[styleName] = nextProp[styleName];
                             }
                         }
                     } else {
-                        styleUpdates = currentProp;
+                        styleUpdates = nextProp;
                     }
                 } else if (propKey === 'events') {
-                    currentProp.forEach(function(event) {
-                        self.addOutPort(event, ub.BrowserEvent.addListener(event, self));
+                    nextProp.forEach(function(event) {
+                        this.addOutPort(event, ub.BrowserEvent.addListener(event, this));
                     });
                 } else {
-                    this.updateProperty(propKey, currentProp);
+                    if (propKey !== 'children') {
+                        this.updateProperty(propKey, nextProp);
+                    }
                 }
 
                 if (styleUpdates) {
@@ -219,8 +229,33 @@
             }
         },
 
-        _updateChildren: function() {
+        _updateDomChildren: function(prevProps) {
+            var nextProps = this.props;
 
+            var prevContent = CONTENT_TYPE[typeof prevProps.children] ?
+                prevProps.children : null;
+            var nextContent = CONTENT_TYPE[typeof nextProps.children] ?
+                nextProps.children : null;
+
+            var prevChildren = prevContent != null ? null : prevProps.children;
+            var nextChildren = nextContent != null ? null : nextProps.children;
+
+            if (prevChildren != null && nextChildren == null) {
+                this.updateChildren(null);
+            } else if (prevContent != null && !(nextContent != null)) {
+                this.updateTextContent('');
+            }
+
+            if (nextContent != null) {
+                if (prevContent !== nextContent) {
+                    this.updateTextContent(nextContent);
+                }
+            } else {
+                this.updateChildren(nextChildren);
+            }
+        },
+
+        removeProperty: function(prop) {
         },
 
         /**
