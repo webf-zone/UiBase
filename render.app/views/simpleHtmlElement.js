@@ -35,27 +35,49 @@
         render: function() {
             var view = this;
 
+            var unit = view.state.seconds === 0 ?
+                undefined : view.state.seconds === 1 ?
+                new ub.Views.HtmlElement({
+                    tag: 'span',
+                    props: {
+                        children: 'Sec'
+                    }
+                })
+                :
+                new ub.Views.HtmlElement({
+                    tag: 'span',
+                    props: {
+                        children: 'Secs'
+                    }
+                });
+
+            var items = [
+                new ub.Views.HtmlElement({
+                    tag: 'span',
+                    props: {
+                        children: 'Seconds Passed: '
+                    }
+                }),
+                new ub.Views.HtmlElement({
+                    tag: 'span',
+                    props: {
+                        style: {
+                            'font-weight': 'bold',
+                            'color': view.state.seconds < 10 ? '#444' : '#FF0000'
+                        },
+                        children: view.state.seconds
+                    }
+                })
+            ];
+
+            if (unit) {
+                items.push(unit);
+            }
+
             return new ub.Views.HtmlElement({
                 tag: 'div',
                 props: {
-                    children: [
-                        new ub.Views.HtmlElement({
-                            tag: 'span',
-                            props: {
-                                children: 'Seconds Passed: '
-                            }
-                        }),
-                        new ub.Views.HtmlElement({
-                            tag: 'span',
-                            props: {
-                                style: {
-                                    'font-weight': 'bold',
-                                    'color': view.state.seconds < 10 ? '#444' : '#FF0000'
-                                },
-                                children: view.state.seconds
-                            }
-                        })
-                    ]
+                    children: items
                 }
             });
         }

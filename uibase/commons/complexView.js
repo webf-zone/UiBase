@@ -35,7 +35,15 @@
 
             this._compoundPhase = ub.ComplexView.ViewPhase.RENDERING;
 
-            this._renderedView = this.render();
+            ub.View.currentParent = this;
+
+            try {
+                this._renderedView = this.render();
+            } catch (error) {
+                throw error;
+            } finally {
+                ub.View.currentParent = null;
+            }
 
             this._compoundPhase = null;
 
@@ -118,7 +126,16 @@
             this._super(prevProps, prevParent);
 
             var prevView = this._renderedView;
-            var nextView = this.render();
+            var nextView = null;
+
+            ub.View.currentParent = this;
+            try {
+                nextView = this.render();
+            } catch (error) {
+                throw error;
+            } finally {
+                ub.View.currentParent = null;
+            }
 
             if (prevView && nextView &&
                 prevView.constructor === nextView.constructor &&

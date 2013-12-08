@@ -22,7 +22,7 @@
 
             config = config || {};
             self.props = config.props || {};
-            self.parent = null;
+            self.parent = ub.View.currentParent;
             self._phase = ub.View.ViewPhase.REMOVED;
             self._futureProps = null;
             self._futureParent = null;
@@ -181,6 +181,7 @@
 
                 var prevChild = prevChildren && prevChildren[name];
                 var nextChild = nextChildren[name];
+
                 if (prevChild && nextChild &&
                     prevChild.constructor === nextChild.constructor &&
                     prevChild.parent === nextChild.parent) {
@@ -195,7 +196,7 @@
                         this.removeChildByName(prevChild, name);
                     }
                     if (nextChild) {
-                        this._renderChildByNameAtIndex(nextChild, name, nextIndex);
+                        this.renderChildByNameAtIndex(nextChild, name, nextIndex);
                     }
                 }
                 if (nextChild) {
@@ -212,13 +213,28 @@
             }
         },
 
-        removeChild: function() {
+        renderChildByNameAtIndex: function(child, name, index) {
+            var rootID = this._rootId + name;
+            var renderImage = child.renderView(rootID, this._depth + 1);
+            child._renderImage = renderImage;
+            child._renderIndex = index;
+            this.createChild(child);
+            this._renderedChildren = this._renderedChildren || {};
+            this._renderedChildren[name] = child;
+        },
+
+        createChild: function(child) {
+            this.enqueueMarkup(child);
         },
 
         moveChild: function (child, toIndex, lastIndex) {
             if (child._renderIndex < lastIndex) {
                 this.enqueueMove(this._rootId, child._renderIndex, toIndex);
             }
+        },
+
+        removeChild: function(child) {
+            this.enqueueRemove(child._renderIndex);
         },
 
         removeChildByName: function(child, name) {
@@ -261,6 +277,26 @@
             }.bind(this));
         },
 
+        enqueueMarkup: function(child) {
+            var parentNode = this.getNode();
+
+            var children = parentNode.children();
+
+            if (children[child._renderIndex] === child) {
+                return;
+            }
+
+            if (child.parent === this) {
+                this.removeChild(child);
+            }
+
+            if (child._renderIndex >= children.length) {
+                parentNode.append(child._renderImage);
+            } else {
+                children[child._renderIndex].before(child._renderImage);
+            }
+        },
+
         getKey: function(index) {
             if (this.props && this.props.key != null) {
                 return '{' + this.props.key + '}';
@@ -293,6 +329,8 @@
             ubId: 5000,
 
             viewCache: {},
+
+            currentParent: null,
 
             ViewPhase: {
                 RENDERED: 'RENDERED',
