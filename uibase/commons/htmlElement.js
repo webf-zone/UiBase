@@ -155,7 +155,8 @@
         },
 
         _updateDomProps: function(prevProps) {
-            var nextProps = this.props,
+            var self = this,
+                nextProps = this.props,
                 propKey,
                 prevStyle,
                 styleName,
@@ -215,7 +216,7 @@
                     }
                 } else if (propKey === 'events') {
                     nextProp.forEach(function(event) {
-                        this.addOutPort(event, ub.BrowserEvent.addListener(event, this));
+                        self.addOutPort(event, ub.BrowserEvent.addListener(event, this));
                     });
                 } else {
                     if (propKey !== 'children') {

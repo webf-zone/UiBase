@@ -28,13 +28,12 @@
             self._futureParent = null;
             self._events = config.events || [];
 
-            self.children = config.children;
-
             self._super();
         },
 
         /**
          * @method renderView
+         * @param rootId
          * @param depth
          * @returns String
          */
@@ -43,6 +42,10 @@
 
             if (view.isRendered()) {
                 throw new Error('renderView: Can only render a un-rendered view');
+            }
+
+            if (this.props.compName != null) {
+                this.parent.addCompToCreator(this, this.props.compName);
             }
 
             view._rootId = rootId;
@@ -147,11 +150,15 @@
                 this._updateChildren(nextChildren);
             } catch (error) {
                 updateDepth -= 1;
-                updateDepth || ub.View.clearChildUpdateQueue();
+                if (updateDepth === 0) {
+                    ub.View.clearChildUpdateQueue();
+                }
                 throw error;
             }
             updateDepth--;
-            updateDepth || ub.View.processChildUpdateQueue();
+            if (updateDepth === 0) {
+                ub.View.processChildUpdateQueue();
+            }
         },
 
         _updateChildren: function(children) {
@@ -215,8 +222,8 @@
 
         renderChildByNameAtIndex: function(child, name, index) {
             var rootID = this._rootId + name;
-            var renderImage = child.renderView(rootID, this._depth + 1);
-            child._renderImage = renderImage;
+
+            child._renderImage = child.renderView(rootID, this._depth + 1);
             child._renderIndex = index;
             this.createChild(child);
             this._renderedChildren = this._renderedChildren || {};
@@ -264,11 +271,15 @@
                 this.enqueueTextContent(nextContent);
             } catch (error) {
                 updateDepth -= 1;
-                updateDepth || ub.View.clearChildUpdateQueue();
+                if (updateDepth === 0) {
+                    ub.View.clearChildUpdateQueue();
+                }
             }
 
             updateDepth -= 1;
-            updateDepth || ub.View.processChildUpdateQueue();
+            if (updateDepth === 0) {
+                ub.View.processChildUpdateQueue();
+            }
         },
 
         enqueueTextContent: function(nextContent) {
@@ -344,12 +355,17 @@
             childrenUpdateOpsQueue: [],
 
             renderView: function(view, container) {
+
+                if (!(view instanceof ub.View)) {
+                    throw new Error('renderView(): passed in view is not valid');
+                }
+
                 var markup,
                     rootId = 'ub[' + (ub.View.ubId++).toString(23) + ']';
 
-                ub.View.viewCache[rootId] = rootId;
+                ub.View.viewCache[rootId] = view;
 
-                markup = view.renderView(rootId, 1);
+                markup = view.renderView(rootId, 0);
                 $(container).html(markup);
 
                 //view._dom = nextRenderedView;

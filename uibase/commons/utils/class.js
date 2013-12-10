@@ -72,8 +72,8 @@
             instanceProps;
 
         instanceProps = utils.extend({}, config);
-        delete instanceProps["extends"];
-        delete instanceProps["static"];
+        delete instanceProps['extends'];
+        delete instanceProps['static'];
 
         if (parent) {
             Child = __extend.apply(parent, [instanceProps]);
@@ -81,12 +81,7 @@
             Child = __extend.apply(function() {}, [instanceProps]);
         }
 
-        utils.extend(Child, config["static"]);
-
-        //TODO: Find a better way to inherit static properties
-        if (parent) utils.extend(Child, parent);
-
-        Child.prototype.constructor = config.construct;
+        utils.extend(Child, config['static']);
 
         return Child;
     };

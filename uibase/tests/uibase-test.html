@@ -8,7 +8,10 @@
 <body>
     <div id="mocha"></div>
     <script src="../../node_modules/mocha/mocha.js"></script>
-    <script>mocha.setup('bdd')</script>
+    <script>
+        mocha.setup('bdd')
+        mocha.reporter('html');
+    </script>
     <!-- assertion framework -->
     <script src="../../node_modules/chai/chai.js"></script>
     <script>var expect = chai.expect</script>
@@ -18,15 +21,21 @@
     <script src="../commons/core.js"></script>
     <script src="../commons/utils/utils.js"></script>
     <script src="../commons/utils/class.js"></script>
+    <script src="../commons/observable.js"></script>
+    <script src="../commons/observer.js"></script>
+    <script src="../commons/component.js"></script>
+    <script src="../commons/view.js"></script>
+    <script src="../commons/complexView.js"></script>
+    <script src="../commons/htmlElement.js"></script>
 
     <!-- include spec files here... -->
     <script src="commons/utils/utils.js"></script>
     <script src="commons/utils/class.js"></script>
+    <script src="commons/view.js"></script>
 
     <script>
-        if (navigator.userAgent.indexOf('PhantomJS') < 0) {
-            mocha.run();
-        }
+        if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+        else { mocha.run(); }
     </script>
 </body>
 </html>

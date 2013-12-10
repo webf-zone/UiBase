@@ -34,22 +34,28 @@
             this._super(rootId, depth);
 
             this._compoundPhase = ub.ComplexView.ViewPhase.RENDERING;
+            this._renderedView = this._getRenderedView();
+            this._compoundPhase = null;
+
+            var markup = this._renderedView.renderView(rootId, depth + 1);
+
+            return markup;
+        },
+
+        _getRenderedView: function() {
+            var renderedView = null;
 
             ub.View.currentParent = this;
 
             try {
-                this._renderedView = this.render();
+                renderedView = this.render();
             } catch (error) {
                 throw error;
             } finally {
                 ub.View.currentParent = null;
             }
 
-            this._compoundPhase = null;
-
-            var markup = this._renderedView.renderView(rootId, depth + 1);
-
-            return markup;
+            return renderedView;
         },
 
         setState: function(partialState) {
@@ -128,14 +134,7 @@
             var prevView = this._renderedView;
             var nextView = null;
 
-            ub.View.currentParent = this;
-            try {
-                nextView = this.render();
-            } catch (error) {
-                throw error;
-            } finally {
-                ub.View.currentParent = null;
-            }
+            nextView = this._getRenderedView();
 
             if (prevView && nextView &&
                 prevView.constructor === nextView.constructor &&
@@ -145,7 +144,8 @@
                 prevView.removeView();
                 this._renderedView = nextView;
                 var nextMarkup = nextView.renderView(this._depth + 1);
-                //TODO: Insert nextMarkup into root node of this view
+
+                this.getNode().html(nextMarkup);
             }
         },
 

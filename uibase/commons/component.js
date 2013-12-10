@@ -26,6 +26,10 @@
             comp._outPorts[name] = observable;
         },
 
+        addCompToCreator: function(comp, name) {
+            this.components[name] = comp;
+        },
+
         static: {
             connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
 

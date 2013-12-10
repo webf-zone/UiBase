@@ -4,9 +4,6 @@
     /* jshint boss:true */
     ub = ub || (window.uibase = Object.create(null));
 
-//http://localhost/UiBase/abc/login/5/
-//http://localhost/predeect/login/
-
     var scripts = document.getElementsByTagName('script');
 
     ub.basePath = scripts[scripts.length-1].src.split('/').slice(0, -3).join('/') + '/';
