@@ -40,6 +40,7 @@
             "commons/router.js",
             "commons/browserEvent.js",
             "commons/view.js",
+            "commons/htmlElement.js",
             "commons/complexView.js",
             "commons/model.js",
             "commons/repository.js",
@@ -58,12 +59,8 @@
         "scripts": "components/collate.js"
     },
 
-    "compHtmlElement": {
-        "scripts": "views/htmlElement.js"
-    },
-
     "compTextbox": {
-        "dependencies": ["compMap", "compHtmlElement"],
+        "dependencies": ["compMap"],
         "scripts": "views/textbox.js"
     },
 

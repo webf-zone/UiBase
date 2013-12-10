@@ -2,9 +2,7 @@
     "basePath": "render.app/",
 
     "v.SimpleHtmlElement": {
-        "dependencies": [
-            "compHtmlElement"
-        ],
+        "dependencies": [],
         "markup": [],
         "styles": [],
         "scripts": "views/simpleHtmlElement.js"
