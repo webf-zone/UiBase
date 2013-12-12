@@ -30,6 +30,12 @@
             this.components[name] = comp;
         },
 
+        removeCompFromCreator: function(comp, name) {
+            if (this.components[name] === comp) {
+                delete this.components[name];
+            }
+        },
+
         static: {
             connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
 

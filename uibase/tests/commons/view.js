@@ -125,7 +125,7 @@
                     return new ub.Views.HtmlElement({
                         tag: 'span',
                         props: {
-                            compName: 'span',
+                            compName: 'span'
                         }
                     });
                 }

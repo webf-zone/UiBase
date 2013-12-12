@@ -4,6 +4,8 @@
 
     ub.Views = ub.Views || {};
 
+    var startSeconds = Number(new Date());
+
     ub.Views.SimpleHtmlElement = ub.Utils.Class({
 
         extends: ub.ComplexView,
@@ -14,6 +16,7 @@
             self._super();
 
             self.state.seconds = 0;
+            startSeconds = Number(new Date());
 
             setTimeout(function() {
                 self._updateTime();
@@ -24,7 +27,7 @@
             var view = this;
 
             view.setState({
-                seconds: view.state.seconds + 1
+                seconds: parseInt((Number(new Date()) - startSeconds) / 1000, 10)
             });
 
             setTimeout(function() {

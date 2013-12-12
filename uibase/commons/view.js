@@ -75,7 +75,16 @@
         },
 
         updateView: function(prevProps, prevParent) {
-            //TODO: Handle parent reference maintenance
+            var props = this.props;
+
+            if (this.parent !== prevParent || props.compName !== prevProps.compName) {
+                if (prevProps.compName != null) {
+                    prevParent.removeCompFromCreator(this, prevProps.compName);
+                }
+                if (this.props.compName != null) {
+                    this.parent.addCompToCreator(this, this.props.compName);
+                }
+            }
         },
 
         copyFrom: function(nextView) {
@@ -94,7 +103,9 @@
             }
 
             var props = this.props;
-            //TODO: Handle parent reference maintenance
+            if (props.compName != null) {
+                this.parent.removeCompFromCreator(this, this.props.compName);
+            }
 
             this._phase = ub.View.ViewPhase.REMOVED;
         },
@@ -323,9 +334,11 @@
         addInPort: function(name, onNext, onError, onCompleted) {
             var self = this;
 
+            //TODO: Handle second argument being an Observer
+
             self._inPorts[name] = new ub.Observer(function() {
                 onNext.apply(self, arguments);
-                self.performUpdateIfRequired();
+                ub.View.enqueueUpdate(self);
             });
         },
 
@@ -348,7 +361,7 @@
                 REMOVED: 'REMOVED'
             },
 
-            dirtyViews: [],
+            dirtyViews: {},
 
             isBatching: false,
 
@@ -374,9 +387,9 @@
             },
 
             enqueueUpdate: function(view) {
-                ub.View.dirtyViews.push(view);
+                ub.View.dirtyViews[view._rootId] = view;
 
-                if (ub.View.dirtyViews.length === 1 && !ub.View.isBatching) {
+                if (Object.keys(ub.View.dirtyViews).length === 1 && !ub.View.isBatching) {
                     ub.View.isBatching = true;
                     ub.View.startTicking();
                 }
@@ -393,14 +406,14 @@
             },
 
             clearUpdateQueue: function() {
-                ub.View.dirtyViews.length = 0;
+                ub.View.dirtyViews = {};
                 ub.View.isBatching = false;
             },
 
             runUpdates: function() {
-                var views = ub.View.dirtyViews;
-
-                views.sort(function(v1, v2) {
+                var views = Object.keys(ub.View.dirtyViews).map(function(key) {
+                    return ub.View.dirtyViews[key];
+                }).sort(function(v1, v2) {
                     return v1._depth - v2._depth;
                 });
 
