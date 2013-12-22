@@ -257,6 +257,8 @@
         },
 
         removeProperty: function(prop) {
+            var node = this.getNode();
+            node.removeProp(name);
         },
 
         updateProperty: function(name, value) {
@@ -264,14 +266,13 @@
             if (value != null) {
                 node.prop(name, value);
             } else {
-                node.removeProp(name);
+                this.removeProperty(name);
             }
         },
         
         updateStyles: function(styles) {
             var node = this.getNode();
 
-            console.log(styles);
             node.css(styles);
         },
 
