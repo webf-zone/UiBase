@@ -12,8 +12,8 @@
         get: function(outPort) {
             var comp = this;
 
-            if (!comp._outPorts[outPort]) {
-                console.warn("No output port \"" + outPort + "\" for component");
+            if (!comp.outPorts[outPort]) {
+                console.warn('No output port "' + outPort + '" for component');
                 return new ub.Observable(function() {});
             }
 
@@ -38,10 +38,6 @@
 
         static: {
             connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
-
-                sinkComp = ub.Utils.instanceOf(ub.Component)(sinkComp);
-                sourceComp = ub.Utils.instanceOf(ub.Component)(sourceComp);
-
                 var observer = sinkComp._inPorts[sinkPort];
 
                 return sourceComp.get(sourcePort).subscribe(observer);

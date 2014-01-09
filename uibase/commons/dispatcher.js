@@ -17,7 +17,7 @@
          * @param {Function} subscribe Associated observable's subscribe method.
          */
         construct: function(subscribe) {
-            this._subscribe = utils.func(subscribe);
+            this._subscribe = subscribe;
             this._subscriptions = [];
         },
 
@@ -52,7 +52,7 @@
         subscribe: function(obs) {
             var oThis = this,
                 subscription,
-                observer = utils.instanceOf(ub.Observer)(obs),
+                observer = obs,
                 unsubscribe = function() {};
 
             subscription = {

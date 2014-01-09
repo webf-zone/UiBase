@@ -1,49 +1,41 @@
-;(function(ub) {
-    "use strict";
+(function(ub) {
+    'use strict';
 
     ub.Components = ub.Components || {};
 
-    var Map = ub.Utils.Class({
+    ub.Components.Map = ub.Utils.createComponent({
 
-        extends: ub.Component,
-
-        construct: function(mapper) {
-            var self = this;
-
-            self._super();
-
-            self._mapper = mapper;
-
-            self._outPorts = {
-                output: new ub.Observable(function(observer) {
-                    self._observer = ub.Utils.instanceOf(ub.Observer)(observer);
-                })
-            };
-
-            self._inPorts = {
-                input: new ub.Observer(function(val) {
-                    if (self._observer) {
-                        self._update(self._mapper.call(self, val));
-                    }
-                },
-                function(errors) {
-                    //TODO: Define this function
-                    self._error(errors);
-                },
-                function() {
-                    //TODO: Define this function
-                    self._completed();
-                })
-            };
+        config: {
+            mapper: {
+                optional: true,
+                default: function(val) { return val; },
+                type: 'function'
+            }
         },
 
-        _update: function(val) {
-            this._observer.onNext(val);
+        beh: {
+            input: {
+                success: function(value) {
+                    return {
+                        output: this.config.mapper(value)
+                    };
+                },
+                error: function(errors) {
+                    return {
+                        output: errors
+                    };
+                }
+            }
+        },
+
+        inPorts: {
+            input: {}
+        },
+
+        outPorts: {
+            output: true
         }
     });
-
-    ub.Components.Map  = Map;
-    ub.Components.Lift = Map;
 
 })(window.uibase);
 

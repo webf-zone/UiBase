@@ -20,7 +20,7 @@
          *   sequence ends.
          */
         construct: function(onNext, onError, onCompleted) {
-            this._onNext = utils.func(onNext);
+            this._onNext = onNext;
             this._onError = onError;
             this._onCompleted = onCompleted;
         },
@@ -32,6 +32,14 @@
          */
         onNext: function() {
             this._onNext.apply(this, arguments);
+        },
+
+        onError: function() {
+            this._onError.apply(this, arguments);
+        },
+
+        onCompleted: function() {
+            this._onCompleted.apply(this, arguments);
         }
     });
 
