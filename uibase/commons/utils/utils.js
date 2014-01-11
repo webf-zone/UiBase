@@ -30,6 +30,23 @@
     }
 
     function createConnections(self, conns) {
+        var isView = self instanceof ub.View;
+
+        /**
+         * Each view must have a root element, and the DOM events fired
+         * at the root element will act as the DOM events for this
+         * component.
+         */
+        if (isView && self.components.root) {
+            self.components.root.config.events.forEach(function(eventName) {
+                if (self._inPorts[eventName]) {
+                    ub.Component.connect(
+                        self.components.root, eventName,
+                        self, eventName
+                    );
+                }
+            });
+        }
         return Object.keys(conns).reduce(function(store, connName) {
             var source = conns[connName][0].split('.'),
                 sink = conns[connName][1].split('.'),
@@ -68,7 +85,7 @@
     }
 
     function createInPorts(self, ports, config) {
-        return Object.keys(ports).reduce(function(store, portName) {
+        return utils.extend(Object.keys(ports).reduce(function(store, portName) {
             var portConfig = ports[portName];
 
             if (portConfig.success) {
@@ -92,7 +109,22 @@
             }
 
             return store;
-        }, {});
+        }, {}), Object.keys(config.config).reduce(function(store, configName) {
+            var configOptions = config.config[configName];
+
+            /*
+                If the config option is not write once (can be set after initialization)
+                then create a input of that name. Make sure no custom configuration
+                for this port has been provided.
+             */
+            if (configOptions.constant === false && !(configName in ports)) {
+                store[configName] = new ub.Observer(function(val) {
+                    self.config[configName] = val;
+                });
+            }
+
+            return store;
+        }, {}));
     }
 
     function createOutPorts(self, ports) {
@@ -135,7 +167,7 @@
         var ViewConstructor = config.picture.name;
 
         return new ViewConstructor({
-            props: utils.extend({}, config.picture.props, config.picture.children.map(parseViewConfig))
+            props: utils.extend({}, config.picture.config, config.picture.children.map(parseViewConfig))
         });
     }
 
@@ -159,6 +191,11 @@
 
         self.config = {};
 
+        /**
+         * Iterate over the config options that this component can accepts
+         * and populate them for the current instance using the instance
+         * configuration.
+         */
         Object.keys(config.config).forEach(function(configName) {
             var localConfig = config.config;
 
@@ -166,8 +203,16 @@
 
             instanceConfig = instanceConfig || {};
 
+            /**
+             * If the configuration options is mandatory and it has not been
+             * passed for the instance, throw and error.
+             */
             if (!optional && typeof instanceConfig[configName] === 'undefined') {
                 throw new Error('Missing required configuration: ' + configName);
+            }
+
+            if (localConfig[configName].type && typeof instanceConfig[configName] !== localConfig[configName].type) {
+                throw new TypeError('Expected ' + configName + ' to be of type ' + localConfig[configName].type);
             }
 
             if (typeof instanceConfig[configName] !== 'undefined' &&
@@ -176,7 +221,8 @@
                 throw new Error('Assertion failed for configuration parameter: ' + configName);
             }
 
-            self.config[configName] = instanceConfig[configName] || localConfig[configName].default;
+            self.config[configName] = instanceConfig[configName] !== undefined ?
+                instanceConfig[configName] : localConfig[configName].default;
         });
 
         if (typeof config.construct === 'function') {
@@ -196,6 +242,13 @@
                 var self = this,
                     pConfig;
 
+                /**
+                 * parentConfig is a configuration option of type function,
+                 * which returns the configuration options required for
+                 * the parent (by inheritance) component.
+                 * The function takes the component instance configuration
+                 * as parameter.
+                 */
                 if (config.parentConfig) {
                     pConfig = config.parentConfig(instanceConfig);
                 } else {
@@ -207,8 +260,6 @@
             }
         }, removeReservedConfigParams(config));
 
-        console.log(classConfig);
-
         return ub.Utils.Class(classConfig);
     };
 
@@ -218,11 +269,18 @@
 
             extends: config.extends || ub.ComplexView,
 
-            construct: function() {
-                var self = this;
+            construct: function(instanceConfig) {
+                var self = this,
+                    pConfig;
 
-                self._super();
-                createProperties(self, config);
+                if (config.parentConfig) {
+                    pConfig = config.parentConfig(instanceConfig);
+                } else {
+                    pConfig = instanceConfig;
+                }
+
+                self._super(pConfig);
+                createProperties(self, config, instanceConfig);
             },
 
             render: function() {

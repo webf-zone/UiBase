@@ -17,7 +17,7 @@
          *   when to call the observer's onNext method.
          */
         construct: function(subscribe) {
-            var dispatcher = new ub.Dispatcher(subscribe);
+            var dispatcher = new ub.Dispatcher(subscribe.bind(this));
 
             /**
              * @method subscribe

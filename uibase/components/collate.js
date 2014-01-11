@@ -1,25 +1,65 @@
-;(function(ub) {
-    "use strict";
+(function(ub) {
+    'use strict';
 
     ub.Components = ub.Components || {};
 
-    var Collate = ub.Utils.Class({
+    ub.Components.Collate = ub.Utils.createComponent({
 
-        extends: ub.Components.Map,
+        config: {
+            seed: {
+                optional: false
+            },
+            op: {
+                optional: false,
+                type: 'function'
+            }
+        },
 
-        construct: function(seed, op) {
-            var oThis = this;
+        inPorts: {
+            input: {},
+            reset: {}
+        },
 
-            this._acc = seed;
-            this._op = ub.Utils.func(op);
+        outPorts: {
+            output: true
+        },
 
-            this._super(function(val) {
-                return oThis._op(oThis._acc, val);
-            });
+        _aux: function(acc, v) {
+            var self = this,
+                result = self.config.op(acc, v);
+
+            return {
+                output: result,
+                next: {
+                    success: function(val) { return self._aux(result, val); }
+                }
+            };
+        },
+
+        beh: {
+            input: {
+                success: function(value) {
+                    var self = this;
+
+                    return self._aux(self.config.seed, value);
+                },
+                error: function(errors) {
+                    return {
+                        output: errors
+                    };
+                }
+            },
+            reset: {
+                success: function() {
+                    return {
+                        output: this.config.seed,
+                        next: {
+                            input: this._aux.bind(this.config.seed)
+                        }
+                    };
+                }
+            }
         }
     });
-
-    ub.Components.Collate = Collate;
-    ub.Components.Foldp   = Collate;
 
 })(window.uibase);
