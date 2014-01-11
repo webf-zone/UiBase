@@ -1,39 +1,44 @@
 (function(ub) {
-    "use strict";
+    'use strict';
 
     ub.Views = ub.Views || {};
 
-    var Button = ub.Utils.Class({
+    ub.Views.Button = ub.Utils.createView({
 
-        extends: ub.View,
-
-        construct: function(config) {
-            var self = this;
-
-            self._super(config);
-
-            self._props = config.props || {};
-            self._text = config.text || "";
-
-            self.addInPort("text", function(text) {
-                self._text = text;
-            });
-
-            self.addOutPort("click", ub.BrowserEvent.addListener("click", self));
+        config: {
+            text: {
+                optional: true,
+                default: '',
+                type: 'string'
+            }
         },
 
-        render: function() {
-            var self = this;
+        inPorts: {
+            text: {},
+            click: {}
+        },
 
-            return new ub.Views.HtmlElement({
-                tag: "button",
-                view: self,
-                props: self._props,
-                text: self._text
-            });
+        outPorts: {
+            click: true
+        },
+
+        beh: {
+            click: {
+                success: function(e) { return { click: e }; }
+            }
+        },
+
+        picture: function() {
+            return {
+                name: ub.Views.HtmlElement,
+                tag: 'button',
+                children: this.config.text,
+                props: {
+                    compName: 'root',
+                    events: [ 'click' ]
+                }
+            };
         }
     });
-
-    ub.Views.Button = Button;
 
 })(window.uibase);

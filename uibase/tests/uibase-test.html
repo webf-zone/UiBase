@@ -7,6 +7,7 @@
 </head>
 <body>
     <div id="mocha"></div>
+    <div id="test-container"></div>
     <script src="../../node_modules/mocha/mocha.js"></script>
     <script>
         mocha.setup('bdd')
@@ -27,9 +28,12 @@
     <script src="../commons/component.js"></script>
     <script src="../commons/view.js"></script>
     <script src="../commons/complexView.js"></script>
+    <script src="../commons/browserEvent.js"></script>
     <script src="../commons/htmlElement.js"></script>
     <script src="../components/map.js"></script>
     <script src="../components/collate.js"></script>
+
+    <script src="../views/button.js"></script>
 
     <!-- include spec files here... -->
     <script src="commons/utils/utils.js"></script>
@@ -38,6 +42,8 @@
 
     <script src="components/map.js"></script>
     <script src="components/collate.js"></script>
+
+    <script src="views/button.js"></script>
 
     <script>
         if (window.mochaPhantomJS) { mochaPhantomJS.run(); }

@@ -381,7 +381,15 @@
                 markup = view.renderView(rootId, 0);
                 $(container).html(markup);
 
-                //view._dom = nextRenderedView;
+                if ('root' in view.components)
+                    view.components.root.props.events.forEach(function(eventName) {
+                        if (view._inPorts[eventName]) {
+                            ub.Component.connect(
+                                view.components.root, eventName,
+                                view, eventName
+                            );
+                        }
+                    });
 
                 return view;
             },

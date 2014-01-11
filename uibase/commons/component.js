@@ -12,7 +12,7 @@
         get: function(outPort) {
             var comp = this;
 
-            if (!comp.outPorts[outPort]) {
+            if (!comp._outPorts[outPort]) {
                 console.warn('No output port "' + outPort + '" for component');
                 return new ub.Observable(function() {});
             }

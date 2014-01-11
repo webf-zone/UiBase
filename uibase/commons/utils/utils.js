@@ -163,12 +163,21 @@
         }, {});
     }
 
-    function parseViewConfig(config) {
-        var ViewConstructor = config.picture.name;
+    function parseViewConfig(self, config) {
+        var picture = config.picture.call(self);
+        var ViewConstructor = picture.name;
 
-        return new ViewConstructor({
-            props: utils.extend({}, config.picture.config, config.picture.children.map(parseViewConfig))
-        });
+        var children = picture.children ? typeof picture.children === 'string' ?
+            picture.children : picture.children.map(parseViewConfig) : {};
+
+        var configs = utils.extend({}, picture);
+        delete configs.props;
+
+        picture.props.children = children;
+
+        return new ViewConstructor(utils.extend(configs, {
+            props: utils.extend({}, picture.props, self.config.props)
+        }));
     }
 
     function removeReservedConfigParams(config) {
@@ -191,6 +200,14 @@
 
         self.config = {};
 
+        var isView = self instanceof ub.View;
+
+        if (isView)
+            config.config.props = {
+                optional: true,
+                default: {}
+            };
+
         /**
          * Iterate over the config options that this component can accepts
          * and populate them for the current instance using the instance
@@ -211,7 +228,9 @@
                 throw new Error('Missing required configuration: ' + configName);
             }
 
-            if (localConfig[configName].type && typeof instanceConfig[configName] !== localConfig[configName].type) {
+            if (typeof instanceConfig[configName] !== 'undefined' &&
+                localConfig[configName].type &&
+                typeof instanceConfig[configName] !== localConfig[configName].type) {
                 throw new TypeError('Expected ' + configName + ' to be of type ' + localConfig[configName].type);
             }
 
@@ -284,7 +303,7 @@
             },
 
             render: function() {
-                return parseViewConfig(config);
+                return parseViewConfig(this, config);
             }
         }, removeReservedConfigParams(config)));
     };
