@@ -54,6 +54,48 @@
 
         });
 
+        it('should reset state when reset input is triggered', function(done) {
+            var op = function(acc, val) { return acc + val; },
+                collate = new ub.Components.Collate({ seed: 1, op: op });
+
+            var input = new ub.Observable(function(observer) {
+                this.write = function(val) { observer.onNext(val); };
+            });
+
+            input.subscribe(collate._inPorts.input);
+
+            input.write(2);
+            input.write(3);
+
+            var iter = 0;
+            var isReset = false;
+
+            collate._outPorts.output.subscribe(new ub.Observer(function(val) {
+                iter += 1;
+                if (iter === 2 && !isReset) {
+                    expect(val).to.equal(6);
+                } else if (iter === 2 && isReset) {
+                    expect(val).to.equal(6);
+                    done();
+                }
+            }));
+
+            var rstInput = new ub.Observable(function(observer) {
+                this.write = function(val) {
+                    observer.onNext(val);
+                    isReset = true;
+                };
+            });
+
+            rstInput.subscribe(collate._inPorts.reset);
+
+            rstInput.write(true);
+
+            iter = 0;
+            input.write(2);
+            input.write(3);
+        });
+
     });
 }(window.uibase));
 
