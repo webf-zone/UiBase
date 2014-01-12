@@ -9,12 +9,18 @@
             text: {
                 optional: true,
                 default: '',
-                type: 'string'
+                type: 'string',
+                constant: false
+            },
+            disabled: {
+                optional: true,
+                default: false,
+                type: 'boolean',
+                constant: false
             }
         },
 
         inPorts: {
-            text: {},
             click: {}
         },
 
@@ -34,6 +40,7 @@
                 tag: 'button',
                 children: this.config.text,
                 props: {
+                    disabled: this.config.disabled,
                     compName: 'root',
                     events: [ 'click' ]
                 }

@@ -117,7 +117,7 @@
                 then create a input of that name. Make sure no custom configuration
                 for this port has been provided.
              */
-            if (configOptions.constant === false && !(configName in ports)) {
+            if (configOptions.constant === false && !(configName in config.beh)) {
                 store[configName] = new ub.Observer(function(val) {
                     self.config[configName] = val;
                 });
