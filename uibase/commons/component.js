@@ -4,26 +4,26 @@
     var Component = ub.Utils.Class({
 
         construct: function() {
-            this._inPorts = {};
-            this._outPorts = {};
+            this.inputs = {};
+            this.outputs = {};
             this.components = {};
         },
 
         get: function(outPort) {
             var comp = this;
 
-            if (!comp._outPorts[outPort]) {
+            if (!comp.outputs[outPort]) {
                 console.warn('No output port "' + outPort + '" for component');
                 return new ub.Observable(function() {});
             }
 
-            return comp._outPorts[outPort];
+            return comp.outputs[outPort];
         },
 
         addOutPort: function(name, observable) {
             var comp = this;
 
-            comp._outPorts[name] = observable;
+            comp.outputs[name] = observable;
         },
 
         addCompToCreator: function(comp, name) {
@@ -38,7 +38,7 @@
 
         static: {
             connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
-                var observer = sinkComp._inPorts[sinkPort];
+                var observer = sinkComp.inputs[sinkPort];
 
                 return sourceComp.get(sourcePort).subscribe(observer);
             }

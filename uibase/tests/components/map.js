@@ -18,14 +18,14 @@
                 outVal = mapper(inputVal),
                 map = new ub.Components.Map({ mapper: mapper });
 
-            map._outPorts.output.subscribe(new ub.Observer(function(val) {
+            map.outputs.output.subscribe(new ub.Observer(function(val) {
                 expect(val).to.equal(outVal);
                 done();
             }));
 
             new ub.Observable(function(observer) {
                 observer.onNext(inputVal);
-            }).subscribe(map._inPorts.input);
+            }).subscribe(map.inputs.input);
         });
 
     });

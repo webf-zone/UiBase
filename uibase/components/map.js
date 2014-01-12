@@ -28,11 +28,11 @@
             }
         },
 
-        inPorts: {
+        inputs: {
             input: {}
         },
 
-        outPorts: {
+        outputs: {
             output: true
         }
     });

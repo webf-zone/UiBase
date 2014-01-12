@@ -37,14 +37,14 @@
                 this.write = function(val) { observer.onNext(val); };
             });
 
-            input.subscribe(collate._inPorts.input);
+            input.subscribe(collate.inputs.input);
 
             input.write(2);
             input.write(3);
 
             var iter = 0;
 
-            collate._outPorts.output.subscribe(new ub.Observer(function(val) {
+            collate.outputs.output.subscribe(new ub.Observer(function(val) {
                 iter += 1;
                 if (iter === 2) {
                     expect(val).to.equal(6);
@@ -62,7 +62,7 @@
                 this.write = function(val) { observer.onNext(val); };
             });
 
-            input.subscribe(collate._inPorts.input);
+            input.subscribe(collate.inputs.input);
 
             input.write(2);
             input.write(3);
@@ -70,7 +70,7 @@
             var iter = 0;
             var isReset = false;
 
-            collate._outPorts.output.subscribe(new ub.Observer(function(val) {
+            collate.outputs.output.subscribe(new ub.Observer(function(val) {
                 iter += 1;
                 if (iter === 2 && !isReset) {
                     expect(val).to.equal(6);
@@ -87,7 +87,7 @@
                 };
             });
 
-            rstInput.subscribe(collate._inPorts.reset);
+            rstInput.subscribe(collate.inputs.reset);
 
             rstInput.write(true);
 

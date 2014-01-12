@@ -15,12 +15,12 @@
             }
         },
 
-        inPorts: {
+        inputs: {
             input: {},
             reset: {}
         },
 
-        outPorts: {
+        outputs: {
             output: true
         },
 

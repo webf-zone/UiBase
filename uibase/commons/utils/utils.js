@@ -39,7 +39,7 @@
          */
         if (isView && self.components.root) {
             self.components.root.config.events.forEach(function(eventName) {
-                if (self._inPorts[eventName]) {
+                if (self.inputs[eventName]) {
                     ub.Component.connect(
                         self.components.root, eventName,
                         self, eventName
@@ -71,13 +71,13 @@
 
             var next = output.next;
             if (next) {
-                self._inPorts[portName]._onNext = onNext.bind(self, next);
+                self.inputs[portName]._onNext = onNext.bind(self, next);
                 delete output.next;
             }
 
             Object.keys(output).forEach(function(outputName) {
                 //TODO: Handle errors
-                self._outPorts[outputName].write('success', output[outputName]);
+                self.outputs[outputName].write('success', output[outputName]);
             });
         }
 
@@ -128,14 +128,14 @@
     }
 
     function createOutPorts(self, ports) {
-        self._outPorts = self._outPorts || {};
+        self.outputs = self.outputs || {};
 
         return Object.keys(ports).reduce(function(store, portName) {
             var portConfig = ports[portName];
 
             if (portConfig === true) {
                 store[portName] = new ub.Observable(function(observer) {
-                    self._outPorts[portName].write = function(type, val) {
+                    self.outputs[portName].write = function(type, val) {
                         if (type === 'success') {
                             observer.onNext(val);
                         } else if (type === 'error') {
@@ -195,8 +195,8 @@
 
         self.connections = createConnections(self, config.connections || {});
 
-        self._inPorts = createInPorts(self, config.inPorts || {}, config);
-        self._outPorts = createOutPorts(self, config.outPorts || {});
+        self.inputs = createInPorts(self, config.inputs || {}, config);
+        self.outputs = createOutPorts(self, config.outputs || {});
 
         self.config = {};
 

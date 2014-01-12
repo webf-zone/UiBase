@@ -336,7 +336,7 @@
 
             //TODO: Handle second argument being an Observer
 
-            self._inPorts[name] = new ub.Observer(function() {
+            self.inputs[name] = new ub.Observer(function() {
                 onNext.apply(self, arguments);
                 ub.View.enqueueUpdate(self);
             });
@@ -383,7 +383,7 @@
 
                 if ('root' in view.components)
                     view.components.root.props.events.forEach(function(eventName) {
-                        if (view._inPorts[eventName]) {
+                        if (view.inputs[eventName]) {
                             ub.Component.connect(
                                 view.components.root, eventName,
                                 view, eventName

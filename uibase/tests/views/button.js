@@ -33,7 +33,7 @@
             ub.View.renderView(btn, '#test-container');
 
             var clicks = 0;
-            btn._outPorts.click.subscribe(new ub.Observer(function(val) {
+            btn.outputs.click.subscribe(new ub.Observer(function(val) {
                 console.log('clicked');
                 clicks += 1;
                 if (val === 2) {
@@ -47,7 +47,7 @@
                     obs.onNext(val);
                 };
             });
-            clickTrigger.subscribe(btn._inPorts.click);
+            clickTrigger.subscribe(btn.inputs.click);
 
             clickTrigger.write(1);
             clickTrigger.write(2);

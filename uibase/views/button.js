@@ -20,11 +20,11 @@
             }
         },
 
-        inPorts: {
+        inputs: {
             click: {}
         },
 
-        outPorts: {
+        outputs: {
             click: true
         },
 
