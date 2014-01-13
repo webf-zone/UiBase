@@ -40,7 +40,8 @@
         renderView: function(rootId, depth) {
             this._super(rootId, depth);
             //TODO: Validate props
-            return this._createOpenTagMarkup() + this._createContentMarkup() + this._tagClose;
+//            return this._createOpenTagMarkup() + this._createContentMarkup() + this._tagClose;
+            return this._createOpenTagMarkup().html(this._createContentMarkup()).prop('outerHTML');
         },
 
         updateView: function(prevProps, prevParent) {
@@ -62,6 +63,7 @@
          * @returns String
          * @private
          */
+        /*
         _createOpenTagMarkup: function () {
             var self = this,
                 props = this.props,
@@ -95,6 +97,39 @@
             }
 
             return ret + ' ' + ub.View.UBID_ATTR_NAME + '="' + this._rootId + '">';
+        },
+        */
+        _createOpenTagMarkup: function() {
+            var self = this,
+                props = this.props,
+                ret = $('<' + this.tag + '>');
+
+            for (var propKey in props) {
+                if (!props.hasOwnProperty(propKey)) {
+                    continue;
+                }
+                var propValue = props[propKey];
+                if (propValue == null) {
+                    continue;
+                }
+                if (propKey === 'events') {
+                    propValue.forEach(function(event) {
+                        self.addOutPort(event, ub.BrowserEvent.addListener(event, self));
+                    });
+                } else {
+                    if (propKey === 'style') {
+                        if (propValue) {
+                            propValue = $.extend({}, props.style, propValue);
+                        }
+                        ret.css(propValue);
+                    }
+                    //var markup = this._createMarkupForProperty(propKey, propValue);
+                    ret.prop(propKey, propValue);
+                }
+            }
+
+//            return ret + ' ' + ub.View.UBID_ATTR_NAME + '="' + this._rootId + '">';
+            return ret.attr(ub.View.UBID_ATTR_NAME, this._rootId);
         },
 
         /**
