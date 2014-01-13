@@ -22,7 +22,7 @@
             var compConfig = utils.extend({}, comps[compName]),
                 CompConstructor = comps[compName].name;
 
-            delete compConfig[name];
+            delete compConfig.name;
             store[compName] = new CompConstructor(compConfig);
 
             return store;
@@ -36,7 +36,11 @@
          * Each view must have a root element, and the DOM events fired
          * at the root element will act as the DOM events for this
          * component.
+         *
+         * Check ub.View.renderView function.
          */
+
+        /**
         if (isView && self.components.root) {
             self.components.root.config.events.forEach(function(eventName) {
                 if (self.inputs[eventName]) {
@@ -47,6 +51,7 @@
                 }
             });
         }
+        */
         return Object.keys(conns).reduce(function(store, connName) {
             var source = conns[connName][0].split('.'),
                 sink = conns[connName][1].split('.'),
@@ -76,8 +81,13 @@
             }
 
             Object.keys(output).forEach(function(outputName) {
-                //TODO: Handle errors
-                self.outputs[outputName].write('success', output[outputName]);
+                if (outputName === 'picture' && self instanceof ub.View) {
+                    self._viewState = utils.extend(self._viewState, output[outputName]);
+                    ub.View.enqueueUpdate(self);
+                } else {
+                    //TODO: Handle errors
+                    self.outputs[outputName].write('success', output[outputName]);
+                }
             });
         }
 
@@ -164,7 +174,7 @@
     }
 
     function parseViewConfig(self, config) {
-        var picture = config.picture.call(self);
+        var picture = config.picture.call(self, self._viewState);
         var ViewConstructor = picture.name;
 
         var children = picture.children ? typeof picture.children === 'string' ?
@@ -243,6 +253,8 @@
             self.config[configName] = instanceConfig[configName] !== undefined ?
                 instanceConfig[configName] : localConfig[configName].default;
         });
+
+        self._viewState = utils.extend(true, {}, self.config);
 
         if (typeof config.construct === 'function') {
             config.construct.call(self, instanceConfig);
