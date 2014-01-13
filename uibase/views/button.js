@@ -9,19 +9,19 @@
             text: {
                 optional: true,
                 default: '',
-                type: 'string',
-                constant: false
+                type: 'string'
             },
             disabled: {
                 optional: true,
                 default: false,
-                type: 'boolean',
-                constant: false
+                type: 'boolean'
             }
         },
 
         inputs: {
-            click: {}
+            click: {},
+            text: {},
+            disabled: {}
         },
 
         outputs: {
@@ -29,18 +29,33 @@
         },
 
         beh: {
+            //TODO: Don't allow, when disabled
             click: {
                 success: function(e) { return { click: e }; }
+            },
+            text: {
+                success: function(txt) {
+                    return {
+                        picture: { text: txt }
+                    };
+                }
+            },
+            disabled: {
+                success: function(disabled) {
+                    return {
+                        picture: { disabled: disabled }
+                    };
+                }
             }
         },
 
-        picture: function() {
+        picture: function(config) {
             return {
                 name: ub.Views.HtmlElement,
                 tag: 'button',
-                children: this.config.text,
+                children: config.text,
                 props: {
-                    disabled: this.config.disabled,
+                    disabled: config.disabled,
                     compName: 'root',
                     events: [ 'click' ]
                 }
