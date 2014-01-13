@@ -75,7 +75,7 @@
                 if (iter === 2 && !isReset) {
                     expect(val).to.equal(6);
                 } else if (iter === 2 && isReset) {
-                    expect(val).to.equal(6);
+                    expect(val).to.equal(10);
                     done();
                 }
             }));
@@ -94,6 +94,7 @@
             iter = 0;
             input.write(2);
             input.write(3);
+            input.write(4);
         });
 
     });
