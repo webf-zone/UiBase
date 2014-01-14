@@ -98,10 +98,41 @@
             }, 100);
         });
 
+        it('should not write to click output, when it is disabled', function(done) {
+            var btn = new ub.Views.Button({
+                props: {
+                    id: 'btn5'
+                },
+                disabled: true,
+                text: 'Button Text'
+            });
+            ub.View.renderView(btn, '#test-container');
+
+            var clickTrigger = new ub.Observable(function(obs) {
+                this.write = function(val) {
+                    obs.onNext(val);
+                };
+            });
+            clickTrigger.subscribe(btn.inputs.click);
+
+            var clickCounter = 0;
+            btn.outputs.click.subscribe(new ub.Observer(function(val) {
+                clickCounter += 1;
+            }));
+
+            clickTrigger.write(1);
+            clickTrigger.write(2);
+
+            setTimeout(function() {
+                expect(clickCounter).to.equal(0);
+                done();
+            }, 500);
+        });
+
         it('should have text input, to update the text', function(done) {
             var btn = new ub.Views.Button({
                 props: {
-                    id: 'btn4'
+                    id: 'btn6'
                 },
                 text: 'Button Text'
             });

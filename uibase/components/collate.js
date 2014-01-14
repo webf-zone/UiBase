@@ -54,7 +54,9 @@
                     return {
                         output: this.config.seed,
                         next: {
-                            input: this._aux.bind(this.config.seed)
+                            input: {
+                                success: this._aux.bind(this, this.config.seed)
+                            }
                         }
                     };
                 }

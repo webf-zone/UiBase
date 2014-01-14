@@ -30,8 +30,6 @@
     }
 
     function createConnections(self, conns) {
-        var isView = self instanceof ub.View;
-
         /**
          * Each view must have a root element, and the DOM events fired
          * at the root element will act as the DOM events for this
@@ -40,18 +38,6 @@
          * Check ub.View.renderView function.
          */
 
-        /**
-        if (isView && self.components.root) {
-            self.components.root.config.events.forEach(function(eventName) {
-                if (self.inputs[eventName]) {
-                    ub.Component.connect(
-                        self.components.root, eventName,
-                        self, eventName
-                    );
-                }
-            });
-        }
-        */
         return Object.keys(conns).reduce(function(store, connName) {
             var source = conns[connName][0].split('.'),
                 sink = conns[connName][1].split('.'),
@@ -71,12 +57,30 @@
         var behConfig = config.beh[portName];
 
         // TODO: Handle onError
-        function onNext(beh, value) {
-            var output = (beh.success.bind(self))(value);
+        function onNext(beh, port, value) {
+            var output,
+                next;
 
-            var next = output.next;
+            if (typeof beh === 'function') {
+                output = (beh.bind(self))(value);
+            } else if (typeof beh.success === 'function') {
+                output = (beh.success.bind(self))(value);
+            }
+
+            output = output === undefined ? {} : output;
+
+            next = output.next;
             if (next) {
-                self.inputs[portName]._onNext = onNext.bind(self, next);
+                if (next.success) {
+                    self.inputs[port]._onNext = onNext.bind(self, next, port);
+                } else {
+                    Object.keys(next).forEach(function(inputName) {
+                        if (inputName in self.inputs) {
+                            self.inputs[inputName]._onNext = onNext.bind(self, next[inputName], inputName);
+                        }
+                    });
+                }
+
                 delete output.next;
             }
 
@@ -91,7 +95,7 @@
             });
         }
 
-        return new ub.Observer(onNext.bind(self, behConfig));
+        return new ub.Observer(onNext.bind(self, behConfig, portName));
     }
 
     function createInPorts(self, ports, config) {
@@ -203,10 +207,10 @@
     function createProperties(self, config, instanceConfig) {
         self.components = createComponents(self, config.components || {});
 
-        self.connections = createConnections(self, config.connections || {});
-
         self.inputs = createInPorts(self, config.inputs || {}, config);
         self.outputs = createOutPorts(self, config.outputs || {});
+
+        self.connections = createConnections(self, config.connections || {});
 
         self.config = {};
 
@@ -252,6 +256,18 @@
 
             self.config[configName] = instanceConfig[configName] !== undefined ?
                 instanceConfig[configName] : localConfig[configName].default;
+
+            if (configName in self.inputs) {
+                var obv = new ub.Observable(function(observer) {
+                    this.write = function(val) {
+                        observer.onNext(val);
+                    };
+                });
+
+                var dispose = obv.subscribe(self.inputs[configName]);
+
+                obv.write(self.config[configName]);
+            }
         });
 
         self._viewState = utils.extend(true, {}, self.config);

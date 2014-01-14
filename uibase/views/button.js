@@ -42,7 +42,11 @@
             },
             disabled: {
                 success: function(disabled) {
+                    var nextClick = disabled ? function(e) {} : function(e) { return {click: e}; };
                     return {
+                        next: {
+                            click: {success: nextClick}
+                        },
                         picture: { disabled: disabled }
                     };
                 }

@@ -64,9 +64,6 @@
 
             input.subscribe(collate.inputs.input);
 
-            input.write(2);
-            input.write(3);
-
             var iter = 0;
             var isReset = false;
 
@@ -74,11 +71,19 @@
                 iter += 1;
                 if (iter === 2 && !isReset) {
                     expect(val).to.equal(6);
-                } else if (iter === 2 && isReset) {
+                    iter = 0;
+                    rstInput.write(true);
+                    input.write(2);
+                    input.write(3);
+                    input.write(4);
+                } else if (iter === 4 && isReset) {
                     expect(val).to.equal(10);
                     done();
                 }
             }));
+
+            input.write(2);
+            input.write(3);
 
             var rstInput = new ub.Observable(function(observer) {
                 this.write = function(val) {
@@ -88,13 +93,6 @@
             });
 
             rstInput.subscribe(collate.inputs.reset);
-
-            rstInput.write(true);
-
-            iter = 0;
-            input.write(2);
-            input.write(3);
-            input.write(4);
         });
 
     });
