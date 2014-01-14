@@ -29,7 +29,6 @@
         },
 
         beh: {
-            //TODO: Don't allow, when disabled
             click: {
                 success: function(e) { return { click: e }; }
             },
@@ -42,7 +41,7 @@
             },
             disabled: {
                 success: function(disabled) {
-                    var nextClick = disabled ? function(e) {} : function(e) { return {click: e}; };
+                    var nextClick = disabled ? function() {} : function(e) { return {click: e}; };
                     return {
                         next: {
                             click: {success: nextClick}
