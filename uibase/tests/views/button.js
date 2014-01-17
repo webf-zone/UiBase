@@ -69,8 +69,10 @@
             });
             ub.View.renderView(btn, '#test-container');
 
-            expect(!!$('#test-container button').attr('disabled')).to.equal(true);
-            btn.removeView();
+            setTimeout(function() {
+                expect(!!$('#test-container button').attr('disabled')).to.equal(true);
+                btn.removeView();
+            }, 500);
         });
 
         it('should have disabled input, to enable/disable the button', function(done) {
@@ -151,7 +153,28 @@
                 expect($('#test-container button').html()).to.equal('New Button Text');
                 btn.removeView();
                 done();
-            }, 100);
+            }, 500);
+        });
+
+        it('should work when embedded inside another view', function(done) {
+            var TestView = ub.Utils.createView({
+                picture: function() {
+                    return {
+                        name: ub.Views.Button,
+                        props: {
+                            id: 'btnEmbed'
+                        },
+                        text: 'Embedded Button'
+                    };
+                }
+            });
+
+            ub.View.renderView(new TestView(), '#test-container');
+
+            setTimeout(function() {
+                expect($('#test-container button').html()).to.equal('Embedded Button');
+                done();
+            }, 500);
         });
     });
 

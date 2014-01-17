@@ -99,6 +99,8 @@
     }
 
     function createInPorts(self, ports, config) {
+        config.config = config.config || {};
+
         return utils.extend(Object.keys(ports).reduce(function(store, portName) {
             var portConfig = ports[portName];
 
@@ -182,16 +184,14 @@
         var ViewConstructor = picture.name;
 
         var children = picture.children ? typeof picture.children === 'string' ?
-            picture.children : picture.children.map(parseViewConfig) : {};
+            picture.children : picture.children.map(parseViewConfig.bind(self, self)) : [];
 
         var configs = utils.extend({}, picture);
-        delete configs.props;
+        delete configs.children;
 
         picture.props.children = children;
 
-        return new ViewConstructor(utils.extend(configs, {
-            props: utils.extend({}, picture.props, self.config.props)
-        }));
+        return new ViewConstructor(configs);
     }
 
     function removeReservedConfigParams(config) {
