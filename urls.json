@@ -7,8 +7,8 @@
         "include": "/todo.app/"
     },
 
-    "render/": {
-        "include": "/render.app/"
+    "deps/": {
+        "include": "/examples/deps.app/"
     },
 
     "textbox": {

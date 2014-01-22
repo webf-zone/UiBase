@@ -1,36 +1,40 @@
 {
-    "name": "UiBase",
-    "version": "0.0.0",
-    "description": "A complete front-end framework for any modern enterprise web application",
-    "directories": {
-        "lib": "src",
-        "test": "test"
-    },
-
-    "scripts": {
-        "test": "grunt test"
-    },
-
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/UsableBytes/UiBase"
-    },
-
-    "keywords": [
-        "UI Framework"
-    ],
-
-    "author": {
-        "name": "",
-        "email": "",
-        "url": "http://www.uibase.net"
-    },
-
-    "license": "MIT",
-
-    "devDependencies": {
-        "mocha": "~1.12.0",
-        "chai": "~1.7.0",
-        "mocha-phantomjs": "~3.3"
-    }
+  "name": "UiBase",
+  "version": "0.0.0",
+  "description": "A complete front-end framework for any modern enterprise web application",
+  "directories": {
+    "lib": "src",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UsableBytes/UiBase"
+  },
+  "keywords": [
+    "UI Framework"
+  ],
+  "author": {
+    "name": "",
+    "email": "",
+    "url": "http://www.uibase.net"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "~1"
+  },
+  "devDependencies": {
+    "mocha": "~1.12.0",
+    "chai": "~1.7.0",
+    "mocha-phantomjs": "~3.3",
+    "uglifyify": "",
+    "webpack": "~1.0.0",
+    "style-loader": "~0.6.0",
+    "css-loader": "~0.6.6",
+    "gulp": "~3.4.0",
+    "gulp-util": "~2.2.12",
+    "webpack-dev-server": "~1.2.0"
+  }
 }
