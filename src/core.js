@@ -9,8 +9,6 @@ require('./core.css');
 
 /* jshint boss:true */
 
-var scripts = document.getElementsByTagName('script');
-
 var basePath = document.getElementsByTagName('base')[0].href;
 
 var staticPath = basePath.split('/');

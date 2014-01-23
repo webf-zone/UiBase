@@ -1,3 +1,4 @@
+var uibase =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	
 /******/ 	// The module cache
@@ -51,16 +52,14 @@
 
 	'use strict';
 	
-	var $ = require(11);
+	var $ = require(7);
 	var View = require(1);
 	var HtmlElement = require(2);
 	var utils = require(3);
 	
-	require(9);
+	require(8);
 	
 	/* jshint boss:true */
-	
-	var scripts = document.getElementsByTagName('script');
 	
 	var basePath = document.getElementsByTagName('base')[0].href;
 	
@@ -335,8 +334,8 @@
 
 	'use strict';
 	
-	var $ = require(11);
-	var Class = require(4);
+	var $ = require(7);
+	var Class = require(6);
 	var Component = require(5);
 	
 	// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -826,10 +825,10 @@
 
 	'use strict';
 	
-	var $ = require(11);
+	var $ = require(7);
 	var utils = require(3);
 	var View = require(1);
-	var BrowserEvent = require(6);
+	var BrowserEvent = require(4);
 	
 	var CONTENT_TYPE = {'string': true, 'number': true};
 	
@@ -1158,12 +1157,12 @@
 
 	'use strict';
 	
-	var jQuery = require(11);
-	var Class = require(4);
+	var jQuery = require(7);
+	var Class = require(6);
 	var Component = require(5);
-	var ComplexView = require(7);
+	var ComplexView = require(10);
 	var View = require(1);
-	var Observable = require(8);
+	var Observable = require(11);
 	
 	var extend = jQuery.extend;
 	
@@ -1511,7 +1510,104 @@
 
 	'use strict';
 	
-	var $ = require(11);
+	var $ = require(7);
+	var Observable = require(11);
+	var Observer = require(13);
+	
+	var registeredEvents = {};
+	
+	var BrowserEvent = {
+	
+	    init: function() {
+	    },
+	
+	    addListener: function(event, view) {
+	        var topLevelEvent = registeredEvents[event] ||
+	            (registeredEvents[event] = new Observable(function(observer) {
+	                    var handler = function(event) {
+	                        observer.onNext.call(observer, event);
+	                    };
+	                    document.body.addEventListener(event, handler, true);
+	                }
+	            ));
+	
+	        return new Observable(function(observer) {
+	            var ob = new Observer(function(event) {
+	                if ($('[data-ubid="' + view._rootId + '"]').get(0) === event.target) {
+	                    observer.onNext.apply(observer, arguments);
+	                }
+	            });
+	            topLevelEvent.subscribe(ob);
+	        });
+	    }
+	};
+	
+	module.exports = BrowserEvent;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, require) {
+
+	'use strict';
+	
+	var Class = require(6);
+	var Observable = require(11);
+	
+	var Component = Class({
+	
+	    construct: function() {
+	        this.inputs = {};
+	        this.outputs = {};
+	        this.components = {};
+	    },
+	
+	    get: function(outPort) {
+	        var comp = this;
+	
+	        if (!comp.outputs[outPort]) {
+	            console.warn('No output port "' + outPort + '" for component');
+	            return new Observable(function() {});
+	        }
+	
+	        return comp.outputs[outPort];
+	    },
+	
+	    addOutPort: function(name, observable) {
+	        var comp = this;
+	
+	        comp.outputs[name] = observable;
+	    },
+	
+	    addCompToCreator: function(comp, name) {
+	        this.components[name] = comp;
+	    },
+	
+	    removeCompFromCreator: function(comp, name) {
+	        if (this.components[name] === comp) {
+	            delete this.components[name];
+	        }
+	    },
+	
+	    static: {
+	        connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
+	            var observer = sinkComp.inputs[sinkPort];
+	
+	            return sourceComp.get(sourcePort).subscribe(observer);
+	        }
+	    }
+	});
+	
+	module.exports = Component;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, require) {
+
+	'use strict';
+	
+	var $ = require(7);
 	/* Simple JavaScript Inheritance
 	 * By John Resig http://ejohn.org/
 	 * MIT Licensed.
@@ -1599,400 +1695,7 @@
 
 
 /***/ },
-/* 5 */
-/***/ function(module, exports, require) {
-
-	'use strict';
-	
-	var Class = require(4);
-	var Observable = require(8);
-	
-	var Component = Class({
-	
-	    construct: function() {
-	        this.inputs = {};
-	        this.outputs = {};
-	        this.components = {};
-	    },
-	
-	    get: function(outPort) {
-	        var comp = this;
-	
-	        if (!comp.outputs[outPort]) {
-	            console.warn('No output port "' + outPort + '" for component');
-	            return new Observable(function() {});
-	        }
-	
-	        return comp.outputs[outPort];
-	    },
-	
-	    addOutPort: function(name, observable) {
-	        var comp = this;
-	
-	        comp.outputs[name] = observable;
-	    },
-	
-	    addCompToCreator: function(comp, name) {
-	        this.components[name] = comp;
-	    },
-	
-	    removeCompFromCreator: function(comp, name) {
-	        if (this.components[name] === comp) {
-	            delete this.components[name];
-	        }
-	    },
-	
-	    static: {
-	        connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
-	            var observer = sinkComp.inputs[sinkPort];
-	
-	            return sourceComp.get(sourcePort).subscribe(observer);
-	        }
-	    }
-	});
-	
-	module.exports = Component;
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, require) {
-
-	'use strict';
-	
-	var $ = require(11);
-	var Observable = require(8);
-	var Observer = require(13);
-	
-	var registeredEvents = {};
-	
-	var BrowserEvent = {
-	
-	    init: function() {
-	    },
-	
-	    addListener: function(event, view) {
-	        var topLevelEvent = registeredEvents[event] ||
-	            (registeredEvents[event] = new Observable(function(observer) {
-	                    var handler = function(event) {
-	                        observer.onNext.call(observer, event);
-	                    };
-	                    document.body.addEventListener(event, handler, true);
-	                }
-	            ));
-	
-	        return new Observable(function(observer) {
-	            var ob = new Observer(function(event) {
-	                if ($('[data-ubid="' + view._rootId + '"]').get(0) === event.target) {
-	                    observer.onNext.apply(observer, arguments);
-	                }
-	            });
-	            topLevelEvent.subscribe(ob);
-	        });
-	    }
-	};
-	
-	module.exports = BrowserEvent;
-
-
-/***/ },
 /* 7 */
-/***/ function(module, exports, require) {
-
-	'use strict';
-	
-	var utils = require(3);
-	var Class = require(4);
-	var View = require(1);
-	
-	/**
-	 * @class ComplexView
-	 * @extends View
-	 */
-	var ComplexView = Class({
-	
-	    extends: View,
-	
-	    /**
-	     * @constructor
-	     * @param config
-	     */
-	    construct: function(config) {
-	        var self = this;
-	
-	        self._super(config);
-	
-	        self.state = {};
-	        self._futureState = {};
-	
-	        self._compoundPhase = null;
-	    },
-	
-	    isRendered: function() {
-	        return this._compoundPhase !== ComplexView.ViewPhase.RENDERING &&
-	            this._phase === View.ViewPhase.RENDERED;
-	    },
-	
-	    renderView: function(rootId, depth) {
-	        this._super(rootId, depth);
-	
-	        this._compoundPhase = ComplexView.ViewPhase.RENDERING;
-	        this._renderedView = this._getRenderedView();
-	        this._compoundPhase = null;
-	
-	        var markup = this._renderedView.renderView(rootId, depth + 1);
-	
-	        return markup;
-	    },
-	
-	    _getRenderedView: function() {
-	        var renderedView = null;
-	
-	        View.currentParent = this;
-	
-	        try {
-	            renderedView = this.render();
-	        } catch (error) {
-	            throw error;
-	        } finally {
-	            View.currentParent = null;
-	        }
-	
-	        return renderedView;
-	    },
-	
-	    setState: function(partialState) {
-	        this.replaceState(utils.extend({}, this._futureState || this.state, partialState));
-	    },
-	
-	    replaceState: function(state) {
-	        if (!(this.isRendered() || this._compoundPhase === ComplexView.RENDERING)) {
-	            throw new Error('State can be updated only when view is rendered or rendering.');
-	        }
-	
-	        if (this._compoundPhase === ComplexView.ViewPhase.UPDATING_STATE ||
-	            this._compoundPhase === ComplexView.ViewPhase.REMOVING) {
-	            throw new Error('Cannot update state for a view when it is being removed or when it\'s state is being updated');
-	        }
-	
-	        this._futureState = state;
-	
-	        View.enqueueUpdate(this);
-	    },
-	
-	    updateViewIfRequired: function() {
-	        var compoundPhase = this._compoundPhase;
-	
-	        if (compoundPhase === ComplexView.ViewPhase.RENDERING ||
-	            compoundPhase === ComplexView.ViewPhase.UPDATING_PROPS) {
-	            return;
-	        }
-	        this._super();
-	    },
-	
-	    _updateViewIfRequired: function() {
-	        if (this._futureProps == null &&
-	            this._futureState == null) {
-	            return;
-	        }
-	
-	        var nextProps = this.props;
-	        if (this._futureProps != null) {
-	            nextProps = this._futureProps;
-	            this._futureProps = null;
-	
-	            this._compoundPhase = ComplexView.ViewPhase.UPDATING_PROPS;
-	            // TODO: Have a hook here
-	        }
-	
-	        this._compoundPhase = ComplexView.ViewPhase.UPDATING_STATE;
-	
-	        var nextParent = this._futureParent;
-	
-	        var nextState = this._futureState || this.state;
-	        this._futureState = null;
-	
-	        this._updateView(nextProps, nextParent, nextState);
-	
-	        this._compoundPhase = null;
-	    },
-	
-	    _updateView: function(nextProps, nextParent, nextState) {
-	        var prevProps = this.props;
-	        var prevParent = this.parent;
-	        var prevState = this.state;
-	
-	
-	        this.props = nextProps;
-	        this.parent = nextParent;
-	        this.state = nextState;
-	
-	
-	        this.updateView(prevProps, prevParent, prevState);
-	    },
-	
-	    updateView: function(prevProps, prevParent, prevState) {
-	        this._super(prevProps, prevParent);
-	
-	        var prevView = this._renderedView;
-	        var nextView = null;
-	
-	        nextView = this._getRenderedView();
-	
-	        if (prevView && nextView &&
-	            prevView.constructor === nextView.constructor &&
-	            prevView.parent === nextView.parent) {
-	            prevView.copyFrom(nextView);
-	        } else {
-	            prevView.removeView();
-	            this._renderedView = nextView;
-	            var nextMarkup = nextView.renderView(this._depth + 1);
-	
-	            this.getNode().html(nextMarkup);
-	        }
-	    },
-	
-	    copyFrom: function(nextView) {
-	        //May require extra logic
-	        this._super(nextView);
-	    },
-	
-	    static: {
-	
-	        ViewPhase: {
-	            RENDERING: 'RENDERING',
-	            UPDATING_PROPS: 'UPDATING_PROPS',
-	            UPDATING_STATE: 'UPDATING_STATE',
-	            REMOVING: 'REMOVING'
-	        }
-	    }
-	});
-	
-	module.exports = ComplexView;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, require) {
-
-	'use strict';
-	
-	var Class = require(4);
-	var Dispatcher = require(14);
-	
-	/**
-	 * Push-style collection
-	 *
-	 * @class Observable
-	 */
-	var Observable = Class({
-	
-	    /**
-	     * @class Observable
-	     * @constructor
-	     * @param {Function} subscribe Describe the subscription logic. Such as
-	     *   when to call the observer's onNext method.
-	     */
-	    construct: function(subscribe) {
-	        var dispatcher = new Dispatcher(subscribe.bind(this));
-	
-	        /**
-	         * @method subscribe
-	         */
-	        this.subscribe = dispatcher.subscribe.bind(dispatcher);
-	
-	        /**
-	         * @method hasObservers
-	         * @return {Boolean}
-	         */
-	        this.hasObservers = dispatcher.hasObservers.bind(dispatcher);
-	    },
-	
-	    static: {
-	
-	        /**
-	         * Helper for creating an Observable from a DOM event.
-	         *
-	         * @method fromEvent
-	         * @static
-	         * @param {Object} element The DOM element
-	         * @param {String} eventName DOM event name
-	         * @return {Observable}
-	         */
-	        fromEvent: function(element, eventName) {
-	            return new Observable(function(observer) {
-	                var el = jQuery(element),
-	                    handler = function(eventObject) {
-	                        observer.onNext(eventObject);
-	                    };
-	
-	                el.bind(eventName, handler);
-	                return function() {
-	                    el.unbind(eventName, handler);
-	                };
-	            });
-	        },
-	
-	        /**
-	         * Helper for creating an Observable from a Ajax request.
-	         *
-	         * @method fromAjax
-	         * @param  {Object} ajaxConfig
-	         * @return {Observable}
-	         */
-	        fromAjax: function(ajaxConfig) {
-	            return new Observable(function(observer) {
-	                var doneHandler = function(data, textStatus, jqXHR) {
-	                    observer.onNext({ data: data, textStatus: textStatus, jqXHR: jqXHR });
-	                };
-	
-	                var failHandler = function(jqXHR, textStatus, errorThrown) {
-	                    observer.onError({ error: errorThrown, textStatus: textStatus, jqXHR: jqXHR });
-	                };
-	
-	                var completeHandler = function() {
-	                    observer.onCompleted();
-	                };
-	
-	                var jqXHR = jQuery.ajax(ajaxConfig);
-	
-	                jqXHR
-	                    .done(doneHandler)
-	                    .fail(failHandler)
-	                    .always(completeHandler);
-	
-	                return function() {
-	                    jqXHR.abort();
-	                };
-	            });
-	        }
-	    }
-	});
-	
-	module.exports = Observable;
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, require) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	var dispose = require(12)
-		// The css code:
-		(require(10))
-	if(false) {
-		module.hot.accept();
-		module.hot.dispose(dispose);
-	}
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, require) {
-
-	module.exports =
-		"/*\n * UIBase Web Application Front-end Framework - Core Styles\n * <http://www.uibase.net> | License: <http://www.uibase.net/license>\n * Copyright 2009-2013 Usable Bytes Pvt Ltd\n * @author Kumar Bhot <http://www.webuiarchitect.com>\n *\n */\n\nhtml,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video {\n    margin: 0;\n    padding: 0;\n    border: 0;\n    outline: 0;\n    font-size: 100%;\n    vertical-align: baseline;\n    background: transparent;\n}\n\ninput,select,textarea,button {\n    margin: 0;\n    padding: 0;\n    outline: 0;\n    font-size: 100%;\n    vertical-align: middle;\n    background: transparent;\n}\n\nbody {\n    line-height: 1;\n}\n\narticle,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section {\n    display: block;\n}\n\nnav ul {\n    list-style: none;\n}\n\nblockquote,q {\n    quotes: none;\n}\n\nblockquote:before,blockquote:after,q:before,q:after {\n    content: none;\n}\n\na {\n    margin: 0;\n    padding: 0;\n    font-size: 100%;\n    vertical-align: baseline;\n    background: transparent;\n}\n\nins {\n    background-color: #ff9;\n    color: #000;\n    text-decoration: none;\n}\n\nmark {\n    background-color: #ff9;\n    color: #000;\n    font-style: italic;\n    font-weight: bold;\n}\n\ndel {\n    text-decoration: line-through;\n}\n\nabbr[title],dfn[title] {\n    border-bottom: 1px dotted;\n    cursor: help;\n}\n\ntable {\n    border-collapse: collapse;\n    border-spacing: 0;\n}\n\nhr {\n    display: block;\n    height: 1px;\n    border: 0;\n    border-top: 1px solid #ccc;\n    margin: 1em 0;\n    padding: 0;\n}\n\ninput,select {\n    vertical-align: middle;\n}\n\nbody.uibase, body.uibase * {\n    font-family: Trebuchet, Trebuchet MS, Helvetica, sans-serif;;\n}\n";
-
-/***/ },
-/* 11 */
 /***/ function(module, exports, require) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -12334,6 +12037,302 @@
 
 
 /***/ },
+/* 8 */
+/***/ function(module, exports, require) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	var dispose = require(12)
+		// The css code:
+		(require(9))
+	if(false) {
+		module.hot.accept();
+		module.hot.dispose(dispose);
+	}
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, require) {
+
+	module.exports =
+		"/*\n * UIBase Web Application Front-end Framework - Core Styles\n * <http://www.uibase.net> | License: <http://www.uibase.net/license>\n * Copyright 2009-2013 Usable Bytes Pvt Ltd\n * @author Kumar Bhot <http://www.webuiarchitect.com>\n *\n */\n\nhtml,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video {\n    margin: 0;\n    padding: 0;\n    border: 0;\n    outline: 0;\n    font-size: 100%;\n    vertical-align: baseline;\n    background: transparent;\n}\n\ninput,select,textarea,button {\n    margin: 0;\n    padding: 0;\n    outline: 0;\n    font-size: 100%;\n    vertical-align: middle;\n    background: transparent;\n}\n\nbody {\n    line-height: 1;\n}\n\narticle,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section {\n    display: block;\n}\n\nnav ul {\n    list-style: none;\n}\n\nblockquote,q {\n    quotes: none;\n}\n\nblockquote:before,blockquote:after,q:before,q:after {\n    content: none;\n}\n\na {\n    margin: 0;\n    padding: 0;\n    font-size: 100%;\n    vertical-align: baseline;\n    background: transparent;\n}\n\nins {\n    background-color: #ff9;\n    color: #000;\n    text-decoration: none;\n}\n\nmark {\n    background-color: #ff9;\n    color: #000;\n    font-style: italic;\n    font-weight: bold;\n}\n\ndel {\n    text-decoration: line-through;\n}\n\nabbr[title],dfn[title] {\n    border-bottom: 1px dotted;\n    cursor: help;\n}\n\ntable {\n    border-collapse: collapse;\n    border-spacing: 0;\n}\n\nhr {\n    display: block;\n    height: 1px;\n    border: 0;\n    border-top: 1px solid #ccc;\n    margin: 1em 0;\n    padding: 0;\n}\n\ninput,select {\n    vertical-align: middle;\n}\n\nbody.uibase, body.uibase * {\n    font-family: Trebuchet, Trebuchet MS, Helvetica, sans-serif;;\n}\n";
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, require) {
+
+	'use strict';
+	
+	var utils = require(3);
+	var Class = require(6);
+	var View = require(1);
+	
+	/**
+	 * @class ComplexView
+	 * @extends View
+	 */
+	var ComplexView = Class({
+	
+	    extends: View,
+	
+	    /**
+	     * @constructor
+	     * @param config
+	     */
+	    construct: function(config) {
+	        var self = this;
+	
+	        self._super(config);
+	
+	        self.state = {};
+	        self._futureState = {};
+	
+	        self._compoundPhase = null;
+	    },
+	
+	    isRendered: function() {
+	        return this._compoundPhase !== ComplexView.ViewPhase.RENDERING &&
+	            this._phase === View.ViewPhase.RENDERED;
+	    },
+	
+	    renderView: function(rootId, depth) {
+	        this._super(rootId, depth);
+	
+	        this._compoundPhase = ComplexView.ViewPhase.RENDERING;
+	        this._renderedView = this._getRenderedView();
+	        this._compoundPhase = null;
+	
+	        var markup = this._renderedView.renderView(rootId, depth + 1);
+	
+	        return markup;
+	    },
+	
+	    _getRenderedView: function() {
+	        var renderedView = null;
+	
+	        View.currentParent = this;
+	
+	        try {
+	            renderedView = this.render();
+	        } catch (error) {
+	            throw error;
+	        } finally {
+	            View.currentParent = null;
+	        }
+	
+	        return renderedView;
+	    },
+	
+	    setState: function(partialState) {
+	        this.replaceState(utils.extend({}, this._futureState || this.state, partialState));
+	    },
+	
+	    replaceState: function(state) {
+	        if (!(this.isRendered() || this._compoundPhase === ComplexView.RENDERING)) {
+	            throw new Error('State can be updated only when view is rendered or rendering.');
+	        }
+	
+	        if (this._compoundPhase === ComplexView.ViewPhase.UPDATING_STATE ||
+	            this._compoundPhase === ComplexView.ViewPhase.REMOVING) {
+	            throw new Error('Cannot update state for a view when it is being removed or when it\'s state is being updated');
+	        }
+	
+	        this._futureState = state;
+	
+	        View.enqueueUpdate(this);
+	    },
+	
+	    updateViewIfRequired: function() {
+	        var compoundPhase = this._compoundPhase;
+	
+	        if (compoundPhase === ComplexView.ViewPhase.RENDERING ||
+	            compoundPhase === ComplexView.ViewPhase.UPDATING_PROPS) {
+	            return;
+	        }
+	        this._super();
+	    },
+	
+	    _updateViewIfRequired: function() {
+	        if (this._futureProps == null &&
+	            this._futureState == null) {
+	            return;
+	        }
+	
+	        var nextProps = this.props;
+	        if (this._futureProps != null) {
+	            nextProps = this._futureProps;
+	            this._futureProps = null;
+	
+	            this._compoundPhase = ComplexView.ViewPhase.UPDATING_PROPS;
+	            // TODO: Have a hook here
+	        }
+	
+	        this._compoundPhase = ComplexView.ViewPhase.UPDATING_STATE;
+	
+	        var nextParent = this._futureParent;
+	
+	        var nextState = this._futureState || this.state;
+	        this._futureState = null;
+	
+	        this._updateView(nextProps, nextParent, nextState);
+	
+	        this._compoundPhase = null;
+	    },
+	
+	    _updateView: function(nextProps, nextParent, nextState) {
+	        var prevProps = this.props;
+	        var prevParent = this.parent;
+	        var prevState = this.state;
+	
+	
+	        this.props = nextProps;
+	        this.parent = nextParent;
+	        this.state = nextState;
+	
+	
+	        this.updateView(prevProps, prevParent, prevState);
+	    },
+	
+	    updateView: function(prevProps, prevParent, prevState) {
+	        this._super(prevProps, prevParent);
+	
+	        var prevView = this._renderedView;
+	        var nextView = null;
+	
+	        nextView = this._getRenderedView();
+	
+	        if (prevView && nextView &&
+	            prevView.constructor === nextView.constructor &&
+	            prevView.parent === nextView.parent) {
+	            prevView.copyFrom(nextView);
+	        } else {
+	            prevView.removeView();
+	            this._renderedView = nextView;
+	            var nextMarkup = nextView.renderView(this._depth + 1);
+	
+	            this.getNode().html(nextMarkup);
+	        }
+	    },
+	
+	    copyFrom: function(nextView) {
+	        //May require extra logic
+	        this._super(nextView);
+	    },
+	
+	    static: {
+	
+	        ViewPhase: {
+	            RENDERING: 'RENDERING',
+	            UPDATING_PROPS: 'UPDATING_PROPS',
+	            UPDATING_STATE: 'UPDATING_STATE',
+	            REMOVING: 'REMOVING'
+	        }
+	    }
+	});
+	
+	module.exports = ComplexView;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, require) {
+
+	'use strict';
+	
+	var Class = require(6);
+	var Dispatcher = require(14);
+	
+	/**
+	 * Push-style collection
+	 *
+	 * @class Observable
+	 */
+	var Observable = Class({
+	
+	    /**
+	     * @class Observable
+	     * @constructor
+	     * @param {Function} subscribe Describe the subscription logic. Such as
+	     *   when to call the observer's onNext method.
+	     */
+	    construct: function(subscribe) {
+	        var dispatcher = new Dispatcher(subscribe.bind(this));
+	
+	        /**
+	         * @method subscribe
+	         */
+	        this.subscribe = dispatcher.subscribe.bind(dispatcher);
+	
+	        /**
+	         * @method hasObservers
+	         * @return {Boolean}
+	         */
+	        this.hasObservers = dispatcher.hasObservers.bind(dispatcher);
+	    },
+	
+	    static: {
+	
+	        /**
+	         * Helper for creating an Observable from a DOM event.
+	         *
+	         * @method fromEvent
+	         * @static
+	         * @param {Object} element The DOM element
+	         * @param {String} eventName DOM event name
+	         * @return {Observable}
+	         */
+	        fromEvent: function(element, eventName) {
+	            return new Observable(function(observer) {
+	                var el = jQuery(element),
+	                    handler = function(eventObject) {
+	                        observer.onNext(eventObject);
+	                    };
+	
+	                el.bind(eventName, handler);
+	                return function() {
+	                    el.unbind(eventName, handler);
+	                };
+	            });
+	        },
+	
+	        /**
+	         * Helper for creating an Observable from a Ajax request.
+	         *
+	         * @method fromAjax
+	         * @param  {Object} ajaxConfig
+	         * @return {Observable}
+	         */
+	        fromAjax: function(ajaxConfig) {
+	            return new Observable(function(observer) {
+	                var doneHandler = function(data, textStatus, jqXHR) {
+	                    observer.onNext({ data: data, textStatus: textStatus, jqXHR: jqXHR });
+	                };
+	
+	                var failHandler = function(jqXHR, textStatus, errorThrown) {
+	                    observer.onError({ error: errorThrown, textStatus: textStatus, jqXHR: jqXHR });
+	                };
+	
+	                var completeHandler = function() {
+	                    observer.onCompleted();
+	                };
+	
+	                var jqXHR = jQuery.ajax(ajaxConfig);
+	
+	                jqXHR
+	                    .done(doneHandler)
+	                    .fail(failHandler)
+	                    .always(completeHandler);
+	
+	                return function() {
+	                    jqXHR.abort();
+	                };
+	            });
+	        }
+	    }
+	});
+	
+	module.exports = Observable;
+
+
+/***/ },
 /* 12 */
 /***/ function(module, exports, require) {
 
@@ -12362,7 +12361,7 @@
 
 	'use strict';
 	
-	var Class = require(4);
+	var Class = require(6);
 	
 	/**
 	 * Iteration over an push-style observable sequence.
@@ -12413,7 +12412,7 @@
 
 	'use strict';
 	
-	var Class = require(4);
+	var Class = require(6);
 	
 	/**
 	 * Notify observers of a new value in an observable sequence. Each
