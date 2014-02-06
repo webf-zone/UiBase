@@ -21,16 +21,11 @@ var HtmlElement = utils.Class({
      * @param config
      */
     construct: function(config) {
-        var self = this,
-            hasClosingTag;
+        var self = this;
 
         self._super(config);
 
         self.tag = config.tag;
-        self.props.text = config.text;
-
-        hasClosingTag = config.hasClosingTag !== undefined ? config.hasClosingTag : true;
-        self._tagClose = hasClosingTag ? '</' + this.tag + '>' : '';
     },
 
     /**
@@ -42,8 +37,7 @@ var HtmlElement = utils.Class({
     renderView: function(rootId, depth) {
         this._super(rootId, depth);
         //TODO: Validate props
-//            return this._createOpenTagMarkup() + this._createContentMarkup() + this._tagClose;
-        return this._createOpenTagMarkup().html(this._createContentMarkup()).prop('outerHTML');
+        return this._createElement().html(this._createContentMarkup()).prop('outerHTML');
     },
 
     updateView: function(prevProps, prevParent) {
@@ -60,51 +54,19 @@ var HtmlElement = utils.Class({
     },
 
     /**
-     * Create markup string for the opening tag of the HTML view
-     * @method _createOpenTagMarkup
-     * @returns String
+     * Create a jQuery object of the element
+     * @method _createElement
+     * @returns jQuery
      * @private
      */
-    /*
-     _createOpenTagMarkup: function () {
-     var self = this,
-     props = this.props,
-     ret = '<' + this.tag;
-
-     for (var propKey in props) {
-     if (!props.hasOwnProperty(propKey)) {
-     continue;
-     }
-     var propValue = props[propKey];
-     if (propValue == null) {
-     continue;
-     }
-     if (propKey === 'events') {
-     propValue.forEach(function(event) {
-     self.addOutPort(event, ub.BrowserEvent.addListener(event, self));
-     });
-     } else {
-     if (propKey === 'style') {
-     if (propValue) {
-     propValue = $.extend({}, props.style, propValue);
-     }
-     propValue = this._createMarkupForStyles(propValue);
-     }
-     var markup = this._createMarkupForProperty(propKey, propValue);
-
-     if (markup) {
-     ret += ' ' + markup;
-     }
-     }
-     }
-
-     return ret + ' ' + ub.View.UBID_ATTR_NAME + '="' + this._rootId + '">';
-     },
-     */
-    _createOpenTagMarkup: function() {
+    _createElement: function() {
         var self = this,
             props = this.props,
             ret = $('<' + this.tag + '>');
+
+        function addEventListener(event) {
+            self.addOutPort(event, BrowserEvent.addListener(event, self));
+        }
 
         for (var propKey in props) {
             if (!props.hasOwnProperty(propKey)) {
@@ -115,9 +77,7 @@ var HtmlElement = utils.Class({
                 continue;
             }
             if (propKey === 'events') {
-                propValue.forEach(function(event) {
-                    self.addOutPort(event, BrowserEvent.addListener(event, self));
-                });
+                propValue.forEach(addEventListener);
             } else {
                 if (propKey === 'style') {
                     if (propValue) {
@@ -125,51 +85,11 @@ var HtmlElement = utils.Class({
                     }
                     ret.css(propValue);
                 }
-                //var markup = this._createMarkupForProperty(propKey, propValue);
                 ret.prop(propKey, propValue);
             }
         }
 
-//            return ret + ' ' + ub.View.UBID_ATTR_NAME + '="' + this._rootId + '">';
         return ret.attr(View.UBID_ATTR_NAME, this._rootId);
-    },
-
-    /**
-     * Create HTML markup for property value pair
-     * @method _createMarkupForProperty
-     * @param name
-     * @param value
-     * @returns String
-     * @private
-     */
-    _createMarkupForProperty: function(name, value) {
-        if (name === 'children') {
-            return '';
-        } else {
-            return name + '=' + value;
-        }
-    },
-
-    /**
-     * Create HTML markup for style property
-     * @method _createMarkupForStyles
-     * @param styles
-     * @returns String|null
-     * @private
-     */
-    _createMarkupForStyles: function(styles) {
-        var serialized = '';
-        for (var styleName in styles) {
-            if (!styles.hasOwnProperty(styleName)) {
-                continue;
-            }
-            var styleValue = styles[styleName];
-            if (styleValue !== null && styleValue !== undefined) {
-                serialized += styleName + ':';
-                serialized += styleValue + ';';
-            }
-        }
-        return serialized || null;
     },
 
     /**
@@ -197,7 +117,11 @@ var HtmlElement = utils.Class({
             propKey,
             prevStyle,
             styleName,
-            styleUpdates;
+            styleUpdates = {};
+
+        function addEventListener(event) {
+            self.addOutPort(event, BrowserEvent.addListener(event, self));
+        }
 
         for (propKey in prevProps) {
             // If this property is being added
@@ -210,7 +134,6 @@ var HtmlElement = utils.Class({
                 prevStyle = prevProps[propKey];
                 for (styleName in prevStyle) {
                     if (prevStyle.hasOwnProperty(styleName)) {
-                        styleUpdates = styleUpdates || {};
                         styleUpdates[styleName] = '';
                     }
                 }
@@ -237,7 +160,6 @@ var HtmlElement = utils.Class({
                     for (styleName in prevProp) {
                         if (prevProp.hasOwnProperty(styleName) &&
                             !nextProp.hasOwnProperty(styleName)) {
-                            styleUpdates = styleUpdates || {};
                             styleUpdates[styleName] = '';
                         }
                     }
@@ -252,9 +174,7 @@ var HtmlElement = utils.Class({
                     styleUpdates = nextProp;
                 }
             } else if (propKey === 'events') {
-                nextProp.forEach(function(event) {
-                    self.addOutPort(event, BrowserEvent.addListener(event, this));
-                });
+                nextProp.forEach(addEventListener);
             } else {
                 if (propKey !== 'children') {
                     this.updateProperty(propKey, nextProp);
@@ -295,7 +215,7 @@ var HtmlElement = utils.Class({
 
     removeProperty: function(prop) {
         var node = this.getNode();
-        node.removeProp(name);
+        node.removeProp(prop);
     },
 
     updateProperty: function(name, value) {

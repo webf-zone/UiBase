@@ -15,7 +15,7 @@ var BrowserEvent = {
         var topLevelEvent = registeredEvents[event] ||
             (registeredEvents[event] = new Observable(function(observer) {
                     var handler = function(event) {
-                        observer.onNext.call(observer, event);
+                        observer.onNext.call(observer, event, true);
                     };
                     document.body.addEventListener(event, handler, true);
                 }

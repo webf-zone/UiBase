@@ -3,6 +3,7 @@
 var $ = require('jquery');
 var Class = require('./utils/class');
 var Component = require('./component');
+var Observer = require('./observer');
 
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
@@ -367,9 +368,9 @@ var View = Class({
 
         //TODO: Handle second argument being an Observer
 
-        self.inputs[name] = new ub.Observer(function() {
+        self.inputs[name] = new Observer(function() {
             onNext.apply(self, arguments);
-            View.enqueueUpdate(self);
+//            View.enqueueUpdate(self);
         });
     },
 
@@ -415,7 +416,7 @@ var View = Class({
             if ('root' in view.components)
                 view.components.root.props.events.forEach(function(eventName) {
                     if (view.inputs[eventName]) {
-                        ub.Component.connect(
+                        Component.connect(
                             view.components.root, eventName,
                             view, eventName
                         );

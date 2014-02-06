@@ -7,6 +7,7 @@
     "camelcase": true,
     "curly": false,
     "eqeqeq": true,
+    "eqnull": true,
     "immed": true,
     "indent": 4,
     "latedef": true,

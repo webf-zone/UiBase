@@ -6,6 +6,7 @@ var Component = require('../component');
 var ComplexView = require('../complexView');
 var View = require('../view');
 var Observable = require('../observable');
+var Observer = require('../observer');
 
 var extend = jQuery.extend;
 
@@ -98,7 +99,7 @@ function getBehFor(self, portName, config) {
         });
     }
 
-    return new ub.Observer(onNext.bind(self, behConfig, portName));
+    return new Observer(onNext.bind(self, behConfig, portName));
 }
 
 function createInPorts(self, ports, config) {

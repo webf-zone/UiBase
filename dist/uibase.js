@@ -867,8 +867,8 @@ var uibase =
 	    renderView: function(rootId, depth) {
 	        this._super(rootId, depth);
 	        //TODO: Validate props
-	//            return this._createOpenTagMarkup() + this._createContentMarkup() + this._tagClose;
-	        return this._createOpenTagMarkup().html(this._createContentMarkup()).prop('outerHTML');
+	//            return this._createElement() + this._createContentMarkup() + this._tagClose;
+	        return this._createElement().html(this._createContentMarkup()).prop('outerHTML');
 	    },
 	
 	    updateView: function(prevProps, prevParent) {
@@ -886,12 +886,12 @@ var uibase =
 	
 	    /**
 	     * Create markup string for the opening tag of the HTML view
-	     * @method _createOpenTagMarkup
+	     * @method _createElement
 	     * @returns String
 	     * @private
 	     */
 	    /*
-	     _createOpenTagMarkup: function () {
+	     _createElement: function () {
 	     var self = this,
 	     props = this.props,
 	     ret = '<' + this.tag;
@@ -926,7 +926,7 @@ var uibase =
 	     return ret + ' ' + ub.View.UBID_ATTR_NAME + '="' + this._rootId + '">';
 	     },
 	     */
-	    _createOpenTagMarkup: function() {
+	    _createElement: function() {
 	        var self = this,
 	            props = this.props,
 	            ret = $('<' + this.tag + '>');
