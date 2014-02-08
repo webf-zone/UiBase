@@ -3,6 +3,7 @@
 var jQuery = require('jquery');
 var Class = require('./class');
 var Component = require('../component');
+var HtmlElement = require('../htmlElement');
 var ComplexView = require('../complexView');
 var View = require('../view');
 var Observable = require('../observable');
@@ -109,19 +110,22 @@ function createInPorts(self, ports, config) {
         var portConfig = ports[portName];
 
         if (portConfig.success) {
-            store[portName] = new ub.Observer(
+            store[portName] = new Observer(
                 portConfig.success.bind(self),
                 portConfig.error.bind(self),
                 portConfig.complete.bind(self)
             );
         } else if (typeof portConfig === 'string') {
             var compName = portConfig.split('.')[0],
-                compPort = portConfig.split('.')[1];
+                compPort = portConfig.split('.').slice(1).join('.');
 
             if (!(compName in self.components)) {
                 throw new Error('createInPorts(): No such component defined: ' + compName);
             } else {
                 // TODO: Check for valid port
+                if (self.components[compName] instanceof HtmlElement) {
+                    self.components[compName].addInput(compPort);
+                }
                 store[portName] = self.components[compName].inPorts[compPort];
             }
         } else {
@@ -138,7 +142,7 @@ function createInPorts(self, ports, config) {
          for this port has been provided.
          */
         if (configOptions.constant === false && !(configName in config.beh)) {
-            store[configName] = new ub.Observer(function(val) {
+            store[configName] = new Observer(function(val) {
                 self.config[configName] = val;
             });
         }
@@ -261,6 +265,7 @@ function createProperties(self, config, instanceConfig) {
         self.config[configName] = instanceConfig[configName] !== undefined ?
             instanceConfig[configName] : localConfig[configName].default;
 
+        // Send IIP
         if (configName in self.inputs) {
             var obv = new Observable(function(observer) {
                 this.write = function(val) {

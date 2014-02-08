@@ -3,7 +3,8 @@
 var $ = require('jquery');
 var utils = require('./utils/utils');
 var View = require('./view');
-var BrowserEvent = require('./browserEvent.js');
+var BrowserEvent = require('./browserEvent');
+var Observer = require('./observer');
 
 var CONTENT_TYPE = {'string': true, 'number': true};
 
@@ -26,6 +27,24 @@ var HtmlElement = utils.Class({
         self._super(config);
 
         self.tag = config.tag;
+    },
+
+    addInput: function(port) {
+        var portType = port.split('.')[0];
+
+        if (portType === 'props') {
+            this.addPropInput(port.split('.')[1]);
+        } else {
+            this._super.apply(this, arguments);
+        }
+    },
+
+    addPropInput: function(propName) {
+        var self = this;
+
+        self.inputs['props.' + propName] = new Observer(function(value) {
+            self.updateProperty(propName, value);
+        });
     },
 
     /**
@@ -65,7 +84,7 @@ var HtmlElement = utils.Class({
             ret = $('<' + this.tag + '>');
 
         function addEventListener(event) {
-            self.addOutPort(event, BrowserEvent.addListener(event, self));
+            self.addOutPort('events.' + event, BrowserEvent.addListener(event, self));
         }
 
         for (var propKey in props) {
@@ -120,7 +139,7 @@ var HtmlElement = utils.Class({
             styleUpdates = {};
 
         function addEventListener(event) {
-            self.addOutPort(event, BrowserEvent.addListener(event, self));
+            self.addOutPort('events.' + event, BrowserEvent.addListener(event, self));
         }
 
         for (propKey in prevProps) {
