@@ -2,7 +2,7 @@
 
 var $ = require('jquery');
 var Observable = require('./observable');
-var Observer = require('./observer');
+var Observer = require('observer');
 
 var registeredEvents = {};
 

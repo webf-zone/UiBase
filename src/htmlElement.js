@@ -4,7 +4,7 @@ var $ = require('jquery');
 var utils = require('./utils/utils');
 var View = require('./view');
 var BrowserEvent = require('./browserEvent');
-var Observer = require('./observer');
+var Observer = require('observer');
 
 var CONTENT_TYPE = {'string': true, 'number': true};
 

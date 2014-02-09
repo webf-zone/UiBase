@@ -17,8 +17,13 @@ module.exports = {
     module: {
         loaders: [
             // required to write "require('./style.css')"
-            { test: /\.css$/,    loader: 'style-loader!css-loader' },
+            { test: /\.css$/, loader: 'style-loader!css-loader' },
         ]
     },
-    plugins: []
+    plugins: [],
+    resolve: {
+        alias: {
+            observer: path.join(__dirname, 'src/observer.js')
+        }
+    }
 };
