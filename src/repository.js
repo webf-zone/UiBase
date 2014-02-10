@@ -1,56 +1,54 @@
-(function(ub) {
+'use strict';
 
-    "use strict";
+var utils = require('utils');
 
-    var Repository = ub.Utils.Class({
-        
-        construct: function(entityType, adapter, location) {
-            var self = this;
+var Repository = utils.Class({
 
-            self._adapter = ub.Repository.getAdapter(adapter);
-            self._location = location;
-            self._EntityType = entityType;
-        },
+    construct: function(entityType, adapter, location) {
+        var self = this;
 
-        insert: function(entity, cb) {
-            var self = this;
+        self._adapter = ub.Repository.getAdapter(adapter);
+        self._location = location;
+        self._EntityType = entityType;
+    },
 
-            self._adapter.insert(self._location, entity, self._castToEntity.bind(self, cb));
-        },
+    insert: function(entity, cb) {
+        var self = this;
 
-        query: function(filter, cb) {
-            var self = this;
+        self._adapter.insert(self._location, entity, self._castToEntity.bind(self, cb));
+    },
 
-            self._adapter.query(self._location, filter, self._castToEntity.bind(self, cb));
-        },
+    query: function(filter, cb) {
+        var self = this;
 
-        update: function(entity, cb) {
-            var self = this;
+        self._adapter.query(self._location, filter, self._castToEntity.bind(self, cb));
+    },
 
-            self._adapter.update(self._location, entity, cb);
-        },
+    update: function(entity, cb) {
+        var self = this;
 
-        remove: function(entity, cb) {
-            var self = this;
+        self._adapter.update(self._location, entity, cb);
+    },
 
-            self._adapter.remove(self._location, entity, self._castToEntity.bind(self, cb));
-        },
+    remove: function(entity, cb) {
+        var self = this;
 
-        _castToEntity: function(cb, collection) {
-            var self = this;
+        self._adapter.remove(self._location, entity, self._castToEntity.bind(self, cb));
+    },
 
-            cb(collection.map(function(data) {
-                return self._EntityType.rebuild(data);
-            }));
-        },
+    _castToEntity: function(cb, collection) {
+        var self = this;
 
-        static: {
-            getAdapter: function(adapterName) {
-                return ub.Stores[adapterName];
-            }
+        cb(collection.map(function(data) {
+            return self._EntityType.rebuild(data);
+        }));
+    },
+
+    static: {
+        getAdapter: function(adapterName) {
+            return ub.Stores[adapterName];
         }
-    });
+    }
+});
 
-    ub.Repository = Repository;
-
-})(window.uibase);
+module.exports = Repository;
