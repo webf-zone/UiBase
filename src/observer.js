@@ -1,13 +1,13 @@
 'use strict';
 
-var Class = require('./utils/class');
+var utils = require('utils');
 
 /**
  * Iteration over an push-style observable sequence.
  *
  * @class Observer
  */
-var Observer = Class({
+var Observer = utils.Class({
 
     /**
      * @class Observer

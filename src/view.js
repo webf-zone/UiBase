@@ -1,9 +1,9 @@
 'use strict';
 
 var $ = require('jquery');
-var Class = require('./utils/class');
-var Component = require('./component');
-var Observer = require('./observer');
+var utils = require('utils');
+var Component = require('component');
+var Observer = require('observer');
 
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
@@ -42,7 +42,7 @@ var updateDepth = 0;
  * @class View
  * @extends Component
  */
-var View = Class({
+var View = utils.Class({
 
     extends: Component,
 

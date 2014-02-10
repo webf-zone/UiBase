@@ -1,9 +1,9 @@
 'use strict';
 
-var Class = require('./utils/class');
-var Observable = require('./observable');
+var utils = require('utils');
+var Observable = require('observable');
 
-var Component = Class({
+var Component = utils.Class({
 
     construct: function() {
         this.inputs = {};

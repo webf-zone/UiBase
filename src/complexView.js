@@ -1,14 +1,13 @@
 'use strict';
 
-var utils = require('./utils/utils');
-var Class = require('./utils/class');
-var View = require('./view');
+var utils = require('utils');
+var View = require('view');
 
 /**
  * @class ComplexView
  * @extends View
  */
-var ComplexView = Class({
+var ComplexView = utils.Class({
 
     extends: View,
 

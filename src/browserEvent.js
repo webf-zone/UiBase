@@ -1,7 +1,7 @@
 'use strict';
 
 var $ = require('jquery');
-var Observable = require('./observable');
+var Observable = require('observable');
 var Observer = require('observer');
 
 var registeredEvents = {};

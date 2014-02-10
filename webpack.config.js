@@ -5,7 +5,7 @@ var path = require('path');
 module.exports = {
     cache: true,
     entry: {
-        uibase: './src/core.js'
+        'uibase': './src/core.js'
     },
     output: {
         path: path.join(__dirname, 'dist'),
@@ -17,13 +17,24 @@ module.exports = {
     module: {
         loaders: [
             // required to write "require('./style.css')"
-            { test: /\.css$/, loader: 'style-loader!css-loader' },
+            { test: /\.css$/, loader: 'style-loader!css-loader' }
         ]
     },
     plugins: [],
     resolve: {
         alias: {
-            observer: path.join(__dirname, 'src/observer.js')
+            browserEvent: path.join(__dirname, 'src/browserEvent.js'),
+            complexView: path.join(__dirname, 'src/complexView.js'),
+            component: path.join(__dirname, 'src/component.js'),
+            dispatcher: path.join(__dirname, 'src/dispatcher.js'),
+            htmlElement: path.join(__dirname, 'src/htmlElement.js'),
+            model: path.join(__dirname, 'src/model.js'),
+            observable: path.join(__dirname, 'src/observable'),
+            observer: path.join(__dirname, 'src/observer.js'),
+            repository: path.join(__dirname, 'src/repository.js'),
+            router: path.join(__dirname, 'src/router.js'),
+            view: path.join(__dirname, 'src/view.js'),
+            utils: path.join(__dirname, 'src/utils/utils.js')
         }
     }
 };

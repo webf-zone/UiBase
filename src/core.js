@@ -1,9 +1,9 @@
 'use strict';
 
 var $ = require('jquery');
-var View = require('./view');
-var HtmlElement = require('./htmlElement');
-var utils = require('./utils/utils');
+var View = require('view');
+var HtmlElement = require('htmlElement');
+var utils = require('utils');
 
 require('./core.css');
 

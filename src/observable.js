@@ -1,14 +1,14 @@
 'use strict';
 
-var Class = require('./utils/class');
-var Dispatcher = require('./dispatcher');
+var utils = require('utils');
+var Dispatcher = require('dispatcher');
 
 /**
  * Push-style collection
  *
  * @class Observable
  */
-var Observable = Class({
+var Observable = utils.Class({
 
     /**
      * @class Observable

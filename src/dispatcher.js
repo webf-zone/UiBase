@@ -1,6 +1,6 @@
 'use strict';
 
-var Class = require('./utils/class');
+var utils = require('utils');
 
 /**
  * Notify observers of a new value in an observable sequence. Each
@@ -8,7 +8,7 @@ var Class = require('./utils/class');
  *
  * @class Dispatcher
  */
-var Dispatcher = Class({
+var Dispatcher = utils.Class({
 
     /**
      * @class Dispatcher

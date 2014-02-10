@@ -2,12 +2,12 @@
 
 var jQuery = require('jquery');
 var Class = require('./class');
-var Component = require('../component');
-var HtmlElement = require('../htmlElement');
-var ComplexView = require('../complexView');
-var View = require('../view');
-var Observable = require('../observable');
-var Observer = require('../observer');
+var Component = require('component');
+var HtmlElement = require('htmlElement');
+var ComplexView = require('complexView');
+var View = require('view');
+var Observable = require('observable');
+var Observer = require('observer');
 
 var extend = jQuery.extend;
 
