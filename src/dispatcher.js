@@ -1,6 +1,7 @@
 'use strict';
 
 var utils = require('utils');
+var Observer = require('observer');
 
 /**
  * Notify observers of a new value in an observable sequence. Each
@@ -63,7 +64,7 @@ var Dispatcher = utils.Class({
         //The Magic
         if (this._subscriptions.length === 1) {
             //TODO: Add error and complete callbacks
-            unsubscribe = this._subscribe(new ub.Observer(function() {
+            unsubscribe = this._subscribe(new Observer(function() {
                 oThis.push.apply(oThis, arguments);
             }));
         }

@@ -1,4 +1,6 @@
-var utils = require('../utils/utils');
+'use strict';
+
+var utils = require('utils');
 
 var Map = utils.createComponent({
 

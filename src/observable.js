@@ -2,6 +2,7 @@
 
 var utils = require('utils');
 var Dispatcher = require('dispatcher');
+var $ = require('jquery');
 
 /**
  * Push-style collection
@@ -44,7 +45,7 @@ var Observable = utils.Class({
          */
         fromEvent: function(element, eventName) {
             return new Observable(function(observer) {
-                var el = jQuery(element),
+                var el = $(element),
                     handler = function(eventObject) {
                         observer.onNext(eventObject);
                     };
@@ -77,7 +78,7 @@ var Observable = utils.Class({
                     observer.onCompleted();
                 };
 
-                var jqXHR = jQuery.ajax(ajaxConfig);
+                var jqXHR = $.ajax(ajaxConfig);
 
                 jqXHR
                     .done(doneHandler)

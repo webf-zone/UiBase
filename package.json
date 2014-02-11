@@ -33,8 +33,9 @@
     "webpack": "~1.0.0",
     "style-loader": "~0.6.0",
     "css-loader": "~0.6.6",
-    "gulp": "~3.4.0",
-    "gulp-util": "~2.2.12",
-    "webpack-dev-server": "~1.2.0"
+    "gulp": "~3.5.2",
+    "gulp-util": "~2",
+    "gulp-jshint": "~1",
+    "jshint-stylish": "~0.1.5"
   }
 }

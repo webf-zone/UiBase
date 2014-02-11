@@ -3,20 +3,23 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var webpack = require('webpack');
+var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
 var webpackConfig = require('./webpack.config.js');
 
 // Production build
-gulp.task('build', ['webpack:build'], function() {});
+gulp.task('build', ['lint', 'webpack:build'], function() {
+    console.log('Done');
+});
 
-
-var myConfig = Object.create(webpackConfig);
-myConfig.entry = {
+var prodConfig = Object.create(webpackConfig);
+prodConfig.entry = {
     'uibase.min': webpackConfig.entry.uibase
 };
 
 gulp.task('webpack:build', function(callback) {
     // modify some webpack config options
-    myConfig.plugins = myConfig.plugins.concat(
+    prodConfig.plugins = prodConfig.plugins.concat(
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
@@ -27,7 +30,7 @@ gulp.task('webpack:build', function(callback) {
     );
 
     // run webpack
-    webpack(myConfig, function(err, stats) {
+    webpack(prodConfig, function(err, stats) {
         if(err) throw new gutil.PluginError('webpack:build', err);
         gutil.log('[webpack:build]', stats.toString({
             colors: true
@@ -36,21 +39,22 @@ gulp.task('webpack:build', function(callback) {
     });
 });
 
-gulp.task('build-dev', ['webpack:build-dev'], function() {});
+gulp.task('build-dev', ['lint', 'webpack:build-dev'], function() {
+    console.log('Done');
+});
 // modify some webpack config options
-var myDevConfig = Object.create(webpackConfig);
-myDevConfig.devtool = 'sourcemap';
-myDevConfig.debug = true;
-myDevConfig.output.filename = '[name].js';
-myDevConfig.entry = {
+var devConfig = Object.create(webpackConfig);
+devConfig.devtool = 'sourcemap';
+devConfig.debug = true;
+devConfig.output.filename = '[name].js';
+devConfig.entry = {
     'uibase': webpackConfig.entry.uibase
 };
 
 // create a single instance of the compiler to allow caching
-var devCompiler = webpack(myDevConfig);
+var devCompiler = webpack(devConfig);
 
 gulp.task('webpack:build-dev', function(callback) {
-    // run webpack
     devCompiler.run(function(err, stats) {
         if(err) throw new gutil.PluginError('webpack:build-dev', err);
         gutil.log('[webpack:build-dev]', stats.toString({
@@ -58,4 +62,11 @@ gulp.task('webpack:build-dev', function(callback) {
         }));
         callback();
     });
+});
+
+gulp.task('lint', function() {
+    return gulp.src('./src/*.js')
+        .pipe(jshint('.jshintrc'))
+        .pipe(jshint.reporter(stylish))
+        .pipe(jshint.reporter('fail'));
 });
