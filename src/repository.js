@@ -7,7 +7,7 @@ var Repository = utils.Class({
     construct: function(entityType, adapter, location) {
         var self = this;
 
-        self._adapter = ub.Repository.getAdapter(adapter);
+        self._adapter = adapter;
         self._location = location;
         self._EntityType = entityType;
     },
@@ -42,12 +42,6 @@ var Repository = utils.Class({
         cb(collection.map(function(data) {
             return self._EntityType.rebuild(data);
         }));
-    },
-
-    static: {
-        getAdapter: function(adapterName) {
-            return ub.Stores[adapterName];
-        }
     }
 });
 

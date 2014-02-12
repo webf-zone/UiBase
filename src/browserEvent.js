@@ -23,7 +23,7 @@ var BrowserEvent = {
 
         return new Observable(function(observer) {
             var ob = new Observer(function(event) {
-                if ($('[data-ubid="' + view._rootId + '"]').get(0) === event.target) {
+                if (view.isRendered() && $('[data-ubid="' + view._rootId + '"]').get(0) === event.target) {
                     observer.onNext.apply(observer, arguments);
                 }
             });

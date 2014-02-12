@@ -1,9 +1,8 @@
 'use strict';
 
-var utils = require('../utils/utils');
-var HtmlElement = require('../htmlElement');
+var uibase = require('uibase');
 
-var Button = utils.createView({
+var Button = uibase.createView({
 
     config: {
         text: {
@@ -20,7 +19,7 @@ var Button = utils.createView({
 
     components: {
         root: {
-            name: HtmlElement,
+            name: uibase.HtmlElement,
             tag: 'button',
             props: {
                 events: [ 'click' ]
@@ -29,7 +28,6 @@ var Button = utils.createView({
     },
 
     inputs: {
-        click: {},
         text: 'root.children',
         disabled: 'root.props.disabled'
     },

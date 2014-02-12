@@ -129,7 +129,7 @@ var ComplexView = utils.Class({
         this.updateView(prevProps, prevParent, prevState);
     },
 
-    updateView: function(prevProps, prevParent, prevState) {
+    updateView: function(prevProps, prevParent) {
         this._super(prevProps, prevParent);
 
         var prevView = this._renderedView;

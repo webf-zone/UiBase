@@ -21,6 +21,7 @@ module.exports = {
         ]
     },
     plugins: [],
+    amd: { jQuery: true },
     resolve: {
         alias: {
             browserEvent: path.join(__dirname, 'src/browserEvent.js'),
@@ -34,7 +35,8 @@ module.exports = {
             repository: path.join(__dirname, 'src/repository.js'),
             router: path.join(__dirname, 'src/router.js'),
             view: path.join(__dirname, 'src/view.js'),
-            utils: path.join(__dirname, 'src/utils/utils.js')
+            utils: path.join(__dirname, 'src/utils/utils.js'),
+            uibase: path.join(__dirname, 'src/core.js')
         }
     }
 };

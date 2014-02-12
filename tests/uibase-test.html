@@ -2,6 +2,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <base href="uibase/">
     <title>UiBase Tests</title>
     <link rel="stylesheet" href="../../node_modules/mocha/mocha.css">
 </head>
@@ -18,33 +19,16 @@
     <script>var expect = chai.expect</script>
 
     <!-- include source files here... -->
-    <script src="../commons/external/jquery.js"></script>
     <script>window.uibase = {};</script>
     <!--<script src="../commons/core.js"></script>-->
-    <script src="../commons/utils/utils.js"></script>
-    <script src="../commons/utils/class.js"></script>
-    <script src="../commons/dispatcher.js"></script>
-    <script src="../commons/observable.js"></script>
-    <script src="../commons/observer.js"></script>
-    <script src="../commons/component.js"></script>
-    <script src="../commons/view.js"></script>
-    <script src="../commons/complexView.js"></script>
-    <script src="../commons/browserEvent.js"></script>
-    <script src="../commons/htmlElement.js"></script>
-    <script src="../components/map.js"></script>
-    <script src="../components/collate.js"></script>
-
-    <script src="../views/button.js"></script>
+    <script>
+        window.uibase = {};
+        window.uibase.options = { testing: true };
+    </script>
+    <script src="../build/uibase.js"></script>
 
     <!-- include spec files here... -->
-    <script src="commons/utils/utils.js"></script>
-    <script src="commons/utils/class.js"></script>
-    <script src="commons/view.js"></script>
-
-    <script src="components/map.js"></script>
-    <script src="components/collate.js"></script>
-
-    <script src="views/button.js"></script>
+    <script src="../build/specs.js"></script>
 
     <script>
         if (window.mochaPhantomJS) { mochaPhantomJS.run(); }

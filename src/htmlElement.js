@@ -34,8 +34,16 @@ var HtmlElement = utils.Class({
 
         if (portType === 'props') {
             this.addPropInput(port.split('.')[1]);
-        } else {
-            this._super.apply(this, arguments);
+        } else if (portType === 'children') {
+            this.addChildrenInput();
+        }
+    },
+
+    addOutput: function(port) {
+        var portType = port.split('.')[0];
+
+        if (portType === 'props') {
+            this.addEventOutput(port.split('.')[1]);
         }
     },
 
@@ -45,6 +53,19 @@ var HtmlElement = utils.Class({
         self.inputs['props.' + propName] = new Observer(function(value) {
             self.updateProperty(propName, value);
         });
+    },
+
+    addChildrenInput: function() {
+        var self = this;
+
+        self.inputs.children = new Observer(function(value) {
+            self.updateChildren(value);
+            self.updateTextContent(value);
+        });
+    },
+
+    addEventOutput: function(portName) {
+        this.addOutPort('events.' + portName, BrowserEvent.addListener(portName, this));
     },
 
     /**
@@ -79,13 +100,8 @@ var HtmlElement = utils.Class({
      * @private
      */
     _createElement: function() {
-        var self = this,
-            props = this.props,
+        var props = this.props,
             ret = $('<' + this.tag + '>');
-
-        function addEventListener(event) {
-            self.addOutPort('events.' + event, BrowserEvent.addListener(event, self));
-        }
 
         for (var propKey in props) {
             if (!props.hasOwnProperty(propKey)) {
@@ -96,7 +112,7 @@ var HtmlElement = utils.Class({
                 continue;
             }
             if (propKey === 'events') {
-                propValue.forEach(addEventListener);
+//                propValue.forEach(addEventListener);
             } else {
                 if (propKey === 'style') {
                     if (propValue) {
@@ -219,7 +235,7 @@ var HtmlElement = utils.Class({
 
         if (prevChildren != null && nextChildren == null) {
             this.updateChildren(null);
-        } else if (prevContent != null && !(nextContent != null)) {
+        } else if (prevContent != null && nextContent == null) {
             this.updateTextContent('');
         }
 

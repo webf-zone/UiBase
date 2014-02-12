@@ -3,10 +3,14 @@
 var $ = require('jquery');
 var View = require('view');
 var HtmlElement = require('htmlElement');
+var ComplexView = require('complexView');
 var utils = require('utils');
 var Model = require('model');
 var Repository = require('repository');
 var Router = require('router');
+var Observer = require('observer');
+var Observable = require('observable');
+var CreateHelpers = require('./utils/createHelpers');
 
 require('./core.css');
 
@@ -20,6 +24,8 @@ staticPath[2] = window.location.hostname;
 staticPath = staticPath.join('/');
 
 basePath = staticPath.replace(window.location.protocol + '//' + window.location.hostname, '');
+
+var options = window.uibase.options;
 
 function loadElement(url, isScript, cb) {
     var el = document.createElement(isScript ? 'script' : 'link'),
@@ -89,8 +95,11 @@ Object.defineProperties(ub, {
     init: {
         value: function () {
             var oThis = this;
-            oThis.router = new Router();
-            oThis._parseUrls(JSON.parse(loadFile('urls.json')), basePath);
+
+            if (!options.testing) {
+                oThis.router = new Router();
+                oThis._parseUrls(JSON.parse(loadFile('urls.json')), basePath);
+            }
         }
     },
 
@@ -145,11 +154,16 @@ Object.defineProperties(ub, {
 });
 
 module.exports = utils.extend(ub, {
-    utils: utils,
+    Utils: utils,
     View: View,
     HtmlElement: HtmlElement,
+    ComplexView: ComplexView,
     Model: Model,
-    Repository: Repository
+    Repository: Repository,
+    Observer: Observer,
+    Observable: Observable,
+    createComponent: CreateHelpers.createComponent,
+    createView: CreateHelpers.createView
 });
 
 ub.init();

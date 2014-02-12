@@ -67,7 +67,7 @@ var Model = utils.Class({
      * @return true if the identities are the same, regardless of other attributes.
      */
     isIdenticalTo: function(other) {
-        return false;
+        return (this === other);
     }
 });
 
