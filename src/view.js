@@ -127,6 +127,7 @@ var View = utils.Class({
         if (!this.isRendered()) {
 //            throw new Error('Props can be updated only when view is rendered.');
             this.props = utils.extend(this.props, props);
+            return;
         }
 
         this._futureProps = props;
@@ -428,15 +429,15 @@ var View = utils.Class({
             markup = view.renderView(rootId, 0);
             $(container).html(markup);
 
-            if ('root' in view.components)
-                view.components.root.props.events.forEach(function(eventName) {
-                    if (view.inputs[eventName]) {
-                        Component.connect(
-                            view.components.root, eventName,
-                            view, eventName
-                        );
-                    }
-                });
+//            if ('root' in view.components)
+//                view.components.root.props.events.forEach(function(eventName) {
+//                    if (view.inputs[eventName]) {
+//                        Component.connect(
+//                            view.components.root, eventName,
+//                            view, eventName
+//                        );
+//                    }
+//                });
 
             return view;
         },

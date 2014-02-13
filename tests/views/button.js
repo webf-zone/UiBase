@@ -53,123 +53,94 @@ describe('Button', function() {
         $('#test-container button').click();
     });
 
-    it('should have an configuration, disabled, to create a button in disabled state', function() {
+    it('should have an configuration, disabled, to create a button in disabled state', function(done) {
         var btn = new Button({
             props: {
-                id: 'btn3',
-                disabled: true
+                id: 'btn3'
             },
+            disabled: true,
             text: 'Button Text'
         });
         uibase.View.renderView(btn, '#test-container');
 
         setTimeout(function() {
             expect(!!$('#test-container button').attr('disabled')).to.equal(true);
-//            btn.removeView();
+            btn.removeView();
+            done();
         }, 500);
     });
 
-//    it('should have disabled input, to enable/disable the button', function(done) {
-//        var btn = new Button({
-//            props: {
-//                id: 'btn4'
-//            },
-//            text: 'Button Text'
-//        });
-//        ub.View.renderView(btn, '#test-container');
-//
-//        var disableTrigger = new ub.Observable(function(obs) {
-//            this.write = function(val) {
-//                obs.onNext(val);
-//            };
-//        });
-//        disableTrigger.subscribe(btn.inputs.disabled);
-//
-//        disableTrigger.write(true);
-//
-//        setTimeout(function() {
-//            expect(!!$('#test-container button').attr('disabled')).to.equal(true);
-//            btn.removeView();
-//            done();
-//        }, 100);
-//    });
-//
-//    it('should not write to click output, when it is disabled', function(done) {
-//        var btn = new Button({
-//            props: {
-//                id: 'btn5'
-//            },
-//            disabled: true,
-//            text: 'Button Text'
-//        });
-//        uibase.View.renderView(btn, '#test-container');
-//
-//        var clickTrigger = new ub.Observable(function(obs) {
-//            this.write = function(val) {
-//                obs.onNext(val);
-//            };
-//        });
-//        clickTrigger.subscribe(btn.inputs.click);
-//
-//        var clickCounter = 0;
-//        btn.outputs.click.subscribe(new ub.Observer(function(val) {
-//            clickCounter += 1;
-//        }));
-//
-//        clickTrigger.write(1);
-//        clickTrigger.write(2);
-//
-//        setTimeout(function() {
-//            expect(clickCounter).to.equal(0);
-//            done();
-//        }, 500);
-//    });
-//
-//    it('should have text input, to update the text', function(done) {
-//        var btn = new Button({
-//            props: {
-//                id: 'btn6'
-//            },
-//            text: 'Button Text'
-//        });
-//        uibase.View.renderView(btn, '#test-container');
-//
-//        var textTrigger = new ub.Observable(function(obs) {
-//            this.write = function(val) {
-//                obs.onNext(val);
-//            };
-//        });
-//        textTrigger.subscribe(btn.inputs.text);
-//
-//        textTrigger.write('New Button Text');
-//
-//        setTimeout(function() {
-//            expect($('#test-container button').html()).to.equal('New Button Text');
-//            btn.removeView();
-//            done();
-//        }, 500);
-//    });
-//
-//    it('should work when embedded inside another view', function(done) {
-//        var TestView = uibase.Utils.createView({
-//            picture: function() {
-//                return {
-//                    name: Button,
-//                    props: {
-//                        id: 'btnEmbed'
-//                    },
-//                    text: 'Embedded Button'
-//                };
-//            }
-//        });
-//
-//        uibase.View.renderView(new TestView(), '#test-container');
-//
-//        setTimeout(function() {
-//            expect($('#test-container button').html()).to.equal('Embedded Button');
-//            done();
-//        }, 500);
-//    });
+    it('should have disabled input, to enable/disable the button', function(done) {
+        var btn = new Button({
+            props: {
+                id: 'btn4'
+            },
+            text: 'Button Text'
+        });
+        uibase.View.renderView(btn, '#test-container');
+
+        var disableTrigger = new uibase.Observable(function(obs) {
+            this.write = function(val) {
+                obs.onNext(val);
+            };
+        });
+        disableTrigger.subscribe(btn.inputs.disabled);
+
+        disableTrigger.write(true);
+
+        setTimeout(function() {
+            expect(!!$('#test-container button').attr('disabled')).to.equal(true);
+            btn.removeView();
+            done();
+        }, 100);
+    });
+
+
+    it('should have text input, to update the text', function(done) {
+        var btn = new Button({
+            props: {
+                id: 'btn6'
+            },
+            text: 'Button Text'
+        });
+        uibase.View.renderView(btn, '#test-container');
+
+        var textTrigger = new uibase.Observable(function(obs) {
+            this.write = function(val) {
+                obs.onNext(val);
+            };
+        });
+        textTrigger.subscribe(btn.inputs.text);
+
+        textTrigger.write('New Button Text');
+
+        setTimeout(function() {
+            expect($('#test-container button').html()).to.equal('New Button Text');
+            btn.removeView();
+            done();
+        }, 500);
+    });
+
+    it('should work when embedded inside another view', function(done) {
+        var TestView = uibase.createView({
+            picture: function() {
+                return {
+                    name: Button,
+                    props: {
+                        id: 'btnEmbed'
+                    },
+                    text: 'Embedded Button'
+                };
+            }
+        });
+
+        uibase.View.renderView(new TestView(), '#test-container');
+
+        setTimeout(function() {
+            expect($('#test-container button').html()).to.equal('Embedded Button');
+            done();
+        }, 500);
+    });
 });
 
 module.exports = {};

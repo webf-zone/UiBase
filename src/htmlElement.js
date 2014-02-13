@@ -27,6 +27,10 @@ var HtmlElement = utils.Class({
         self._super(config);
 
         self.tag = config.tag;
+
+        self.inputs.props = new Observer(function(partialProps) {
+            self.setProps(partialProps);
+        });
     },
 
     addInput: function(port) {
