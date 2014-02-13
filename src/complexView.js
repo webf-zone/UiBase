@@ -155,6 +155,18 @@ var ComplexView = utils.Class({
         this._super(nextView);
     },
 
+    removeView: function() {
+        this._compoundPhase = ComplexView.ViewPhase.REMOVING;
+
+        this._renderedView.removeView();
+        this._renderedView = null;
+
+        this.components = null;
+        this._compoundPhase = null;
+
+        this._super();
+    },
+
     static: {
 
         ViewPhase: {

@@ -45,6 +45,7 @@ describe('Button', function() {
             clicks += 1;
             if (clicks === 2) {
                 expect(clicks).to.equal(2);
+                btn.removeView();
                 done();
             }
         }));
@@ -134,10 +135,13 @@ describe('Button', function() {
             }
         });
 
-        uibase.View.renderView(new TestView(), '#test-container');
+        var tstView = new TestView();
+
+        uibase.View.renderView(tstView, '#test-container');
 
         setTimeout(function() {
             expect($('#test-container button').html()).to.equal('Embedded Button');
+            tstView.removeView();
             done();
         }, 500);
     });

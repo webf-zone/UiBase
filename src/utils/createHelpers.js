@@ -159,7 +159,7 @@ function createInPorts(self, ports, config) {
                     var obv = new Observable(function(observer) {
                         this.write = function(val) {
                             observer.onNext(val.value);
-                            //val.dispose();
+                            val.dispose();
                         };
                     });
 
@@ -299,7 +299,7 @@ function createProperties(self, config, instanceConfig) {
             var obv = new Observable(function(observer) {
                 this.write = function(val) {
                     observer.onNext(val.value);
-                    //val.dispose();
+                    val.dispose();
                 };
             });
 

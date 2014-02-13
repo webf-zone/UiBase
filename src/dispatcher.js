@@ -30,9 +30,7 @@ var Dispatcher = utils.Class({
     },
 
     removeObserver: function(subscription) {
-        //TODO: Define this function
-        //Eg: http://lodash.com/docs#without
-        utils.without(this._subscriptions, subscription);
+        this._subscriptions.splice(this._subscriptions.indexOf(subscription), 1);
     },
 
     push: function() {
@@ -73,9 +71,11 @@ var Dispatcher = utils.Class({
             this.removeObserver(subscription);
 
             if (!oThis.hasObservers()) {
-                return unsubscribe();
+                if (typeof unsubscribe === 'function') {
+                    return unsubscribe();
+                }
             }
-        };
+        }.bind(oThis);
     }
 });
 
