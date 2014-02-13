@@ -2,7 +2,7 @@
 'use strict';
 
 var uibase = require('uibase');
-var Button = require('../../src/views/button');
+var Button = require('comp.Button');
 
 describe('Button', function() {
 
@@ -48,7 +48,7 @@ describe('Button', function() {
             }
         }));
 
-        var clickTrigger = new ub.Observable(function(obs) {
+        var clickTrigger = new uibase.Observable(function(obs) {
             this.write = function(val) {
                 obs.onNext(val);
             };

@@ -36,7 +36,9 @@ module.exports = {
             router: path.join(__dirname, 'src/router.js'),
             view: path.join(__dirname, 'src/view.js'),
             utils: path.join(__dirname, 'src/utils/utils.js'),
-            uibase: path.join(__dirname, 'src/core.js')
+            uibase: path.join(__dirname, 'src/core.js'),
+
+            'comp.Button': path.join(__dirname, 'src/views/button.js')
         }
     }
 };
