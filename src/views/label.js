@@ -1,27 +1,32 @@
-;(function(ub) {
-    "use strict";
+'use strict';
 
-    ub.Views = ub.Views || {};
+var ub = require('uibase');
 
-    var Label = ub.Utils.Class({
+var Label = ub.createView({
 
-        extends: ub.View,
-
-        construct: function(config) {
-            var v = this;
-
-            this._super(config);
-
-            v._text = config.text || "";
-            v._el = $("<span>").text(v._text);
-
-            v._inPorts.text = new ub.Observer(function(text) {
-                v._text = text;
-                v._el.text(text);
-            });
+    config: {
+        text: {
+            optional: true,
+            default: ''
         }
-    });
+    },
 
-    ub.Views.Label = Label;
+    components: {
+        root: {
+            name: ub.HtmlElement,
+            tag: 'span'
+        }
+    },
 
-})(window.uibase);
+    inputs: {
+        text: 'root.children'
+    },
+
+    outputs: {},
+
+    picture: function() {
+        return this.components.root;
+    }
+});
+
+module.exports = Label;
