@@ -7,13 +7,11 @@ var Button = uibase.createView({
     config: {
         text: {
             optional: true,
-            default: '',
-            type: 'string'
+            default: ''
         },
         disabled: {
             optional: true,
-            default: false,
-            type: 'boolean'
+            default: false
         }
     },
 

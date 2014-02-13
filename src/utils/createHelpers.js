@@ -273,16 +273,22 @@ function createProperties(self, config, instanceConfig) {
 
         /**
          * If the configuration options is mandatory and it has not been
-         * passed for the instance, throw and error.
+         * passed for the instance, throw an error.
          */
         if (!optional && typeof instanceConfig[configName] === 'undefined') {
             throw new Error('Missing required configuration: ' + configName);
         }
 
+        /**
+         * Check the type of the config parameter. The expected type is either
+         * specified using the 'type' configuration or inferred from the default value.
+         */
+        var type = (localConfig[configName].type || typeof localConfig[configName].default);
+
         if (typeof instanceConfig[configName] !== 'undefined' &&
-            localConfig[configName].type &&
-            typeof instanceConfig[configName] !== localConfig[configName].type) {
-            throw new TypeError('Expected ' + configName + ' to be of type ' + localConfig[configName].type);
+            type !== undefined && type !== null && type !== 'any' &&
+            typeof instanceConfig[configName] !== type) {
+            throw new TypeError('Expected ' + configName + ' to be of type ' + type);
         }
 
         if (typeof instanceConfig[configName] !== 'undefined' &&
