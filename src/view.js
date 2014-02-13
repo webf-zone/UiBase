@@ -119,6 +119,21 @@ var View = utils.Class({
         }
     },
 
+    setProps: function(partialProps) {
+        this.replaceProps(utils.extend({}, this._futureProps || this.props, partialProps));
+    },
+
+    replaceProps: function(props) {
+        if (!this.isRendered()) {
+//            throw new Error('Props can be updated only when view is rendered.');
+            this.props = utils.extend(this.props, props);
+        }
+
+        this._futureProps = props;
+
+        View.enqueueUpdate(this);
+    },
+
     copyFrom: function(nextView) {
         if (!this.isRendered()) {
             throw new Error('Only a rendered view can be updated');

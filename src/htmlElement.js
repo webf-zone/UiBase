@@ -42,7 +42,7 @@ var HtmlElement = utils.Class({
     addOutput: function(port) {
         var portType = port.split('.')[0];
 
-        if (portType === 'props') {
+        if (portType === 'events') {
             this.addEventOutput(port.split('.')[1]);
         }
     },
@@ -51,7 +51,10 @@ var HtmlElement = utils.Class({
         var self = this;
 
         self.inputs['props.' + propName] = new Observer(function(value) {
-            self.updateProperty(propName, value);
+            var partialProps = {};
+
+            partialProps[propName] = value;
+            self.setProps(partialProps);
         });
     },
 
@@ -59,8 +62,10 @@ var HtmlElement = utils.Class({
         var self = this;
 
         self.inputs.children = new Observer(function(value) {
-            self.updateChildren(value);
-            self.updateTextContent(value);
+            var partialProps = {};
+
+            partialProps.children = value;
+            self.setProps(partialProps);
         });
     },
 
