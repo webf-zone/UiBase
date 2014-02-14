@@ -90,13 +90,30 @@ function getBehFor(self, portName, config) {
         }
 
         Object.keys(output).forEach(function(outputName) {
-            if (outputName === 'picture' && self instanceof View) {
-                self._viewState = extend(self._viewState, output[outputName]);
-                View.enqueueUpdate(self);
+            if (typeof output[outputName] === 'function') {
+                var obv = new Observable(output[outputName]);
+                var obs = new Observer(function(value) {
+                    if (outputName === 'picture' && self instanceof View) {
+                        self._viewState = extend(self._viewState, value);
+                        View.enqueueUpdate(self);
+                    } else {
+                        //TODO: Handle errors
+                        self.outputs[outputName].write('success', value);
+                    }
+                    //TODO: Destroy obs and obv
+                });
+
+                obv.subscribe(obs);
             } else {
-                //TODO: Handle errors
-                self.outputs[outputName].write('success', output[outputName]);
+                if (outputName === 'picture' && self instanceof View) {
+                    self._viewState = extend(self._viewState, output[outputName]);
+                    View.enqueueUpdate(self);
+                } else {
+                    //TODO: Handle errors
+                    self.outputs[outputName].write('success', output[outputName]);
+                }
             }
+
         });
     }
 
