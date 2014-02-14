@@ -1,14 +1,13 @@
 'use strict';
 
-var utils = require('utils');
+var ub = require('uibase');
 
-var Map = utils.createComponent({
+var Map = ub.createComponent({
 
     config: {
         mapper: {
             optional: true,
-            default: function(val) { return val; },
-            type: 'function'
+            default: function(val) { return val; }
         }
     },
 

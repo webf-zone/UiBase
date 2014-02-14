@@ -1,44 +1,43 @@
-(function(ub) {
-    "use strict";
+'use strict';
 
-    ub.Views = ub.Views || {};
+var ub = require('uibase');
+var Map = require('comp.Map');
+var $ = require('jquery');
 
-    var Textbox = ub.Utils.Class({
+var Textbox = ub.createView({
 
-        extends: ub.View,
-
-        construct: function(config) {
-            var self = this;
-
-            self._super(config);
-
-            self.element = new ub.Views.HtmlElement({
-                tag: "input",
-                props: ub.Utils.extend({}, config.props, {
-                    type: "text"
-                }),
-                events: [
-                    "input",
-                    "keypress"
-                ],
-                view: self
-            });
-
-            var mapValue = new ub.Components.Map(function(event) {
-                return $(event.target).val();
-            });
-
-            ub.Component.connect(self.element, "input", mapValue, "input");
-
-            self.addOutPort("value", mapValue.get("output"));
-            self.addOutPort("keypress", self.element.get("keypress"));
+    components: {
+        root: {
+            name: ub.HtmlElement,
+            tag: 'input',
+            props: {
+                type: 'text'
+            },
+            events: [
+                'input',
+                'keypress'
+            ]
         },
-
-        render: function() {
-            return this.element;
+        mapValue: {
+            name: Map,
+            mapper: function(event) { return $(event.target).val(); }
         }
-    });
+    },
 
-    ub.Views.Textbox = Textbox;
+    connections: {
+        valFromEvt: [ 'root.events.input', 'mapValue.input' ]
+    },
 
-})(window.uibase);
+    inputs: {},
+
+    outputs: {
+        value: 'mapValue.output',
+        keypress: 'root.events.keypress'
+    },
+
+    picture: function() {
+        return this.components.root;
+    }
+});
+
+module.exports = Textbox;

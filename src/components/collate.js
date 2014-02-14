@@ -1,67 +1,66 @@
-(function(ub) {
-    'use strict';
+'use strict';
 
-    ub.Components = ub.Components || {};
+var ub = require('uibase');
 
-    ub.Components.Collate = ub.Utils.createComponent({
+var Collate = ub.createComponent({
 
-        config: {
-            seed: {
-                optional: false
+    config: {
+        seed: {
+            optional: false
+        },
+        op: {
+            optional: false,
+            type: 'function'
+        }
+    },
+
+    inputs: {
+        input: {},
+        reset: {}
+    },
+
+    outputs: {
+        output: true
+    },
+
+    _aux: function(acc, v) {
+        var self = this,
+            result = self.config.op(acc, v);
+
+        return {
+            output: result,
+            next: {
+                success: function(val) { return self._aux(result, val); }
+            }
+        };
+    },
+
+    beh: {
+        input: {
+            success: function(value) {
+                var self = this;
+
+                return self._aux(self.config.seed, value);
             },
-            op: {
-                optional: false,
-                type: 'function'
+            error: function(errors) {
+                return {
+                    output: errors
+                };
             }
         },
-
-        inputs: {
-            input: {},
-            reset: {}
-        },
-
-        outputs: {
-            output: true
-        },
-
-        _aux: function(acc, v) {
-            var self = this,
-                result = self.config.op(acc, v);
-
-            return {
-                output: result,
-                next: {
-                    success: function(val) { return self._aux(result, val); }
-                }
-            };
-        },
-
-        beh: {
-            input: {
-                success: function(value) {
-                    var self = this;
-
-                    return self._aux(self.config.seed, value);
-                },
-                error: function(errors) {
-                    return {
-                        output: errors
-                    };
-                }
-            },
-            reset: {
-                success: function() {
-                    return {
-                        output: this.config.seed,
-                        next: {
-                            input: {
-                                success: this._aux.bind(this, this.config.seed)
-                            }
+        reset: {
+            success: function() {
+                return {
+                    output: this.config.seed,
+                    next: {
+                        input: {
+                            success: this._aux.bind(this, this.config.seed)
                         }
-                    };
-                }
+                    }
+                };
             }
         }
-    });
+    }
+});
 
-})(window.uibase);
+module.exports = Collate;
