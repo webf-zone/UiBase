@@ -91,7 +91,10 @@ function getBehFor(self, portName, config) {
 
         Object.keys(output).forEach(function(outputName) {
             if (typeof output[outputName] === 'function') {
-                var obv = new Observable(output[outputName]);
+                var obv = new Observable(function(observer) {
+                    output[outputName](observer.onNext.bind(observer));
+                });
+
                 var obs = new Observer(function(value) {
                     if (outputName === 'picture' && self instanceof View) {
                         self._viewState = extend(self._viewState, value);
@@ -100,7 +103,6 @@ function getBehFor(self, portName, config) {
                         //TODO: Handle errors
                         self.outputs[outputName].write('success', value);
                     }
-                    //TODO: Destroy obs and obv
                 });
 
                 obv.subscribe(obs);

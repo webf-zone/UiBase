@@ -87,7 +87,8 @@ testConfig.entry = {
     'dummy': path.join(__dirname, 'tests/__dummy__.js'),
     'specs': [
         path.join(__dirname, 'tests/utils/utils.js'),
-        path.join(__dirname, 'tests/views/button.js')
+        path.join(__dirname, 'tests/views/button.js'),
+        path.join(__dirname, 'tests/views/delay-test.js')
     ]
 };
 testConfig.output = {

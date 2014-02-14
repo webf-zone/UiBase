@@ -38,7 +38,8 @@ module.exports = {
             utils: path.join(__dirname, 'src/utils/utils.js'),
             uibase: path.join(__dirname, 'src/core.js'),
 
-            'comp.Button': path.join(__dirname, 'src/views/button.js')
+            'comp.Button': path.join(__dirname, 'src/views/button.js'),
+            'comp.Delay': path.join(__dirname, 'src/components/delay.js')
         }
     }
 };
