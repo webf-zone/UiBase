@@ -122,7 +122,7 @@ function getBehFor(self, portName, config) {
     return new Observer(onNext.bind(self, behConfig, portName));
 }
 
-function createInPorts(self, ports, config) {
+function createInputs(self, ports, config) {
     config.config = config.config || {};
 
     return extend(Object.keys(ports).reduce(function(store, portName) {
@@ -139,7 +139,7 @@ function createInPorts(self, ports, config) {
                 compPort = portConfig.split('.').slice(1).join('.');
 
             if (!(compName in self.components)) {
-                throw new Error('createInPorts(): No such component defined: ' + compName);
+                throw new Error('createInputs(): No such component defined: ' + compName);
             } else {
                 // TODO: Check for valid port
                 if (self.components[compName] instanceof HtmlElement) {
@@ -191,10 +191,10 @@ function createInPorts(self, ports, config) {
     });
 }
 
-function createOutPorts(self, ports) {
+function createOutputs(self, ports) {
     self.outputs = self.outputs || {};
 
-    return Object.keys(ports).reduce(function(store, portName) {
+    return extend(Object.keys(ports).reduce(function(store, portName) {
         var portConfig = ports[portName];
 
         if (portConfig === true) {
@@ -216,7 +216,7 @@ function createOutPorts(self, ports) {
                 compPort = portConfig.split('.').slice(1).join('.');
 
             if (!(compName in self.components)) {
-                throw new Error('createInPorts(): No such component defined: ' + compName);
+                throw new Error('createInputs(): No such component defined: ' + compName);
             } else {
                 // TODO: Check for valid port
                 if (self.components[compName] instanceof HtmlElement) {
@@ -227,7 +227,17 @@ function createOutPorts(self, ports) {
         }
 
         return store;
-    }, {});
+    }, {}), {
+        load: new Observable(function(observer) {
+            self.outputs.load.write = function(type, val) {
+                if (type === 'success') {
+                    observer.onNext(val);
+                } else if (type === 'error') {
+                    observer.onError(val);
+                }
+            };
+        })
+    });
 }
 
 function parseViewConfig(self, config) {
@@ -247,7 +257,11 @@ function parseViewConfig(self, config) {
 
     picture.props.children = children;
 
-    return new ViewConstructor(configs);
+    var root = new ViewConstructor(configs);
+
+    self.components.root = self.components.root || root;
+
+    return root;
 }
 
 function removeReservedConfigParams(config) {
@@ -263,8 +277,8 @@ function removeReservedConfigParams(config) {
 function createProperties(self, config, instanceConfig) {
     self.components = createComponents(self, config.components || {});
 
-    self.inputs = createInPorts(self, config.inputs || {}, config);
-    self.outputs = createOutPorts(self, config.outputs || {});
+    self.inputs = createInputs(self, config.inputs || {}, config);
+    self.outputs = createOutputs(self, config.outputs || {});
 
     self.connections = createConnections(self, config.connections || {});
 
@@ -335,10 +349,6 @@ function createProperties(self, config, instanceConfig) {
     });
 
     self._viewState = extend(true, {}, self.config);
-
-    if (typeof config.construct === 'function') {
-        config.construct.call(self, instanceConfig);
-    }
 }
 
 var createComponent = function(config) {
@@ -368,6 +378,12 @@ var createComponent = function(config) {
 
             self._super(pConfig);
             createProperties(self, config, instanceConfig);
+
+            if (typeof config.construct === 'function') {
+                config.construct.call(self, instanceConfig);
+            }
+
+            self.outputs.load.write('success');
         }
     }, removeReservedConfigParams(config));
 
@@ -392,6 +408,10 @@ var createView = function(config) {
 
             self._super(pConfig);
             createProperties(self, config, instanceConfig);
+
+            if (typeof config.construct === 'function') {
+                config.construct.call(self, instanceConfig);
+            }
         },
 
         render: function() {

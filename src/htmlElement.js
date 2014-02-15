@@ -31,6 +31,8 @@ var HtmlElement = utils.Class({
         self.inputs.props = new Observer(function(partialProps) {
             self.setProps(partialProps);
         });
+
+        self.addOutPort('load', BrowserEvent.addListener('load', this));
     },
 
     addInput: function(port) {

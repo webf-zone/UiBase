@@ -40,6 +40,8 @@ var ComplexView = utils.Class({
 
         var markup = this._renderedView.renderView(rootId, depth + 1);
 
+        this.outputs.load = this.components.root.outputs.load;
+
         return markup;
     },
 

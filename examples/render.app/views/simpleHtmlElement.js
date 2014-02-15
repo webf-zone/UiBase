@@ -1,89 +1,45 @@
-(function(ub) {
+'use strict';
 
-    'use strict';
+var ub = require('uibase');
+var Label = require('comp.Label');
+var Delay = require('comp.Delay');
+var Collate = require('comp.Collate');
 
-    ub.Views = ub.Views || {};
+var startSeconds = Number(new Date());
 
-    var startSeconds = Number(new Date());
+var SimpleHtmlElement = ub.createView({
 
-    ub.Views.SimpleHtmlElement = ub.Utils.Class({
+    config: {},
 
-        extends: ub.ComplexView,
-
-        construct: function() {
-            var self = this;
-
-            self._super();
-
-            self.state.seconds = 0;
-            startSeconds = Number(new Date());
-
-            setTimeout(function() {
-                self._updateTime();
-            }, 500);
+    components: {
+        display: {
+            name: Label
         },
-
-        _updateTime: function() {
-            var view = this;
-
-            view.setState({
-                seconds: parseInt((Number(new Date()) - startSeconds) / 1000, 10)
-            });
-
-            setTimeout(function() {
-                view._updateTime();
-            }, 1000);
+        delay: {
+            name: Delay,
+            amount: 1000
         },
-
-        render: function() {
-            var view = this;
-
-            var unit = view.state.seconds === 0 ?
-                undefined : view.state.seconds === 1 ?
-                new ub.Views.HtmlElement({
-                    tag: 'span',
-                    props: {
-                        children: 'Sec'
-                    }
-                })
-                :
-                new ub.Views.HtmlElement({
-                    tag: 'span',
-                    props: {
-                        children: 'Secs'
-                    }
-                });
-
-            var items = [
-                new ub.Views.HtmlElement({
-                    tag: 'span',
-                    props: {
-                        children: 'Seconds Passed: '
-                    }
-                }),
-                new ub.Views.HtmlElement({
-                    tag: 'span',
-                    props: {
-                        style: {
-                            'font-weight': 'bold',
-                            'color': view.state.seconds < 10 ? '#444' : '#FF0000'
-                        },
-                        children: view.state.seconds
-                    }
-                })
-            ];
-
-            if (unit) {
-                items.push(unit);
-            }
-
-            return new ub.Views.HtmlElement({
-                tag: 'div',
-                props: {
-                    children: items
-                }
-            });
+        adder: {
+            name: Collate,
+            seed: 0,
+            op: function(total, val) { return total + val; }
         }
-    });
+    },
 
-})(window.uibase);
+    connections: {
+        start: [ 'this.load',    'adder.reset'  ],
+        count: [ 'delay.output', 'adder.input'  ],
+        show:  [ 'adder.output', 'display.text' ]
+    },
+
+    picture: function() {
+        return {
+            name: ub.HtmlElement,
+            tag: 'div',
+            children: [ this.components.display ]
+        };
+    }
+
+});
+
+module.exports = SimpleHtmlElement;
