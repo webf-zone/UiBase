@@ -1,19 +1,26 @@
-;(function(ub) {
-    "use strict";
+'use strict';
 
-    ub.Components = ub.Components || {};
+var ub = require('uibase');
+var Collate = require('comp.Collate');
 
-    var Count = ub.Utils.Class({
+var Count = ub.createComponent({
 
-        extends: ub.Components.Collate,
-
-        construct: function() {
-            this._super(0, function(count) {
-                return count + 1;
-            });
+    components: {
+        collate: {
+            name: Collate,
+            seed: 0,
+            op: function(result) { return result + 1; }
         }
-    });
+    },
 
-    ub.Components.Count = Count;
+    inputs: {
+        reset: 'collate.reset',
+        input: 'collate.input'
+    },
 
-})(window.uibase);
+    outputs: {
+        output: 'collate.output'
+    }
+});
+
+module.exports = Count;
