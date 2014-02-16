@@ -176,6 +176,10 @@ function createInputs(self, ports, config) {
             return new Observer(function(partialProps) {
                 if (self.components.root) {
                     var obv = new Observable(function(observer) {
+                        /**
+                         * This function only works because the dispatcher class
+                         * never this subscribe more than once.
+                         */
                         this.write = function(val) {
                             observer.onNext(val.value);
                             val.dispose();
