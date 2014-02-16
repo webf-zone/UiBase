@@ -1,7 +1,6 @@
 'use strict';
 
 var ub = require('uibase');
-var Map = require('comp.Map');
 
 var Filter = ub.createComponent({
 
