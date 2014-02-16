@@ -1,50 +1,34 @@
-;(function(ub) {
-    "use strict";
+'use strict';
 
-    ub.Components = ub.Components || {};
+var ub = require('uibase');
 
-    var SampleOn = ub.Utils.Class({
+var SampleOn = ub.createComponent({
 
-        extends: ub.Component,
+    inputs: {
+        value: {},
+        sampleOn: {}
+    },
 
-        construct: function() {
-            var self = this;
+    outputs: {
+        output: true
+    },
 
-            self._super();
-
-            self._val = null;
-
-            self._outPorts = {
-                output: new ub.Observable(function(observer) {
-                    self._observer = observer;
-                })
-            };
-
-            self._inPorts = {
-                sampleOn: new ub.Observer(function() {
-                    if (self._observer) {
-                        self._update();
+    beh: {
+        value: {
+            success: function(val) {
+                return {
+                    next: {
+                        sampleOn: function() {
+                            return { output: val };
+                        }
                     }
-                },
-                function(errors) {
-                    //TODO: Define this function
-                    self._error(errors);
-                },
-                function() {
-                    //TODO: Define this function
-                    self._completed();
-                }),
-                value: new ub.Observer(function(val) {
-                    self._val = val;
-                })
-            };
+                };
+            }
         },
-
-        _update: function() {
-            this._observer.onNext(this._val);
+        sampleOn: function() {
+            return {};
         }
-    });
+    }
+});
 
-    ub.Components.SampleOn  = SampleOn;
-
-})(window.uibase);
+module.exports = SampleOn;
