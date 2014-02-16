@@ -1,48 +1,34 @@
-;(function(ub) {
-    "use strict";
+'use strict';
 
-    ub.Components = ub.Components || {};
+var ub = require('uibase');
+var Map = require('comp.Map');
 
-    var Filter = ub.Utils.Class({
+var Filter = ub.createComponent({
 
-        extends: ub.Component,
-
-        construct: function(filter) {
-            var self = this;
-
-            self._super();
-
-            self._filter = filter;
-
-            self._outPorts = {
-                output: new ub.Observable(function(observer) {
-                    self._observer = ub.Utils.instanceOf(ub.Observer)(observer);
-                })
-            };
-
-            self._inPorts = {
-                input: new ub.Observer(function(val) {
-                    if (self._observer && self._filter(val) === true) {
-                        self._update(val);
-                    }
-                },
-                function(errors) {
-                    //TODO: Define this function
-                    self._error(errors);
-                },
-                function() {
-                    //TODO: Define this function
-                    self._completed();
-                })
-            };
-        },
-
-        _update: function(val) {
-            this._observer.onNext(val);
+    config: {
+        test: {
+            optional: false,
+            type: 'function'
         }
-    });
+    },
 
-    ub.Components.Filter  = Filter;
+    inputs: {
+        input: {}
+    },
 
-})(window.uibase);
+    outputs: {
+        output: true
+    },
 
+    beh: {
+        input: {
+            success: function(val) {
+                if (this.config.test(val) === true) {
+                    return { output: val };
+                }
+            }
+        }
+    }
+});
+
+module.exports = Filter;

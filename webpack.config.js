@@ -41,7 +41,8 @@ module.exports = {
             'comp.Button': path.join(__dirname, 'src/views/button.js'),
             'comp.Delay': path.join(__dirname, 'src/components/delay.js'),
             'comp.Collate': path.join(__dirname, 'src/components/collate.js'),
-            'comp.Count': path.join(__dirname, 'src/components/count.js')
+            'comp.Count': path.join(__dirname, 'src/components/count.js'),
+            'comp.Filter': path.join(__dirname, 'src/components/filter.js')
         }
     }
 };
