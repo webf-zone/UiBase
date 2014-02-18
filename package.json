@@ -36,6 +36,13 @@
     "gulp": "~3.5.2",
     "gulp-util": "~2",
     "gulp-jshint": "~1",
-    "jshint-stylish": "~0.1.5"
+    "jshint-stylish": "~0.1.5",
+    "cssify": "~0.4.2",
+    "gulp-browserify": "~0.4.5",
+    "gulp-rename": "~1.1.0",
+    "gulp-uglify": "~0.2.1",
+    "aliasify": "~1.4.0",
+    "gulp-concat": "~2.1.7",
+    "lodash": "~2.4.1"
   }
 }

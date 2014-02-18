@@ -31,5 +31,3 @@ describe('Delay', function() {
         obv.write(2);
     });
 });
-
-module.exports = {};

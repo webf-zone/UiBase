@@ -387,7 +387,9 @@ var createComponent = function(config) {
                 config.construct.call(self, instanceConfig);
             }
 
-            self.outputs.load.write('success');
+            if (self.outputs.load.write) {
+                self.outputs.load.write('success');
+            }
         }
     }, removeReservedConfigParams(config));
 

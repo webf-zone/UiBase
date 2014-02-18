@@ -25,7 +25,7 @@ staticPath = staticPath.join('/');
 
 basePath = staticPath.replace(window.location.protocol + '//' + window.location.hostname, '');
 
-var options = window.uibase.options;
+var options = (window.uibase && window.uibase.options) || {};
 
 function loadElement(url, isScript, cb) {
     var el = document.createElement(isScript ? 'script' : 'link'),

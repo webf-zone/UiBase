@@ -146,5 +146,3 @@ describe('Button', function() {
         }, 500);
     });
 });
-
-module.exports = {};
