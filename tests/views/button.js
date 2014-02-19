@@ -41,7 +41,6 @@ describe('Button', function() {
 
         var clicks = 0;
         btn.outputs.click.subscribe(new uibase.Observer(function(e) {
-            console.log('clicked');
             clicks += 1;
             if (clicks === 2) {
                 expect(clicks).to.equal(2);

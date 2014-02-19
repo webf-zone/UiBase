@@ -102,7 +102,7 @@ gulp.task('lint', function() {
 });
 
 gulp.task('build-test', ['lint'], function() {
-    return gulp.src(['./tests/views/button.js', './tests/views/delay-test.js'])
+    return gulp.src([ './tests/utils/*.js', './tests/views/*.js' ])
         .pipe(concat('specs.js'))
         .pipe(browserify(componentsBrowserifyConfig))
         .pipe(rename('specs.js'))

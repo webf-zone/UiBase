@@ -3,7 +3,7 @@
 
 var utils = require('uibase').Utils;
 
-describe('UiBase.Utils', function() {
+describe('Utils', function() {
 
     it('should have a method extend', function() {
         expect(utils.extend).to.be.a('function');
