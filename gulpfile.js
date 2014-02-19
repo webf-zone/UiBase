@@ -45,20 +45,18 @@ var componentsBrowserifyConfig = {
 
 /* Production build */
 gulp.task('build', function() {
-    return gulp.src('src/core.js')
-        .pipe(browserify(coreBrowserifyConfig))
+    return gulp.src('src/core.js', { read: false })
+        .pipe(browserify(_.merge(coreBrowserifyConfig, { debug: false })))
         .on('prebundle', function(bundle) {
             bundle.require(__dirname + '/src/core.js', { expose: 'uibase' });
         })
-        .pipe(rename('uibase.js'))
-        .pipe(gulp.dest('./dist'))
         .pipe(uglify())
         .pipe(rename('uibase.min.js'))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build-dev', function() {
-    return gulp.src('src/core.js')
+    return gulp.src('src/core.js', { read: false })
         .pipe(browserify(coreBrowserifyConfig))
         .on('prebundle', function(bundle) {
             bundle.require(__dirname + '/src/core.js', { expose: 'uibase' });
@@ -68,15 +66,29 @@ gulp.task('build-dev', function() {
 });
 
 gulp.task('build-components-dev', function() {
-    return gulp.src(['src/components/*.js', 'src/views/*.js'])
+    return gulp.src('src/components/*.js', { read: false })
         .pipe(browserify(componentsBrowserifyConfig))
+        .on('prebundle', function(bundle) {
+            Object.keys(aliases.aliases).forEach(function(alias) {
+                if (/^comp\./.test(alias)) {
+                    bundle.require(path.join(__dirname, aliases.aliases[alias]), { expose: alias });
+                }
+            });
+        })
         .pipe(rename('uibase-components.js'))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build-components', function() {
-    return gulp.src(['src/components/*.js', 'src/views/*.js'])
+    return gulp.src('src/components/*.js', { read: false })
         .pipe(browserify(componentsBrowserifyConfig))
+        .on('prebundle', function(bundle) {
+            Object.keys(aliases.aliases).forEach(function(alias) {
+                if (/^comp\./.test(alias)) {
+                    bundle.require(path.join(__dirname, aliases.aliases[alias]), { expose: alias });
+                }
+            });
+        })
         .pipe(uglify())
         .pipe(rename('uibase-components.min.js'))
         .pipe(gulp.dest('./dist'));
