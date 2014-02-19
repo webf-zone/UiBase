@@ -11,6 +11,10 @@
         "include": "/examples/deps.app/"
     },
 
+    "render/": {
+        "include": "/examples/render.app/"
+    },
+
     "textbox": {
         "view": "Textbox",
         "package": "compTextbox"

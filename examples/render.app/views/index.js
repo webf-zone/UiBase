@@ -3,43 +3,49 @@
 var ub = require('uibase');
 var Label = require('comp.Label');
 var Delay = require('comp.Delay');
-var Collate = require('comp.Collate');
+var Count = require('comp.Count');
 
-var startSeconds = Number(new Date());
-
-var SimpleHtmlElement = ub.createView({
+var Index = ub.createView({
 
     config: {},
 
     components: {
         display: {
-            name: Label
+            name: Label,
+            text: '0'
         },
         delay: {
             name: Delay,
             amount: 1000
         },
         adder: {
-            name: Collate,
-            seed: 0,
-            op: function(total, val) { return total + val; }
+            name: Count
         }
     },
 
     connections: {
         start: [ 'this.load',    'adder.reset'  ],
         count: [ 'delay.output', 'adder.input'  ],
-        show:  [ 'adder.output', 'display.text' ]
+        show:  [ 'adder.output', 'display.text' ],
+        loop:  [ 'adder.output', 'delay.input' ]
     },
 
     picture: function() {
         return {
             name: ub.HtmlElement,
             tag: 'div',
-            children: [ this.components.display ]
+            props: {
+                children: [
+                    {
+                        name: Label,
+                        text: 'Elapsed Seconds: '
+                    },
+                    this.components.display
+                ]
+            }
         };
     }
 
 });
 
-module.exports = SimpleHtmlElement;
+module.exports = Index;

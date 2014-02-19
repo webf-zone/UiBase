@@ -1,6 +1,5 @@
 {
-    "label": {
-        "view": "SimpleHtmlElement",
-        "package": "v.SimpleHtmlElement"
+    "index": {
+        "url": "build/index.js"
     }
 }

@@ -251,18 +251,25 @@ function parseViewConfig(self, config) {
         return picture;
     }
 
-    var ViewConstructor = picture.name;
+    function createViewFromConfig(picture) {
+        if (picture instanceof View) {
+            return picture;
+        }
 
-    var children = picture.children ? typeof picture.children === 'string' ?
-        picture.children : picture.children.map(parseViewConfig.bind(self, self)) : undefined;
+        var ViewConstructor = picture.name;
 
-    var configs = extend({}, picture);
-    delete configs.children;
+        var children = picture.props && picture.props.children ?
+            typeof picture.props.children === 'string' ? picture.props.children :
+                picture.props.children.map(createViewFromConfig) : undefined;
 
-    picture.props.children = children;
+        if (picture.props) {
+            picture.props.children = children;
+        }
 
-    var root = new ViewConstructor(configs);
+        return new ViewConstructor(picture);
+    }
 
+    var root = createViewFromConfig(picture);
     self.components.root = self.components.root || root;
 
     return root;
@@ -323,7 +330,7 @@ function createProperties(self, config, instanceConfig) {
         var type = (localConfig[configName].type || typeof localConfig[configName].default);
 
         if (typeof instanceConfig[configName] !== 'undefined' &&
-            type !== undefined && type !== null && type !== 'any' &&
+            type !== 'undefined' && type !== undefined && type !== null && type !== 'any' &&
             typeof instanceConfig[configName] !== type) {
             throw new TypeError('Expected ' + configName + ' to be of type ' + type);
         }
@@ -417,6 +424,10 @@ var createView = function(config) {
 
             if (typeof config.construct === 'function') {
                 config.construct.call(self, instanceConfig);
+            }
+
+            if (self.outputs.load.write) {
+                self.outputs.load.write('success');
             }
         },
 
