@@ -16,7 +16,12 @@ require('./core.css');
 
 /* jshint boss:true */
 
-var basePath = document.getElementsByTagName('base')[0].href;
+var base = document.getElementsByTagName('base')[0];
+if (base) {
+    var basePath = base.href;
+} else {
+    var basePath = '/';
+}
 
 var staticPath = basePath.split('/');
 staticPath[0] = window.location.protocol;
@@ -154,6 +159,7 @@ Object.defineProperties(ub, {
 });
 
 module.exports = utils.extend(ub, {
+    init: ub.init.bind(ub),
     Utils: utils,
     View: View,
     HtmlElement: HtmlElement,
@@ -165,5 +171,3 @@ module.exports = utils.extend(ub, {
     createComponent: CreateHelpers.createComponent,
     createView: CreateHelpers.createView
 });
-
-ub.init();
