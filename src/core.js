@@ -2,6 +2,7 @@
 
 var $ = require('jquery');
 var View = require('view');
+var Component = require('component');
 var HtmlElement = require('htmlElement');
 var ComplexView = require('complexView');
 var utils = require('utils');
@@ -161,6 +162,7 @@ Object.defineProperties(ub, {
 module.exports = {
     init: function() { ub.init.call(ub); },
     Utils: utils,
+    Component: Component,
     View: View,
     HtmlElement: HtmlElement,
     ComplexView: ComplexView,

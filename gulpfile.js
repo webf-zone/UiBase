@@ -102,12 +102,24 @@ gulp.task('lint', function() {
 });
 
 gulp.task('build-test', ['lint'], function() {
-    return gulp.src([ './tests/utils/*.js', './tests/views/*.js' ])
+    return gulp.src([
+            './tests/utils/*.js',
+            './tests/components/*.js',
+            './tests/views/*.js'
+        ])
         .pipe(concat('specs.js'))
         .pipe(browserify(componentsBrowserifyConfig))
         .pipe(rename('specs.js'))
         .pipe(gulp.dest('./tests/build'));
 });
+
+gulp.task('build-all', [
+    'build-dev',
+    'build',
+    'build-components-dev',
+    'build-components',
+    'build-test'
+], function() {});
 
 gulp.task('test', ['build-test'], function(cb) {
     var mochaPhantomjs = spawn('node_modules/.bin/mocha-phantomjs', ['tests/uibase-test.html']);
