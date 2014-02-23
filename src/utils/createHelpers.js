@@ -25,9 +25,9 @@ var RESERVED_CONFIG_PARAMS = {
 function createComponents(self, comps) {
     return Object.keys(comps).reduce(function(store, compName) {
         var compConfig = extend({}, comps[compName]),
-            CompConstructor = comps[compName].name;
+            CompConstructor = comps[compName].type;
 
-        delete compConfig.name;
+        delete compConfig.type;
         store[compName] = new CompConstructor(compConfig);
 
         return store;
@@ -256,7 +256,7 @@ function parseViewConfig(self, config) {
             return picture;
         }
 
-        var ViewConstructor = picture.name;
+        var ViewConstructor = picture.type;
 
         var children = picture.props && picture.props.children ?
             typeof picture.props.children === 'string' ? picture.props.children :

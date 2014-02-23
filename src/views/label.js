@@ -13,7 +13,7 @@ var Label = ub.createView({
 
     components: {
         root: {
-            name: ub.HtmlElement,
+            type: ub.HtmlElement,
             tag: 'span'
         }
     },

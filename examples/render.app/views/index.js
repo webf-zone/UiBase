@@ -11,15 +11,15 @@ var Index = ub.createView({
 
     components: {
         display: {
-            name: Label,
+            type: Label,
             text: '0'
         },
         delay: {
-            name: Delay,
+            type: Delay,
             amount: 1000
         },
         adder: {
-            name: Count
+            type: Count
         }
     },
 
@@ -32,12 +32,12 @@ var Index = ub.createView({
 
     picture: function() {
         return {
-            name: ub.HtmlElement,
+            type: ub.HtmlElement,
             tag: 'div',
             props: {
                 children: [
                     {
-                        name: Label,
+                        type: Label,
                         text: 'Elapsed Seconds: '
                     },
                     this.components.display

@@ -125,7 +125,7 @@ describe('Button', function() {
         var TestView = uibase.createView({
             picture: function() {
                 return {
-                    name: Button,
+                    type: Button,
                     props: {
                         id: 'btnEmbed'
                     },

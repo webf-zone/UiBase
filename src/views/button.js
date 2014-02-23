@@ -17,7 +17,7 @@ var Button = uibase.createView({
 
     components: {
         root: {
-            name: uibase.HtmlElement,
+            type: uibase.HtmlElement,
             tag: 'button',
             props: {
                 events: [ 'click' ]

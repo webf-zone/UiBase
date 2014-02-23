@@ -7,7 +7,7 @@ var Count = ub.createComponent({
 
     components: {
         collate: {
-            name: Collate,
+            type: Collate,
             seed: 0,
             op: function(result) { return result + 1; }
         }

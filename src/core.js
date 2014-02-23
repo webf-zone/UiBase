@@ -158,8 +158,8 @@ Object.defineProperties(ub, {
     }
 });
 
-module.exports = utils.extend(ub, {
-    init: ub.init.bind(ub),
+module.exports = {
+    init: function() { ub.init.call(ub); },
     Utils: utils,
     View: View,
     HtmlElement: HtmlElement,
@@ -170,4 +170,4 @@ module.exports = utils.extend(ub, {
     Observable: Observable,
     createComponent: CreateHelpers.createComponent,
     createView: CreateHelpers.createView
-});
+};

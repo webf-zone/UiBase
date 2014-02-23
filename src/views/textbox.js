@@ -8,7 +8,7 @@ var Textbox = ub.createView({
 
     components: {
         root: {
-            name: ub.HtmlElement,
+            type: ub.HtmlElement,
             tag: 'input',
             props: {
                 type: 'text'
@@ -19,7 +19,7 @@ var Textbox = ub.createView({
             ]
         },
         mapValue: {
-            name: Map,
+            type: Map,
             mapper: function(event) { return $(event.target).val(); }
         }
     },
