@@ -221,6 +221,7 @@ var View = utils.Class({
     },
 
     _updateChildren: function(children) {
+        if (children == null) { return; }
         var nextChildren = children.reduce(function(result, child, idx) {
             var name = child.getKey(idx);
             result[name] = child;

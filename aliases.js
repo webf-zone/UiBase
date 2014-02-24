@@ -16,6 +16,7 @@ module.exports = {
 
         'comp.Label': './src/views/label.js',
         'comp.Button': './src/views/button.js',
+        'comp.Layout': './src/views/layout.js',
         'comp.Map': './src/components/map.js',
         'comp.Delay': './src/components/delay.js',
         'comp.Collate': './src/components/collate.js',

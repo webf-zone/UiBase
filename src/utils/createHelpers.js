@@ -24,11 +24,17 @@ var RESERVED_CONFIG_PARAMS = {
 
 function createComponents(self, comps) {
     return Object.keys(comps).reduce(function(store, compName) {
-        var compConfig = extend({}, comps[compName]),
-            CompConstructor = comps[compName].type;
+        var compConfig;
+        if (typeof comps[compName] === 'function') {
+            compConfig = comps[compName].call(self, self);
+        } else {
+            compConfig = extend({}, comps[compName]);
+        }
+        var CompConstructor = compConfig.type;
 
-        delete compConfig.type;
-        store[compName] = new CompConstructor(compConfig);
+        var filteredCompConfig = extend({}, compConfig);
+        delete filteredCompConfig.type;
+        store[compName] = new CompConstructor(filteredCompConfig);
 
         return store;
     }, {});
@@ -47,11 +53,13 @@ function createConnections(self, conns) {
         var source = conns[connName][0].split('.'),
             sink = conns[connName][1].split('.'),
             sourceComp = source[0] === 'this' ? self : self.components[source[0]],
-            sinkComp = sink[0] === 'this' ? self : self.components[sink[0]];
+            sinkComp = sink[0] === 'this' ? self : self.components[sink[0]],
+            sourcePort = source.slice(1).join('.'),
+            sinkPort = sink.slice(1).join('.');
 
         store[connName] = Component.connect(
-            sourceComp, source[1],
-            sinkComp  , sink[1]
+            sourceComp, sourcePort,
+            sinkComp  , sinkPort
         );
 
         return store;
@@ -286,14 +294,8 @@ function removeReservedConfigParams(config) {
 }
 
 function createProperties(self, config, instanceConfig) {
-    self.components = createComponents(self, config.components || {});
-
-    self.inputs = createInputs(self, config.inputs || {}, config);
-    self.outputs = createOutputs(self, config.outputs || {});
-
-    self.connections = createConnections(self, config.connections || {});
-
     self.config = {};
+    config.config = config.config || {};
 
     var isView = self instanceof View;
 
@@ -343,8 +345,19 @@ function createProperties(self, config, instanceConfig) {
 
         self.config[configName] = instanceConfig[configName] !== undefined ?
             instanceConfig[configName] : localConfig[configName].default;
+    });
 
-        // Send IIP
+    self._viewState = extend(true, {}, self.config);
+
+    self.components = createComponents(self, config.components || {});
+
+    self.inputs = createInputs(self, config.inputs || {}, config);
+    self.outputs = createOutputs(self, config.outputs || {});
+
+    self.connections = createConnections(self, config.connections || {});
+
+    /* Send IIP */
+    Object.keys(config.config).forEach(function(configName) {
         if (configName in self.inputs || configName === 'props') {
             var obv = new Observable(function(observer) {
                 this.write = function(val) {
@@ -359,7 +372,6 @@ function createProperties(self, config, instanceConfig) {
         }
     });
 
-    self._viewState = extend(true, {}, self.config);
 }
 
 var createComponent = function(config) {

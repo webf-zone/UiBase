@@ -8,6 +8,34 @@ var Observer = require('observer');
 
 var CONTENT_TYPE = {'string': true, 'number': true};
 
+function createViewFromConfig(picture) {
+    if (picture instanceof View || typeof picture === 'string') {
+        return picture;
+    }
+
+    var ViewConstructor = picture.type;
+
+    var children = picture.props && picture.props.children ?
+        typeof picture.props.children === 'string' ? picture.props.children :
+            picture.props.children.map(createViewFromConfig) : undefined;
+
+    if (picture.props) {
+        picture.props.children = children;
+    }
+
+    return new ViewConstructor(picture);
+}
+
+function createChildrenViews(children) {
+    if (typeof children === 'string') {
+        return children;
+    }
+
+    return children.map(function(child) {
+        return createViewFromConfig(child);
+    });
+}
+
 /**
  * Basic DOM element view. This should be used for all defining HTML tags.
  * @class HtmlElement
@@ -28,9 +56,18 @@ var HtmlElement = utils.Class({
 
         self.tag = config.tag;
 
+        if (config.props && !config.props.children) {
+            config.props.children = [];
+        }
+
         self.inputs.props = new Observer(function(partialProps) {
+            if (partialProps.children) {
+                partialProps.children = createChildrenViews(partialProps.children);
+            }
             self.setProps(partialProps);
         });
+
+        self.addChildrenInput();
 
         self.addOutPort('load', BrowserEvent.addListener('load', this));
     },
@@ -40,8 +77,6 @@ var HtmlElement = utils.Class({
 
         if (portType === 'props') {
             this.addPropInput(port.split('.')[1]);
-        } else if (portType === 'children') {
-            this.addChildrenInput();
         }
     },
 
@@ -59,7 +94,11 @@ var HtmlElement = utils.Class({
         self.inputs['props.' + propName] = new Observer(function(value) {
             var partialProps = {};
 
-            partialProps[propName] = value;
+            if (propName === 'children') {
+                partialProps.children = createChildrenViews(value);
+            } else {
+                partialProps[propName] = value;
+            }
             self.setProps(partialProps);
         });
     },
@@ -70,7 +109,7 @@ var HtmlElement = utils.Class({
         self.inputs.children = new Observer(function(value) {
             var partialProps = {};
 
-            partialProps.children = value;
+            partialProps.children = createChildrenViews(value);
             self.setProps(partialProps);
         });
     },
