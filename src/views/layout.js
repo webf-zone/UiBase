@@ -6,8 +6,12 @@ var Map = require('comp.Map');
 require('./layout.css');
 
 var DIRECTIONS = {
-    vertical: 'vertical',
-    horizontal: 'horizontal'
+    vertical: 'down',
+    horizontal: 'right',
+    'to right': 'right',
+    'to left': 'left',
+    'to top': 'up',
+    'to bottom': 'down'
 };
 
 var CLASSES = {
@@ -46,9 +50,9 @@ var Layout = ub.createView({
         root: function(self) {
             return {
                 type: ub.HtmlElement,
-                tag: 'div',
+                tag: self.config.wrapperTag,
                 props: {
-                    class: 'ub-comp-layout ' + self.config.direction
+                    class: 'ub-comp-layout ' + DIRECTIONS[self.config.direction]
                 }
             };
         },

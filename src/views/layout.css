@@ -1,0 +1,7 @@
+.ub-comp-layout {}
+
+/* Flow towards right starting from left */
+.ub-comp-layout.right .layout-item { float: left; }
+
+/* Flow towards left starting from right */
+.ub-comp-layout.left .layout-item { float: right; }
