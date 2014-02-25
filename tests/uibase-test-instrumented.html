@@ -1,0 +1,39 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <base href="uibase/">
+    <title>UiBase Tests</title>
+    <link rel="stylesheet" href="../../node_modules/mocha/mocha.css">
+</head>
+<body>
+    <div id="mocha"></div>
+    <div id="test-container"></div>
+    <script src="../../node_modules/mocha/mocha.js"></script>
+    <script>
+        mocha.setup('bdd')
+        mocha.reporter('html');
+    </script>
+    <!-- assertion framework -->
+    <script src="../../node_modules/chai/chai.js"></script>
+    <script>var expect = chai.expect</script>
+
+    <!-- include source files here... -->
+    <script>window.uibase = {};</script>
+    <!--<script src="../commons/core.js"></script>-->
+    <script>
+        window.uibase = {};
+        window.uibase.options = { testing: true };
+    </script>
+    <script src="../../dist/uibase.inst.js"></script>
+
+    <!-- include spec files here... -->
+    <script src="../build/specs.js"></script>
+
+    <script>
+        after(function() { console.log(__coverage__); });
+        if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+        else { mocha.run(); }
+    </script>
+</body>
+</html>

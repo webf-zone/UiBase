@@ -8,6 +8,7 @@ var _ = require('lodash');
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var istanbul = require('gulp-istanbul');
 
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
@@ -34,7 +35,7 @@ var coreBrowserifyConfig = {
 };
 
 var componentsBrowserifyConfig = {
-    debug : false,
+    debug : true,
     transform: [ aliasify, cssify ],
     extensions: [ '.css' ],
     external: [
@@ -63,6 +64,66 @@ gulp.task('build-dev', function() {
         })
         .pipe(rename('uibase.js'))
         .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('build-instrumented', function(cb) {
+    var aliases = require('./aliases');
+    aliases.aliases = Object.keys(aliases.aliases).reduce(function(store, alias) {
+        store[alias] = './instrumented/' + aliases.aliases[alias];
+        return store;
+    }, {});
+    var aliasify = require('aliasify').configure(aliases);
+
+    gulp.src([
+            'src/**/*.js'
+        ])
+        .pipe(istanbul())
+        .pipe(gulp.dest('./instrumented/src'))
+        .on('end', function() {
+            gulp.src('instrumented/src/core.js', { read: false })
+                .pipe(browserify(_.merge(coreBrowserifyConfig, {
+                    transform: [ aliasify, cssify ]
+                })))
+                .on('prebundle', function(bundle) {
+                    bundle.require(__dirname + '/instrumented/src/core.js', { expose: 'uibase' });
+                })
+                .pipe(rename('uibase.inst.js'))
+                .pipe(gulp.dest('./dist'))
+                .on('end', cb);
+        });
+});
+
+gulp.task('coverage-report', [ 'build-instrumented' ], function(cb) {
+    var mochaPhantomjs = spawn('node_modules/.bin/mocha-phantomjs', [
+        '-R', 'tap',
+        'tests/uibase-test-instrumented.html'
+    ]);
+    var covStream = fs.createWriteStream('coverage.json', { flags: 'a' });
+    mochaPhantomjs.stdout.pipe(covStream);
+    mochaPhantomjs.stderr.pipe(process.stderr);
+    mochaPhantomjs.on('exit', function(code) {
+        if (code === 127) { print('Perhaps phantomjs is not installed?\n'); }
+
+        fs.readFile('coverage.json', function(err, data) {
+            if (err) throw err;
+
+            var lines = data.toString('utf-8').split('\n');
+
+            var testCases = lines[0].split('..')[1];
+            var coverageData = lines[+testCases + 1];
+
+            fs.writeFileSync('coverage-cleaned.json', coverageData);
+
+            var istanbulCmd = spawn('node_modules/.bin/istanbul', ['report', 'html', 'coverage-cleaned.json']);
+            istanbulCmd.on('exit', function() {
+                fs.unlink('coverage.json');
+                fs.unlink('coverage-cleaned.json');
+                fs.unlink('dist/uibase.inst.js');
+                cb();
+                process.exit(code);
+            });
+        });
+    });
 });
 
 gulp.task('build-components-dev', function() {

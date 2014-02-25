@@ -41,6 +41,8 @@
         "gulp-uglify": "~0.2.1",
         "aliasify": "~1.4.0",
         "gulp-concat": "~2.1.7",
-        "lodash": "~2.4.1"
+        "lodash": "~2.4.1",
+        "istanbul": "~0.2.4",
+        "gulp-istanbul": "~0.1.1"
     }
 }
