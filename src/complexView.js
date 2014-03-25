@@ -1,6 +1,7 @@
 'use strict';
 
 var utils = require('utils');
+var Observer = require('observer');
 var View = require('view');
 
 /**
@@ -41,6 +42,13 @@ var ComplexView = utils.Class({
         var markup = this._renderedView.renderView(rootId, depth + 1);
 
         this.outputs.load = this.components.root.outputs.load;
+
+        if (this.viewIsRendered) {
+            var view = this;
+            this.outputs.load.subscribe(new Observer(function () {
+                view.viewIsRendered();
+            }));
+        }
 
         return markup;
     },

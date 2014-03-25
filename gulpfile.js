@@ -47,7 +47,7 @@ var componentsBrowserifyConfig = {
 /* Production build */
 gulp.task('build', function() {
     return gulp.src('src/core.js', { read: false })
-        .pipe(browserify(_.merge(coreBrowserifyConfig, { debug: false })))
+        .pipe(browserify(_.merge(coreBrowserifyConfig, { debug: true })))
         .on('prebundle', function(bundle) {
             bundle.require(__dirname + '/src/core.js', { expose: 'uibase' });
         })

@@ -70,6 +70,13 @@ var HtmlElement = utils.Class({
         self.addChildrenInput();
 
         self.addOutPort('load', BrowserEvent.addListener('load', this));
+
+        if (this.viewIsRendered) {
+            var view = this;
+            this.outputs.load.subscribe(new Observer(function () {
+                view.viewIsRendered();
+            }));
+        }
     },
 
     addInput: function(port) {

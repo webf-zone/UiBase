@@ -3,6 +3,7 @@
 var ub = require('uibase');
 var Label = require('comp.Label');
 var Delay = require('comp.Delay');
+var Map = require('comp.Map');
 var Count = require('comp.Count');
 
 var Index = ub.createView({
@@ -20,13 +21,18 @@ var Index = ub.createView({
         },
         adder: {
             type: Count
+        },
+        typeConverter: {
+            type: Map,
+            mapper: function (c) { return c.toString(); }
         }
     },
 
     connections: {
         start: [ 'this.load',    'adder.reset'  ],
         count: [ 'delay.output', 'adder.input'  ],
-        show:  [ 'adder.output', 'display.text' ],
+        convert: [ 'adder.output', 'typeConverter.input' ],
+        show:  [ 'typeConverter.output', 'display.text' ],
         loop:  [ 'adder.output', 'delay.input' ]
     },
 
