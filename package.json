@@ -1,48 +1,49 @@
 {
-    "name": "UiBase",
-    "version": "0.0.0",
-    "description": "A complete front-end framework for any modern enterprise web application",
-    "directories": {
-        "lib": "src",
-        "test": "tests"
-    },
-    "scripts": {
-        "build": "gulp build",
-        "test": "gulp test"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/UsableBytes/UiBase"
-    },
-    "keywords": [
-        "UI Framework"
-    ],
-    "author": {
-        "name": "",
-        "email": "",
-        "url": "http://www.uibase.net"
-    },
-    "license": "MIT",
-    "dependencies": {
-        "jquery": "~1"
-    },
-    "devDependencies": {
-        "mocha": "~1.12.0",
-        "chai": "~1.7.0",
-        "mocha-phantomjs": "~3.3",
-        "uglifyify": "",
-        "gulp": "~3.5.2",
-        "gulp-util": "~2",
-        "gulp-jshint": "~1",
-        "jshint-stylish": "~0.1.5",
-        "cssify": "~0.4.2",
-        "gulp-browserify": "~0.4.5",
-        "gulp-rename": "~1.1.0",
-        "gulp-uglify": "~0.2.1",
-        "aliasify": "~1.4.0",
-        "gulp-concat": "~2.1.7",
-        "lodash": "~2.4.1",
-        "istanbul": "~0.2.4",
-        "gulp-istanbul": "~0.1.1"
-    }
+  "name": "UiBase",
+  "version": "0.0.0",
+  "description": "A complete front-end framework for any modern enterprise web application",
+  "directories": {
+    "lib": "src",
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UsableBytes/UiBase"
+  },
+  "keywords": [
+    "UI Framework"
+  ],
+  "author": {
+    "name": "",
+    "email": "",
+    "url": "http://www.uibase.net"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "~1"
+  },
+  "devDependencies": {
+    "mocha": "~1.12.0",
+    "chai": "~1.7.0",
+    "mocha-phantomjs": "~3.3",
+    "uglifyify": "",
+    "gulp": "~3.5.2",
+    "gulp-util": "~2",
+    "gulp-jshint": "~1",
+    "jshint-stylish": "~0.1.5",
+    "cssify": "~0.4.2",
+    "gulp-rename": "~1.1.0",
+    "gulp-uglify": "~0.2.1",
+    "aliasify": "~1.4.0",
+    "gulp-concat": "~2.1.7",
+    "lodash": "~2.4.1",
+    "istanbul": "~0.2.4",
+    "gulp-istanbul": "~0.1.1",
+    "vinyl-source-stream": "~0.1.1",
+    "gulp-buffer": "0.0.2"
+  }
 }

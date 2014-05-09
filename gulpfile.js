@@ -13,17 +13,19 @@ var istanbul = require('gulp-istanbul');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 
-var browserify = require('gulp-browserify');
+var browserify = require('browserify');
 var cssify = require('cssify');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
+var buffer = require('gulp-buffer');
+var source = require('vinyl-source-stream');
 
 var aliases = require('./aliases');
 var aliasify = require('aliasify').configure(aliases);
 
 var coreBrowserifyConfig = {
-    debug : true,
+    debug : false,
     transform: [ aliasify, cssify ],
     extensions: [ '.css' ],
     shim: {
@@ -35,7 +37,7 @@ var coreBrowserifyConfig = {
 };
 
 var componentsBrowserifyConfig = {
-    debug : true,
+    debug : false,
     transform: [ aliasify, cssify ],
     extensions: [ '.css' ],
     external: [
@@ -44,25 +46,35 @@ var componentsBrowserifyConfig = {
     ]
 };
 
+var getFilesInDir = function (dir) {
+    return fs.readdirSync(dir).map(function (path) {
+        return dir + '/' + path;
+    });
+};
+
 /* Production build */
 gulp.task('build', function() {
-    return gulp.src('src/core.js', { read: false })
-        .pipe(browserify(_.merge(coreBrowserifyConfig, { debug: true })))
-        .on('prebundle', function(bundle) {
-            bundle.require(__dirname + '/src/core.js', { expose: 'uibase' });
-        })
+    return browserify(_.merge(coreBrowserifyConfig, {
+            entries: [__dirname + '/src/core.js']
+        }))
+        .transform(aliasify)
+        .transform(cssify)
+        .bundle({ standalone: 'uibase' })
+        .pipe(source('uibase.min.js'))
+        .pipe(buffer())
         .pipe(uglify())
-        .pipe(rename('uibase.min.js'))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build-dev', function() {
-    return gulp.src('src/core.js', { read: false })
-        .pipe(browserify(coreBrowserifyConfig))
-        .on('prebundle', function(bundle) {
-            bundle.require(__dirname + '/src/core.js', { expose: 'uibase' });
-        })
-        .pipe(rename('uibase.js'))
+    return browserify(_.merge(coreBrowserifyConfig, {
+            debug: true,
+            entries: [__dirname + '/src/core.js']
+        }))
+        .transform(aliasify)
+        .transform(cssify)
+        .bundle({ standalone: 'uibase' })
+        .pipe(source('uibase.js'))
         .pipe(gulp.dest('./dist'));
 });
 
@@ -74,22 +86,19 @@ gulp.task('build-instrumented', function(cb) {
     }, {});
     var aliasify = require('aliasify').configure(aliases);
 
-    gulp.src([
-            'src/**/*.js'
-        ])
+    gulp.src([ 'src/**/*.js' ])
         .pipe(istanbul())
         .pipe(gulp.dest('./instrumented/src'))
         .on('end', function() {
-            gulp.src('instrumented/src/core.js', { read: false })
-                .pipe(browserify(_.merge(coreBrowserifyConfig, {
-                    transform: [ aliasify, cssify ]
-                })))
-                .on('prebundle', function(bundle) {
-                    bundle.require(__dirname + '/instrumented/src/core.js', { expose: 'uibase' });
-                })
-                .pipe(rename('uibase.inst.js'))
-                .pipe(gulp.dest('./dist'))
-                .on('end', cb);
+            browserify(_.merge(coreBrowserifyConfig, {
+                entries: ['instrumented/src/core.js']
+            }))
+            .transform(aliasify)
+            .transform(cssify)
+            .bundle({ standalone: 'uibase' })
+            .pipe(source('uibase.inst.js'))
+            .pipe(gulp.dest('./dist'))
+            .on('end', cb);
         });
 });
 
@@ -126,33 +135,50 @@ gulp.task('coverage-report', [ 'build-instrumented' ], function(cb) {
     });
 });
 
+var components = getFilesInDir('./src/components')
+    .concat(getFilesInDir('./src/views'));
+
 gulp.task('build-components-dev', function() {
-    return gulp.src('src/components/*.js', { read: false })
-        .pipe(browserify(componentsBrowserifyConfig))
-        .on('prebundle', function(bundle) {
-            Object.keys(aliases.aliases).forEach(function(alias) {
-                if (/^comp\./.test(alias)) {
-                    bundle.require(path.join(__dirname, aliases.aliases[alias]), { expose: alias });
-                }
-            });
-        })
-        .pipe(rename('uibase-components.js'))
-        .pipe(gulp.dest('./dist'));
+    return browserify(_.merge(componentsBrowserifyConfig, {
+        debug: true,
+        entries: components
+    }))
+    .external('uibase')
+    .external('jquery')
+    .on('prebundle', function(bundle) {
+        Object.keys(aliases.aliases).forEach(function(alias) {
+            if (/^comp\./.test(alias)) {
+                bundle.require(path.join(__dirname, aliases.aliases[alias]), { expose: alias });
+            }
+        });
+    })
+    .transform(aliasify)
+    .transform(cssify)
+    .bundle()
+    .pipe(source('uibase-components.js'))
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build-components', function() {
-    return gulp.src('src/components/*.js', { read: false })
-        .pipe(browserify(componentsBrowserifyConfig))
-        .on('prebundle', function(bundle) {
-            Object.keys(aliases.aliases).forEach(function(alias) {
-                if (/^comp\./.test(alias)) {
-                    bundle.require(path.join(__dirname, aliases.aliases[alias]), { expose: alias });
-                }
-            });
-        })
-        .pipe(uglify())
-        .pipe(rename('uibase-components.min.js'))
-        .pipe(gulp.dest('./dist'));
+    return browserify(_.merge(componentsBrowserifyConfig, {
+        entries: components
+    }))
+    .external('uibase')
+    .external('jquery')
+    .on('prebundle', function(bundle) {
+        Object.keys(aliases.aliases).forEach(function(alias) {
+            if (/^comp\./.test(alias)) {
+                bundle.require(path.join(__dirname, aliases.aliases[alias]), { expose: alias });
+            }
+        });
+    })
+    .transform(aliasify)
+    .transform(cssify)
+    .bundle()
+    .pipe(source('uibase-components.min.js'))
+    .pipe(buffer())
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('lint', function() {
@@ -162,16 +188,24 @@ gulp.task('lint', function() {
         .pipe(jshint.reporter('fail'));
 });
 
+var testFiles = getFilesInDir('./tests/utils')
+    .concat(getFilesInDir('./tests/components'))
+    .concat(getFilesInDir('./tests/views'));
+
 gulp.task('build-test', ['lint'], function() {
-    return gulp.src([
-            './tests/utils/*.js',
-            './tests/components/*.js',
-            './tests/views/*.js'
-        ])
-        .pipe(concat('specs.js'))
-        .pipe(browserify(componentsBrowserifyConfig))
-        .pipe(rename('specs.js'))
-        .pipe(gulp.dest('./tests/build'));
+    return browserify(_.merge(componentsBrowserifyConfig, {
+        debug: true,
+        entries: testFiles
+    }))
+    .external('uibase')
+    .external('jquery')
+    .transform(aliasify)
+    .transform(cssify)
+    .bundle()
+    .pipe(source('specs.js'))
+    .pipe(buffer())
+    .pipe(concat('specs.js'))
+    .pipe(gulp.dest('./tests/build'));
 });
 
 gulp.task('build-all', [
