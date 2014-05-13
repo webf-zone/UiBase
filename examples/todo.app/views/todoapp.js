@@ -1,86 +1,91 @@
-;(function(ub) {
-    "use strict";
+'use strict';
 
-    ub.Views = ub.Views || {};
+var ub = require('uibase');
+var Textbox = require('comp.Textbox');
+var Filter = require('comp.Filter');
+var SampleOn = require('comp.SampleOn');
 
-    var TodoApp = ub.Utils.Class({
+var Todos = require('./todos');
+var CreateTodo = require('../domain/services/createTodo');
+var QueryTodos = require('../domain/services/queryTodos');
 
-        extends: ub.View,
+require('./todoapp.css');
 
-        construct: function() {
-            var v = this;
+var TodoApp = ub.createView({
 
-            this._super();
+    components: {
 
-            v.textbox = new ub.Views.Textbox({
-                props: {
-                    id: "new-todo",
-                    placeholder: "What needs to be done?"
-                }
-            });
-            var enterFilter = new ub.Components.Filter(function(e) {
+        enterFilter: {
+            type: Filter,
+            test: function(e) {
                 return e.which === 13;
-            });
-
-            var sampleOn = new ub.Components.SampleOn();
-
-            var todoRepository = new ub.Repository(ub.Models.Todo, "LocalStorage", "uibase-todos");
-            var createTodo = new ub.Services.CreateTodo(todoRepository);
-            //var editTodo = new ub.Models.Todos.EditTodo();
-            var deleteTodo = new ub.Services.DeleteTodo(todoRepository);
-            var queryTodos = new ub.Services.QueryTodos(todoRepository);
-
-            var mergeWrites = new ub.Components.Merge();
-
-            var todolistView = new ub.Views.TodoList();
-
-            this.todolistView = todolistView;
-
-            ub.Component.connect(v.textbox,      "keypress", enterFilter,    "input");
-            ub.Component.connect(v.textbox,      "value",    sampleOn,       "value");
-            ub.Component.connect(enterFilter,    "output",   sampleOn,       "sampleOn");
-            ub.Component.connect(sampleOn,       "output",   createTodo,     "description");
-            ub.Component.connect(createTodo,     "output",   mergeWrites,    "input");
-            ub.Component.connect(todolistView,   "destroy",  deleteTodo,     "todo");
-            ub.Component.connect(deleteTodo,     "output",   mergeWrites,    "input");
-            ub.Component.connect(mergeWrites,    "output",   queryTodos,     "filter");
-            ub.Component.connect(queryTodos,     "output",   todolistView,   "todolist");
+            }
         },
+        
+        todos: { type: Todos },
 
-        render: function() {
-            return new ub.Views.HtmlElement({
-                tag: "section",
-                props: {
-                    id: "todoapp"
-                },
-                children: [
-                    new ub.Views.HtmlElement({
-                        tag: "header",
-                        props: {
-                            id: "header"
-                        },
-                        children: [
-                            new ub.Views.HtmlElement({
-                                tag: "h1",
-                                text: "todos"
-                            }),
-                            this.textbox
-                        ]
-                    }),
-                    new ub.Views.HtmlElement({
-                        tag: "section",
-                        props: {
-                            id: "main"
-                        },
-                        children: [
-                            this.todolistView
-                        ]
-                    })
-                ]
-            });
+        sampleOn: { type: SampleOn },
+
+        createTodo: { type: CreateTodo },
+        
+        queryTodos: { type: QueryTodos },
+        
+        /** Views **/
+        textbox: {
+            type: Textbox,
+            props: {
+                id: 'new-todo',
+                placeholder: 'What needs to be done?'
+            }
         }
-    });
+    },
+    
+    connections: {
+        showOnLoad: [ 'this.load', 'queryTodos.filters' ],
+        detectEnter: [ 'textbox.keypress', 'enterFilter.input' ],
+        getValue: [ 'textbox.value', 'sampleOn.value' ],
+        storeValue: [ 'enterFilter.output', 'sampleOn.sampleOn' ],
+        createNew: [ 'sampleOn.output', 'createTodo.description' ],
+        updateList: [ 'createTodo.todos', 'todos.todos' ],
+        updateList2: [ 'queryTodos.todos', 'todos.todos' ]
+    },
+    
+    picture: function() {
+        return {
+            type: ub.HtmlElement,
+            tag: 'section',
+            props: {
+                id: 'todoapp',
+                children: [
+                    {
+                        type: ub.HtmlElement,
+                        tag: 'header',
+                        props: {
+                            id: 'header',
+                            children: [
+                                {
+                                    type: ub.HtmlElement,
+                                    tag: 'h1',
+                                    text: 'todos'
+                                },
+                                this.components.textbox
+                            ]
+                        }
+                    },
+                    {
+                        type: ub.HtmlElement,
+                        tag: 'section',
+                        props: {
+                            id: 'main',
+                            children: [
+                                this.components.todos
+                            ]
+                        }
+                    }
+                ]
+            }
+        };
+    }
+});
 
-    ub.Views.TodoApp = TodoApp;
-
-})(window.uibase);
+module.exports = TodoApp;

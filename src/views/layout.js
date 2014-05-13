@@ -52,7 +52,7 @@ var Layout = ub.createView({
                 type: ub.HtmlElement,
                 tag: self.config.wrapperTag,
                 props: {
-                    class: 'ub-comp-layout ' + DIRECTIONS[self.config.direction]
+                    cls: 'ub-comp-layout ' + DIRECTIONS[self.config.direction]
                 }
             };
         },
@@ -64,7 +64,7 @@ var Layout = ub.createView({
                         type: ub.HtmlElement,
                         tag: 'div',
                         props: {
-                            class: CLASSES.item,
+                            cls: CLASSES.item,
                             children: [ child ]
                         }
                     };

@@ -1,6 +1,6 @@
 # [UiBase](http://www.uibase.net)
 
-Some key featuers:
+Some key features:
 
 - In-built seamless support for "Access Control"
 - Very easy to learn and use, yet not losing on flexibility and power

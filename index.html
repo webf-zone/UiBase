@@ -19,7 +19,7 @@
         <script type="text/javascript" src="dist/uibase-components.js"></script>
         <script>
             (function() {
-                var ub = (require && require('uibase')) || window.uibase;
+                var ub = (typeof require === 'function' && require('uibase')) || window.uibase;
                 if (ub) ub.init();
             })();
         </script>

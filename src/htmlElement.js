@@ -157,8 +157,13 @@ var HtmlElement = utils.Class({
      * @private
      */
     _createElement: function() {
-        var props = this.props,
+        var self = this,
+            props = this.props,
             ret = $('<' + this.tag + '>');
+
+        function addEventListener(event) {
+             self.addOutput('events.' + event, BrowserEvent.addListener(event, self));
+        }
 
         for (var propKey in props) {
             if (!props.hasOwnProperty(propKey)) {
@@ -169,7 +174,9 @@ var HtmlElement = utils.Class({
                 continue;
             }
             if (propKey === 'events') {
-//                propValue.forEach(addEventListener);
+                propValue.forEach(addEventListener);
+            } else if (propKey === 'cls') {
+                ret.addClass(propValue);
             } else {
                 if (propKey === 'style') {
                     if (propValue) {

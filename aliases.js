@@ -17,12 +17,15 @@ module.exports = {
         'comp.Label': './src/views/label.js',
         'comp.Button': './src/views/button.js',
         'comp.Layout': './src/views/layout.js',
+        'comp.Textbox': './src/views/textbox.js',
         'comp.Map': './src/components/map.js',
         'comp.Delay': './src/components/delay.js',
         'comp.Collate': './src/components/collate.js',
         'comp.Count': './src/components/count.js',
         'comp.Filter': './src/components/filter.js',
-        'comp.sampleOn': './src/components/sampleOn.js'
+        'comp.SampleOn': './src/components/sampleOn.js',
+        
+        'store.LocalStorage': './src/stores/localstorage.js'
     },
     configDir: __dirname,
     verbose: false

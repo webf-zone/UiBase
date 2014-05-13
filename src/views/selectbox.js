@@ -1,33 +1,33 @@
-;(function(ub) {
-    "use strict";
+'use strict';
 
-    ub.Views = ub.Views || {};
+var ub = require('uibase');
 
-    var Selectbox = ub.Utils.Class({
+var Selectbox = ub.createView({
 
-        extends: ub.Component,
-
-        construct: function(config) {
-            this._super(config);
-
-            this._el = $("<select>");
-
-            var html = "";
-            config.items.forEach(function(option) {
-                html += "<option value=" + option.value + ">" + option.text + "</option>";
-            });
-            this._el.html(html);
-
-            this._outPorts.value = ub.Observable.fromEvent(this._el, "change").map(function(event) {
-                return $(event.target).val();
-            });
-        },
-
-        render: function() {
-            return this._el;
+    config: {
+        options: {
+            optional: true,
+            default: []
         }
-    });
+    },
+    
+    picture: function () {
+        return {
+            type: ub.HtmlElement,
+            tag: 'select',
+            events: [ 'change' ],
+            children: this.config.options.map(function (option) {
+                return {
+                    type: ub.HtmlElement,
+                    tag: 'option',
+                    text: option.text,
+                    props: {
+                        value: option.value
+                    }
+                };
+            })
+        };
+    }
+});
 
-    ub.Views.Selectbox = Selectbox;
-
-})(window.uibase);
+module.exports = Selectbox;

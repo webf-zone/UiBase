@@ -4,7 +4,7 @@
     },
 
     "todos/": {
-        "include": "/todo.app/"
+        "include": "/examples/todo.app/"
     },
 
     "deps/": {

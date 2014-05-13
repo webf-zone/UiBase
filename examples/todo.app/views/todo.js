@@ -1,59 +1,68 @@
-(function(ub) {
-    
-    "use strict";
+'use strict';
 
-    var Todo = ub.Utils.Class({
-        
-        extends: ub.View,
+var ub = require('uibase');
+var Map = require('comp.Map');
+var Button = require('comp.Button');
 
-        construct: function(todo) {
-            var self = this;
+require('./todo.css');
 
-            self._super();
+var Todo = ub.createView({
 
-            self._todo = todo;
-
-            self._destroyBtn = new ub.Views.Button({
-                text: "✖",
-                props: {
-                    class: "destroy"
-                }
-            });
-
-            self._inPorts.todo = new ub.Observer(function(todo) {
-                self._todo = todo;
-            });
-
-            var destroyMap = new ub.Components.Map(function() {
-                return self._todo;
-            });
-
-            ub.Component.connect(self._destroyBtn, "click", destroyMap, "input");
-            self._outPorts.destroy = destroyMap.get("output");
-        },
-
-        render: function() {
-            var self = this;
-
-            return new ub.Views.HtmlElement({
-                tag: "div",
-                children:[
-                    new ub.Views.HtmlElement({
-                        tag: "span",
-                        props: {
-                            class: self._todo.get("completed") ? "completed" : "active"
-                        },
-                        text: self._todo.get("description")
-                    }),
-                    self._destroyBtn
-                ],
-                props: {
-                    class: "todo"
-                }
-            });
+    config: {
+        todo: {
+            optional: false
         }
-    });
+    },
+    
+    components: {
+        destroyBtn: {
+            type: Button,
+            text: '✖',
+            props: {
+                cls: 'destroy'
+            }
+        },
+        destroyMap: function (self) {
+            return {
+                type: Map,
+                mapper: function () {
+                    return self.config.todo;
+                }
+            };
+        }
+    },
+    
+    connections: {
+        destroy: [ 'destroyBtn.click', 'destroyMap.input' ]
+    },
+    
+    output: {
+        destroy: 'destroyMap.output'
+    },
+    
+    picture: function () {
+        var self = this;
 
-    ub.Views.Todo = Todo;
+        return {
+            type: ub.HtmlElement,
+            tag: 'div',
+            props: {
+                children:[
+                    {
+                        type: ub.HtmlElement,
+                        tag: 'span',
+                        props: {
+                            cls: self.config.todo.get('completed') ? 'completed' : 'active',
+                            children: self.config.todo.get('description')
+                        },
+                        text: self.config.todo.get('description')
+                    },
+                    self.components.destroyBtn
+                ],
+                cls: 'todo'
+            }
+        };
+    }
+});
 
-})(window.uibase);
+module.exports = Todo;

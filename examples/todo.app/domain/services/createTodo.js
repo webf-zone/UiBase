@@ -1,42 +1,42 @@
-(function(ub) {
+'use strict';
+
+var ub = require('uibase');
+var LocalStorage = require('store.LocalStorage');
+
+var Todo = require('../models/todo');
+
+var CreateTodo = ub.createComponent({
     
-    "use strict";
-
-    ub.Services = ub.Services || {};
-
-    var CreateTodo = ub.Utils.Class({
-        
-        extends: ub.Component,
-
-        construct: function(repository) {
-            var self = this;
-
-            self._super();
-
-            self._repository = repository;
-
-            self._inPorts.description = new ub.Observer(function(desc) {
-                var todo = new ub.Models.Todo(desc);
-
-                self._repository.insert(todo, function() {
-                    if (self._observer) {
-                        self._update();
-                    }
-                });
-            });
-
-            self._outPorts.output = new ub.Observable(function(observer) {
-                self._observer = observer;
-            });
-        },
-
-        _update: function() {
-            var self = this;
-
-            self._observer.onNext.apply(self._observer, arguments);
+    config: {
+        repository: {
+            optional: true,
+            default: new ub.Repository(Todo, LocalStorage, 'todos-uibase')
         }
-    });
+    },
+    
+    inputs: { description: {} },
+    
+    outputs: { todos: true },
+    
+    beh: {
+        description: {
+            success: function (desc) {
+                var self = this,
+                    todo = new Todo(desc);
+                
+                return {
+                    todos: function (done) {
+                        self.config.repository.insert(todo, function () {
+                            self.config.repository.query({}, function (todos) {
+                                done(todos);
+                            });
+                        });
+                    }
+                };
+            }
+        }
+    }
+    
+});
 
-    ub.Services.CreateTodo = CreateTodo;
-
-})(window.uibase);
+module.exports = CreateTodo;

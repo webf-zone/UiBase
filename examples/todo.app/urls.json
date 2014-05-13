@@ -1,6 +1,5 @@
 {
     "app": {
-        "view": "TodoApp",
-        "package": "v.todoapp"
+        "url": "build/index.js"
     }
 }

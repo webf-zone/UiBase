@@ -11,21 +11,23 @@ var Textbox = ub.createView({
             type: ub.HtmlElement,
             tag: 'input',
             props: {
-                type: 'text'
-            },
-            events: [
-                'input',
-                'keypress'
-            ]
+                type: 'text',
+                events: [
+                    'input',
+                    'keypress'
+                ]
+            }
         },
         mapValue: {
             type: Map,
-            mapper: function(event) { return $(event.target).val(); }
+            mapper: function(event) {
+                return $(event.target).val();
+            }
         }
     },
 
     connections: {
-        valFromEvt: [ 'root.events.input', 'mapValue.input' ]
+        valFromEvt: [ 'root.events.keypress', 'mapValue.input' ]
     },
 
     inputs: {},

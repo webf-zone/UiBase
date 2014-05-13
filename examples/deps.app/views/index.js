@@ -1,3 +1,5 @@
+var uibase = require('uibase');
+
 var Index = uibase.utils.createView({
     picture: function() {
         return {

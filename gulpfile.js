@@ -68,12 +68,16 @@ gulp.task('build', function() {
 
 gulp.task('build-dev', function() {
     return browserify(_.merge(coreBrowserifyConfig, {
-            debug: true,
+            debug: true
+            /*
             entries: [__dirname + '/src/core.js']
+            */
         }))
+        .require(__dirname + '/src/core.js', { expose: 'uibase' })
+        .require('jquery', { expose: 'jquery' })
         .transform(aliasify)
         .transform(cssify)
-        .bundle({ standalone: 'uibase' })
+        .bundle(/*{ standalone: 'uibase' }*/)
         .pipe(source('uibase.js'))
         .pipe(gulp.dest('./dist'));
 });
