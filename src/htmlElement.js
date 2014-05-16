@@ -162,7 +162,7 @@ var HtmlElement = utils.Class({
             ret = $('<' + this.tag + '>');
 
         function addEventListener(event) {
-             self.addOutput('events.' + event, BrowserEvent.addListener(event, self));
+            self.addOutput('events.' + event, BrowserEvent.addListener(event, self));
         }
 
         for (var propKey in props) {
