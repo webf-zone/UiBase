@@ -36,7 +36,7 @@ var Todo = ub.createView({
         destroy: [ 'destroyBtn.click', 'destroyMap.input' ]
     },
     
-    output: {
+    outputs: {
         destroy: 'destroyMap.output'
     },
     
