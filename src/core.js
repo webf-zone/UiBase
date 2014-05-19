@@ -117,7 +117,7 @@ Object.defineProperties(ub, {
             realPath = realPath || '/';
 
             Object.keys(urls).forEach(function(url) {
-                var routeUrl = (parentUrl ? parentUrl : '') + url;
+                var routeUrl = (parentUrl ? parentUrl : '') + (url === '__default__' ? '' : url);
 
                 if (urls[url].include) {
                     router.bind(routeUrl + '.*', function() {

@@ -1,5 +1,5 @@
 {
-    "app": {
+    "__default__": {
         "url": "build/index.js"
     }
 }
