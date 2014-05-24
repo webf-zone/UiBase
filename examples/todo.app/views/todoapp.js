@@ -8,6 +8,7 @@ var SampleOn = require('comp.SampleOn');
 var Todos = require('./todos');
 var CreateTodo = require('../domain/services/createTodo');
 var QueryTodos = require('../domain/services/queryTodos');
+var DeleteTodo = require('../domain/services/deleteTodo');
 
 require('./todoapp.css');
 
@@ -29,6 +30,8 @@ var TodoApp = ub.createView({
         createTodo: { type: CreateTodo },
         
         queryTodos: { type: QueryTodos },
+
+        deleteTodos: { type: DeleteTodo },
         
         /** Views **/
         textbox: {
@@ -46,8 +49,10 @@ var TodoApp = ub.createView({
         getValue: [ 'textbox.value', 'sampleOn.value' ],
         storeValue: [ 'enterFilter.output', 'sampleOn.sampleOn' ],
         createNew: [ 'sampleOn.output', 'createTodo.description' ],
+        deleteTodo: [ 'todos.destroy', 'deleteTodos.todo' ],
         updateList: [ 'createTodo.todos', 'todos.todos' ],
-        updateList2: [ 'queryTodos.todos', 'todos.todos' ]
+        updateList2: [ 'queryTodos.todos', 'todos.todos' ],
+        updateList3: [ 'deleteTodos.todos', 'todos.todos' ]
     },
     
     picture: function() {

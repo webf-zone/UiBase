@@ -2,6 +2,7 @@
 
 var ub = require('uibase');
 var Map = require('comp.Map');
+var Switch = require('comp.Switch');
 
 var TodoView = require('./todo');
 
@@ -15,11 +16,11 @@ var Todos = ub.createView({
     },
     
     inputs: {
-        todos: 'mapper.input'
+        todos: 'createTodoViews.input'
     },
     
     outputs: {
-        destroy: true
+        destroy: 'switch.destroy'
     },
     
     components: {
@@ -31,18 +32,29 @@ var Todos = ub.createView({
                 cls: 'todos'
             }
         },
-        mapper: {
+        createTodoViews: {
             type: Map,
             mapper: function (todos) {
                 return todos.map(function(t) {
+                    return ub.Component.create({
+                        type: TodoView,
+                        todo: t
+                    });
+                });
+            }
+        },
+        switch: {
+            type: Switch
+        },
+        wrapInLi: {
+            type: Map,
+            mapper: function (todovs) {
+                return todovs.map(function(tv) {
                     return {
                         type: ub.HtmlElement,
                         tag: 'li',
                         props: {
-                            children: [{
-                                type: TodoView,
-                                todo: t
-                            }]
+                            children: [ tv ]
                         }
                     };
                 });
@@ -51,12 +63,12 @@ var Todos = ub.createView({
     },
 
     connections: {
-        update: [ 'mapper.output', 'root.children' ]
+        collectTodos: [ 'createTodoViews.output', 'wrapInLi.input' ],
+        storeTodos: [ 'createTodoViews.output', 'switch.input' ],
+        update: [ 'wrapInLi.output', 'root.children' ]
     },
-    
-    picture: function () {
-        var self = this;
 
+    picture: function () {
         return this.components.root;
     }
 
