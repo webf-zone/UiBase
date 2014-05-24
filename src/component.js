@@ -40,9 +40,17 @@ var Component = utils.Class({
 
     static: {
         connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
+            sourceComp.beforeOutputConnect &&  sourceComp.beforeOutputConnect(sourcePort);
+            sinkComp.beforeInputConnect && sinkComp.beforeInputConnect(sinkPort);
+
             var observer = sinkComp.inputs[sinkPort];
 
             return sourceComp.get(sourcePort).subscribe(observer);
+        },
+        create: function (config) {
+            var Constructor = config.type;
+
+            return new Constructor(config);
         }
     }
 });
