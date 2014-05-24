@@ -368,6 +368,14 @@ var View = utils.Class({
         }
     },
 
+    enqueueRemove: function (renderIndex) {
+        var parentNode = this.getNode();
+
+        var childNode = parentNode.children().eq(renderIndex);
+
+        childNode.remove();
+    },
+
     getKey: function(index) {
         if (this.props && this.props.key != null) {
             return '{' + this.props.key + '}';
