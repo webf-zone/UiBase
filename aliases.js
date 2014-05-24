@@ -24,6 +24,7 @@ module.exports = {
         'comp.Count': './src/components/count.js',
         'comp.Filter': './src/components/filter.js',
         'comp.SampleOn': './src/components/sampleOn.js',
+        'comp.Switch': './src/components/switch.js',
         
         'store.LocalStorage': './src/stores/localstorage.js'
     },
