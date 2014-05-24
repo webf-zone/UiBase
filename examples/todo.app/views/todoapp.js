@@ -2,8 +2,7 @@
 
 var ub = require('uibase');
 var Textbox = require('comp.Textbox');
-var Filter = require('comp.Filter');
-var SampleOn = require('comp.SampleOn');
+var Filter = require('comp.Filter'); var SampleOn = require('comp.SampleOn');
 
 var Todos = require('./todos');
 var CreateTodo = require('../domain/services/createTodo');
@@ -71,7 +70,9 @@ var TodoApp = ub.createView({
                                 {
                                     type: ub.HtmlElement,
                                     tag: 'h1',
-                                    text: 'todos'
+                                    props: {
+                                        children: 'todos'
+                                    }
                                 },
                                 this.components.textbox
                             ]
