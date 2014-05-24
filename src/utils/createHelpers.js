@@ -120,7 +120,9 @@ function getBehFor(self, portName, config) {
                     View.enqueueUpdate(self);
                 } else {
                     //TODO: Handle errors
-                    self.outputs[outputName].write('success', output[outputName]);
+                    if (self.outputs[outputName].write) {
+                        self.outputs[outputName].write('success', output[outputName]);
+                    }
                 }
             }
 
@@ -231,6 +233,9 @@ function createOutputs(self, ports) {
                 throw new Error('createInputs(): No such component defined: ' + compName);
             } else {
                 // TODO: Check for valid port
+                if (self.components[compName].beforeOutputConnect) {
+                    self.components[compName].beforeOutputConnect(compPort);
+                }
                 if (self.components[compName] instanceof HtmlElement) {
                     self.components[compName].addOutput(compPort);
                 }

@@ -40,8 +40,13 @@ var Component = utils.Class({
 
     static: {
         connect: function(sourceComp, sourcePort, sinkComp, sinkPort) {
-            sourceComp.beforeOutputConnect &&  sourceComp.beforeOutputConnect(sourcePort);
-            sinkComp.beforeInputConnect && sinkComp.beforeInputConnect(sinkPort);
+            if (sourceComp.beforeOutputConnect) {
+                sourceComp.beforeOutputConnect(sourcePort);
+            }
+
+            if (sinkComp.beforeInputConnect) {
+                sinkComp.beforeInputConnect(sinkPort);
+            }
 
             var observer = sinkComp.inputs[sinkPort];
 

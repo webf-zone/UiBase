@@ -14,8 +14,7 @@ var Switch = ub.createComponent({
     },
 
     outputs: {
-        output: true,
-        destroy: true
+        output: true
     },
 
     beh: {
@@ -43,11 +42,11 @@ var Switch = ub.createComponent({
                         Object.keys(component.outputs).forEach(function (outputName) {
                             self._onOutput = function () {};
                             if (outputName in self.outputs) {
-                                var oldOnOutput = self._onOutput;
-                                self._onOutput = function (observer) {
-                                    self._disposables[outputName] = components.outputs[outputName].subscribe(observer);
-                                    oldOnOutput();
-                                };
+                                component.outputs[outputName].subscribe(new ub.Observer(function (val) {
+                                    if (self.outputs[outputName].write) {
+                                        self.outputs[outputName].write('success', val);
+                                    }
+                                }));
                             } else {
                                 self.outputs[outputName] = new ub.Observable(function (observer) {
                                     self.outputs[outputName].write = function(type, val) {
@@ -57,15 +56,12 @@ var Switch = ub.createComponent({
                                             observer.onError(val);
                                         }
                                     };
-                                    if (self._onOutput) {
-                                        self._onOutput(observer);
-                                    }
                                 });
-                                var oldOnOutput = self._onOutput;
-                                self._onOutput = function (observer) {
-                                    self._disposables[outputName] = components.outputs[outputName].subscribe(observer);
-                                    oldOnOutput();
-                                };
+                                component.outputs[outputName].subscribe(new ub.Observer(function (val) {
+                                    if (self.outputs[outputName].write) {
+                                        self.outputs[outputName].write('success', val);
+                                    }
+                                }));
                             }
                         });
                     });
@@ -90,6 +86,10 @@ var Switch = ub.createComponent({
                         }
                     });
                 }
+
+                return {
+                    output: components
+                };
             },
             error: function(errors) {
                 return {
@@ -128,9 +128,6 @@ var Switch = ub.createComponent({
                     observer.onError(val);
                 }
             };
-            if (self._onOutput) {
-                self._onOutput(observer);
-            }
         });
     }
 });
