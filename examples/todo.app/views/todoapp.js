@@ -2,9 +2,11 @@
 
 var ub = require('uibase');
 var Textbox = require('comp.Textbox');
-var Filter = require('comp.Filter'); var SampleOn = require('comp.SampleOn');
+var Filter = require('comp.Filter');
+var SampleOn = require('comp.SampleOn');
 
 var Todos = require('./todos');
+var TodoFooter = require('./todoFooter');
 var CreateTodo = require('../domain/services/createTodo');
 var QueryTodos = require('../domain/services/queryTodos');
 var DeleteTodo = require('../domain/services/deleteTodo');
@@ -23,6 +25,8 @@ var TodoApp = ub.createView({
         },
         
         todos: { type: Todos },
+
+        todoFooter: { type: TodoFooter },
 
         sampleOn: { type: SampleOn },
 
@@ -51,7 +55,10 @@ var TodoApp = ub.createView({
         deleteTodo: [ 'todos.destroy', 'deleteTodos.todo' ],
         updateList: [ 'createTodo.todos', 'todos.todos' ],
         updateList2: [ 'queryTodos.todos', 'todos.todos' ],
-        updateList3: [ 'deleteTodos.todos', 'todos.todos' ]
+        updateList3: [ 'deleteTodos.todos', 'todos.todos' ],
+        updateCount: [ 'createTodo.todos', 'todoFooter.todos' ],
+        updateCount2: [ 'queryTodos.todos', 'todoFooter.todos' ],
+        updateCount3: [ 'deleteTodos.todos', 'todoFooter.todos' ]
     },
     
     picture: function() {
@@ -87,7 +94,8 @@ var TodoApp = ub.createView({
                                 this.components.todos
                             ]
                         }
-                    }
+                    },
+                    this.components.todoFooter
                 ]
             }
         };
