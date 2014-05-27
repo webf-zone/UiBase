@@ -34,6 +34,8 @@ var TodoApp = ub.createView({
         
         queryTodos: { type: QueryTodos },
 
+        queryTodosNoFilters: { type: QueryTodos },
+
         deleteTodos: { type: DeleteTodo },
         
         /** Views **/
@@ -48,6 +50,7 @@ var TodoApp = ub.createView({
     
     connections: {
         showOnLoad: [ 'this.load', 'queryTodos.filters' ],
+        showCountOnLoad: [ 'this.load', 'queryTodosNoFilters.filters' ],
         detectEnter: [ 'textbox.keypress', 'enterFilter.input' ],
         getValue: [ 'textbox.value', 'sampleOn.value' ],
         storeValue: [ 'enterFilter.output', 'sampleOn.sampleOn' ],
@@ -57,10 +60,11 @@ var TodoApp = ub.createView({
         updateList2: [ 'queryTodos.todos', 'todos.todos' ],
         updateList3: [ 'deleteTodos.todos', 'todos.todos' ],
         updateCount: [ 'createTodo.todos', 'todoFooter.todos' ],
-        updateCount2: [ 'queryTodos.todos', 'todoFooter.todos' ],
-        updateCount3: [ 'deleteTodos.todos', 'todoFooter.todos' ]
+        updateCount2: [ 'queryTodosNoFilters.todos', 'todoFooter.todos' ],
+        updateCount3: [ 'deleteTodos.todos', 'todoFooter.todos' ],
+        filterList: [ 'todoFooter.filterValue', 'queryTodos.filters' ]
     },
-    
+
     picture: function() {
         return {
             type: ub.HtmlElement,

@@ -4,6 +4,8 @@ var ub = require('uibase');
 var Map = require('comp.Map');
 var Label = require('comp.Label');
 
+var TodoFilters = require('./todoFilters.js');
+
 require('./todoFooter.css');
 
 var TodoFooter = ub.createView({
@@ -15,7 +17,7 @@ var TodoFooter = ub.createView({
     },
 
     outputs: {
-        statusFilter: true,
+        filterValue: 'todoFilters.value',
         clearCompleted: true
     },
 
@@ -51,6 +53,10 @@ var TodoFooter = ub.createView({
         itemLabel: {
             type: Label,
             text: 'items'
+        },
+
+        todoFilters: {
+            type: TodoFilters
         }
     },
 
@@ -91,7 +97,8 @@ var TodoFooter = ub.createView({
                                 }
                             ]
                         }
-                    }
+                    },
+                    this.components.todoFilters
                 ]
             }
         };

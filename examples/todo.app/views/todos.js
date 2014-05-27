@@ -54,7 +54,8 @@ var Todos = ub.createView({
                         type: ub.HtmlElement,
                         tag: 'li',
                         props: {
-                            children: [ tv ]
+                            children: [ tv ],
+                            key: tv.config.todo.get('id')
                         }
                     };
                 });
