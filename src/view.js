@@ -343,12 +343,31 @@ var View = utils.Class({
     },
 
     enqueueTextContent: function(nextContent) {
+        View.childrenUpdateOpsQueue.push({
+            type: View.ChildUpdateTypes.TEXT_CONTENT,
+            parentNode: this,
+            markup: null,
+            textContent: nextContent,
+            fromIndex: null,
+            toIndex: null
+        });
+        /*
         View.childrenUpdateOpsQueue.push(function() {
             this.getNode().text(nextContent);
         }.bind(this));
+        */
     },
 
     enqueueMarkup: function(child) {
+        View.childrenUpdateOpsQueue.push({
+            type: View.ChildUpdateTypes.INSERT_MARKUP,
+            parentNode: this,
+            markup: child._renderImage,
+            textContent: null,
+            fromIndex: null,
+            toIndex: child._renderIndex
+        });
+        /*
         var parentNode = this.getNode();
 
         var children = parentNode.children();
@@ -364,16 +383,38 @@ var View = utils.Class({
         if (child._renderIndex >= children.length) {
             parentNode.append(child._renderImage);
         } else {
-            children[child._renderIndex].before(child._renderImage);
+            $(children[child._renderIndex]).before(child._renderImage);
         }
+        */
     },
 
     enqueueRemove: function (renderIndex) {
+        View.childrenUpdateOpsQueue.push({
+            type: View.ChildUpdateTypes.REMOVE_NODE,
+            parentNode: this,
+            markup: null,
+            textContent: null,
+            fromIndex: renderIndex,
+            toIndex: null
+        });
+        /*
         var parentNode = this.getNode();
 
         var childNode = parentNode.children().eq(renderIndex);
 
         childNode.remove();
+        */
+    },
+
+    enqueueMove: function (rootId, renderIndex, toIndex) {
+        View.childrenUpdateOpsQueue.push({
+            type: View.ChildUpdateTypes.MOVE_EXISTING,
+            parentNode: this,
+            markup: null,
+            textContent: null,
+            fromIndex: renderIndex,
+            toIndex: toIndex
+        });
     },
 
     getKey: function(index) {
@@ -421,6 +462,13 @@ var View = utils.Class({
         dirtyViews: {},
 
         isBatching: false,
+
+        ChildUpdateTypes: {
+            INSERT_MARKUP: 0,
+            MOVE_EXISTING: 1,
+            REMOVE_NODE: 2,
+            TEXT_CONTENT: 3
+        },
 
         childrenUpdateOpsQueue: [],
 
@@ -501,11 +549,127 @@ var View = utils.Class({
         },
 
         processChildUpdateQueue: function() {
+            /*
             View.childrenUpdateOpsQueue.forEach(function(op) {
                 op();
             });
+            */
+            if (!View.childrenUpdateOpsQueue.length) {
+                return;
+            }
+            var updates = View.childrenUpdateOpsQueue.slice(0);
+            // Mapping from parent IDs to initial child orderings.
+            var initialChildren = null;
+            // List of children that will be moved or removed.
+            var updatedChildren = null;
+
+            updates.forEach(function (update) {
+                if (update.type === View.ChildUpdateTypes.MOVE_EXISTING ||
+                    update.type === View.ChildUpdateTypes.REMOVE_NODE) {
+                    var updatedIndex = update.fromIndex;
+                    var parentNode = update.parentNode.getNode().get(0);
+                    var updatedChild = parentNode.childNodes[updatedIndex];
+                    var parentId = update.parentNode._rootId;
+
+                    initialChildren = initialChildren || {};
+                    initialChildren[parentId] = initialChildren[parentId] || [];
+                    initialChildren[parentId][updatedIndex] = updatedChild;
+
+                    updatedChildren = updatedChildren || [];
+                    updatedChildren.push(updatedChild);
+                }
+            });
+
+            // Remove updated children first so that `toIndex` is consistent.
+            if (updatedChildren) {
+                for (var j = 0; j < updatedChildren.length; j++) {
+                    updatedChildren[j].parentNode.removeChild(updatedChildren[j]);
+                }
+            }
+
+            updates.forEach(function (update) {
+                switch (update.type) {
+                case View.ChildUpdateTypes.INSERT_MARKUP:
+                    insertChildAt(
+                        update.parentNode.getNode().get(0),
+                        $(update.markup).get(0),
+                        update.toIndex
+                    );
+                    break;
+                case View.ChildUpdateTypes.MOVE_EXISTING:
+                    insertChildAt(
+                        update.parentNode.getNode().get(0),
+                        initialChildren[update.parentNode._rootId][update.fromIndex],
+                        update.toIndex
+                    );
+                    break;
+                case View.ChildUpdateTypes.TEXT_CONTENT:
+                    updateTextContent(
+                        update.parentNode.getNode().get(0),
+                        update.textContent
+                    );
+                    break;
+                case View.ChildUpdateTypes.REMOVE_NODE:
+                    // Already removed by the for-loop above.
+                    break;
+                }
+            });
+
+            View.clearChildUpdateQueue();
         }
     }
 });
+
+function insertChildAt (parentNode, childNode, index) {
+    var childNodes = parentNode.childNodes;
+    if ($(childNodes[index]).prop('outerHTML') === $(childNode).prop('outerHTML')) {
+        return;
+    }
+    // If `childNode` is already a child of `parentNode`, remove it so that
+    // computing `childNodes[index]` takes into account the removal.
+    if (childNode.parentNode === parentNode) {
+        parentNode.removeChild(childNode);
+    }
+    if (index >= childNodes.length) {
+        parentNode.appendChild(childNode);
+    } else {
+        parentNode.insertBefore(childNode, childNodes[index]);
+    }
+}
+
+var textContentAccessor = 'textContent' in document.createElement('div') ?
+    'textContent' :
+    'innerText';
+
+var updateTextContent;
+if (textContentAccessor === 'textContent') {
+    /**
+     * Sets the text content of `node` to `text`.
+     *
+     * @param {DOMElement} node Node to change
+     * @param {string} text New text content
+     */
+    updateTextContent = function(node, text) {
+        node.textContent = text;
+    };
+} else {
+    /**
+     * Sets the text content of `node` to `text`.
+     *
+     * @param {DOMElement} node Node to change
+     * @param {string} text New text content
+     */
+    updateTextContent = function(node, text) {
+        // In order to preserve newlines correctly, we can't use .innerText to set
+        // the contents (see #1080), so we empty the element then append a text node
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
+        }
+        if (text) {
+            var doc = node.ownerDocument || document;
+            node.appendChild(doc.createTextNode(text));
+        }
+    };
+}
 
 module.exports = View;
