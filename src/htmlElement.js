@@ -69,6 +69,12 @@ var HtmlElement = utils.Class({
 
         self.addChildrenInput();
 
+        if (config.props && config.props.events) {
+            config.props.events.forEach(function (event) {
+                self.addEventOutput(event);
+            });
+        }
+
         self.addOutPort('load', BrowserEvent.addListener('load', this));
 
         if (this.viewIsRendered) {
@@ -162,7 +168,7 @@ var HtmlElement = utils.Class({
             ret = $('<' + this.tag + '>');
 
         function addEventListener(event) {
-            self.addOutput('events.' + event, BrowserEvent.addListener(event, self));
+            self.addOutput('events.' + event);
         }
 
         for (var propKey in props) {
@@ -174,7 +180,11 @@ var HtmlElement = utils.Class({
                 continue;
             }
             if (propKey === 'events') {
-                propValue.forEach(addEventListener);
+                /**
+                 * This is executed while rendering, but connections are made
+                 * before that. Thus, we need the outputs ready earlier
+                 */
+                //propValue.forEach(addEventListener);
             } else if (propKey === 'cls') {
                 ret.addClass(propValue);
             } else {
