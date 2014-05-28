@@ -40,6 +40,20 @@ function createComponents(self, comps) {
     }, {});
 }
 
+function createSingleConnection (self, source, sink) {
+    var sourceA = source.split('.'),
+        sinkA = sink.split('.'),
+        sourceComp = sourceA[0] === 'this' ? self : self.components[sourceA[0]],
+        sinkComp = sinkA[0] === 'this' ? self : self.components[sinkA[0]],
+        sourcePort = sourceA.slice(1).join('.'),
+        sinkPort = sinkA.slice(1).join('.');
+
+    return Component.connect(
+        sourceComp, sourcePort,
+        sinkComp  , sinkPort
+    );
+}
+
 function createConnections(self, conns) {
     /**
      * Each view must have a root element, and the DOM events fired
@@ -50,17 +64,18 @@ function createConnections(self, conns) {
      */
 
     return Object.keys(conns).reduce(function(store, connName) {
-        var source = conns[connName][0].split('.'),
-            sink = conns[connName][1].split('.'),
-            sourceComp = source[0] === 'this' ? self : self.components[source[0]],
-            sinkComp = sink[0] === 'this' ? self : self.components[sink[0]],
-            sourcePort = source.slice(1).join('.'),
-            sinkPort = sink.slice(1).join('.');
+        var source, sink;
 
-        store[connName] = Component.connect(
-            sourceComp, sourcePort,
-            sinkComp  , sinkPort
-        );
+        source = conns[connName][0];
+        sink = conns[connName][1];
+
+        if (Array.isArray(sink)) {
+            sink.forEach(function (snk, i) {
+                store[connName + '[' + i + ']'] = createSingleConnection(self, source, snk);
+            });
+        } else {
+            store[connName] = createSingleConnection(self, source, sink);
+        }
 
         return store;
     }, {});

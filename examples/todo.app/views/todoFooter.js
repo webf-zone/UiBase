@@ -61,11 +61,17 @@ var TodoFooter = ub.createView({
     },
 
     connections: {
-        countStr: [ 'activeCounter.output', 'countStrGenerator.input' ],
-        itemStr: [ 'activeCounter.output', 'itemsTextGenerator.input' ],
+        /**
+         * Get 'count' (key) from activeCounter.output and send to
+         * countStrGenerator.input and itemsTextGenerator.input.
+         */
+        count: [ 'activeCounter.output', [
+            'countStrGenerator.input',
+            'itemsTextGenerator.input'
+        ]],
 
-        updateCountStr: [ 'countStrGenerator.output', 'countLabel.children' ],
-        updateItemStr: [ 'itemsTextGenerator.output', 'itemLabel.text' ]
+        countText: [ 'countStrGenerator.output', 'countLabel.children' ],
+        itemText: [ 'itemsTextGenerator.output', 'itemLabel.text' ]
     },
 
     picture: function () {
