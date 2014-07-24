@@ -1,6 +1,7 @@
 'use strict';
 
 var utils = require('utils');
+var Observable = require('Observable');
 
 var Repository = utils.Class({
 
@@ -20,8 +21,22 @@ var Repository = utils.Class({
 
     query: function(filter, cb) {
         var self = this;
+        var obs = null;
 
-        self._adapter.query(self._location, filter, self._castToEntity.bind(self, cb));
+        var _cb = function (collection) {
+            self._castToEntity(self, cb, collection);
+            if (obs != null) {
+                obs.onNext(collection);
+            }
+        };
+
+        var obv = new Observable(function (observer) {
+            obs = observer;
+        });
+
+        self._adapter.query(self._location, filter, _cb);
+
+        return obv;
     },
 
     update: function(entity, cb) {

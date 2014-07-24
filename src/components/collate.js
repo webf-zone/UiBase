@@ -4,62 +4,25 @@ var ub = require('uibase');
 
 var Collate = ub.createComponent({
 
-    config: {
-        seed: {
-            optional: false
-        },
-        op: {
-            optional: false,
-            type: 'function'
-        }
-    },
-
     inputs: {
+        seed: {},
         input: {},
-        reset: {}
+        reset: {},
+        op: {}
     },
 
-    outputs: {
-        output: true
-    },
+    body: function (inputs) {
+        var next;
 
-    _aux: function(acc, v) {
-        var self = this,
-            result = self.config.op(acc, v);
+        if (inputs.reset) {
+            next = inputs.seed;
+        } else {
+            next = inputs.op(this.outputv.output || inputs.seed, inputs.input);
+        }
 
         return {
-            output: result,
-            next: {
-                success: function(val) { return self._aux(result, val); }
-            }
+            output: next
         };
-    },
-
-    beh: {
-        input: {
-            success: function(value) {
-                var self = this;
-
-                return self._aux(self.config.seed, value);
-            },
-            error: function(errors) {
-                return {
-                    output: errors
-                };
-            }
-        },
-        reset: {
-            success: function() {
-                return {
-                    output: this.config.seed,
-                    next: {
-                        input: {
-                            success: this._aux.bind(this, this.config.seed)
-                        }
-                    }
-                };
-            }
-        }
     }
 });
 

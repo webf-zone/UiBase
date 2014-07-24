@@ -10,17 +10,6 @@ require('./todoFooter.css');
 
 var TodoFooter = ub.createView({
 
-    config: {},
-
-    inputs: {
-        todos: 'activeCounter.input'
-    },
-
-    outputs: {
-        filterValue: 'todoFilters.value',
-        clearCompleted: true
-    },
-
     components: {
         activeCounter: {
             type: Map,
@@ -28,13 +17,6 @@ var TodoFooter = ub.createView({
                 return todos.filter(function (todo) {
                     return !todo.get('completed');
                 }).length;
-            }
-        },
-
-        countStrGenerator: {
-            type: Map,
-            mapper: function (count) {
-                return String(count);
             }
         },
 
@@ -60,18 +42,23 @@ var TodoFooter = ub.createView({
         }
     },
 
-    connections: {
-        /**
-         * Get 'count' (key) from activeCounter.output and send to
-         * countStrGenerator.input and itemsTextGenerator.input.
-         */
-        count: [ 'activeCounter.output', [
-            'countStrGenerator.input',
-            'itemsTextGenerator.input'
-        ]],
+    inputs: {
+        todos: {
+            default: []
+        }
+    },
 
-        countText: [ 'countStrGenerator.output', 'countLabel.children' ],
-        itemText: [ 'itemsTextGenerator.output', 'itemLabel.text' ]
+    body: function (inputs) {
+        var count    = ub.apply('activeCounter', {input: inputs.todos});
+        var itemsTxt = ub.apply('itemsTextGenerator', {input: count.output});
+        var filter   = ub.apply('todoFilters', {});
+
+        ub.apply('countLabel', {text: count.output}, { text: function (c) { return String(c); }});
+        ub.apply('itemLabel', {text: itemsTxt.output});
+
+        return {
+            filterValue: filter.value
+        };
     },
 
     picture: function () {

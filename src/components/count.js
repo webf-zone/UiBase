@@ -14,12 +14,17 @@ var Count = ub.createComponent({
     },
 
     inputs: {
-        reset: 'collate.reset',
-        input: 'collate.input'
+        reset: {},
+        input: {}
     },
 
-    outputs: {
-        output: 'collate.output'
+    body: function (inputs) {
+        return {
+            output: ub.apply('collate', {
+                input: inputs.input,
+                reset: inputs.reset
+            })
+        }.output;
     }
 });
 

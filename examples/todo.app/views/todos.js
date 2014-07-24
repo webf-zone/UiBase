@@ -8,21 +8,6 @@ var TodoView = require('./todo');
 
 var Todos = ub.createView({
     
-    config: {
-        todos: {
-            optional: true,
-            default: []
-        }
-    },
-    
-    inputs: {
-        todos: 'createTodoViews.input'
-    },
-    
-    outputs: {
-        destroy: 'switch.destroy'
-    },
-    
     components: {
         root: {
             type: ub.HtmlElement,
@@ -63,10 +48,20 @@ var Todos = ub.createView({
         }
     },
 
-    connections: {
-        collectTodos: [ 'createTodoViews.output', 'wrapInLi.input' ],
-        storeTodos: [ 'createTodoViews.output', 'switch.input' ],
-        update: [ 'wrapInLi.output', 'root.children' ]
+    inputs: {
+        todos: {
+            default: []
+        }
+    },
+
+    body: function (inputs) {
+        var todoViews = ub.apply('createTodoViews', {input: inputs.todos});
+        var lis = ub.apply('wrapInLi', {input: todoViews.output});
+        ub.send('root', {children: lis.output});
+
+        return {
+            destroy: todoViews.output.map(function (tv) { return tv.outputs.destroy; })
+        };
     },
 
     picture: function () {

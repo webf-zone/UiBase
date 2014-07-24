@@ -153,43 +153,18 @@ function createInputs(self, ports, config) {
     return extend(Object.keys(ports).reduce(function(store, portName) {
         var portConfig = ports[portName];
 
-        if (portConfig.success) {
-            store[portName] = new Observer(
-                portConfig.success.bind(self),
-                portConfig.error.bind(self),
-                portConfig.complete.bind(self)
-            );
-        } else if (typeof portConfig === 'string') {
-            var compName = portConfig.split('.')[0],
-                compPort = portConfig.split('.').slice(1).join('.');
+        store[portName] = new Observer(function (val) {
+            var type = portConfig.type || (typeof portConfig.default);
 
-            if (!(compName in self.components)) {
-                throw new Error('createInputs(): No such component defined: ' + compName);
+            if (portConfig.default === undefined && val === undefined) {
+                this.onError(new TypeError('Expected some value for input, ' + portName));
+            } else if (type && typeof val !== type) {
+                this.onError(new TypeError('Expected ' + portName + ' to be of type ' + type));
             } else {
-                // TODO: Check for valid port
-                if (self.components[compName] instanceof HtmlElement) {
-                    self.components[compName].addInput(compPort);
-                }
-                store[portName] = self.components[compName].inputs[compPort];
+                this.onNext(val);
             }
-        } else {
-            store[portName] = getBehFor(self, portName, config);
-        }
 
-        return store;
-    }, {}), Object.keys(config.config).reduce(function(store, configName) {
-        var configOptions = config.config[configName];
-
-        /*
-         If the config option is not write once (can be set after initialization)
-         then create a input of that name. Make sure no custom configuration
-         for this port has been provided.
-         */
-        if (configOptions.constant === false && !(configName in config.beh)) {
-            store[configName] = new Observer(function(val) {
-                self.config[configName] = val;
-            });
-        }
+        });
 
         return store;
     }, {}), {
@@ -245,7 +220,7 @@ function createOutputs(self, ports) {
                 compPort = portConfig.split('.').slice(1).join('.');
 
             if (!(compName in self.components)) {
-                throw new Error('createInputs(): No such component defined: ' + compName);
+                throw new Error('createOutputs(): No such component defined: ' + compName);
             } else {
                 // TODO: Check for valid port
                 if (self.components[compName].beforeOutputConnect) {
@@ -312,62 +287,17 @@ function removeReservedConfigParams(config) {
 
     return cleanConfig;
 }
-
 function createProperties(self, config, instanceConfig) {
-    self.config = {};
-    config.config = config.config || {};
-
+    self.args = extend(true, {}, instanceConfig);
     var isView = self instanceof View;
 
-    if (isView)
-        config.config.props = {
-            optional: true,
+    if (isView) {
+        config.inputs.props = {
             default: {}
         };
+    }
 
-    /**
-     * Iterate over the config options that this component can accepts
-     * and populate them for the current instance using the instance
-     * configuration.
-     */
-    Object.keys(config.config).forEach(function(configName) {
-        var localConfig = config.config;
-
-        var optional = localConfig[configName].optional || false;
-
-        instanceConfig = instanceConfig || {};
-
-        /**
-         * If the configuration options is mandatory and it has not been
-         * passed for the instance, throw an error.
-         */
-        if (!optional && typeof instanceConfig[configName] === 'undefined') {
-            throw new Error('Missing required configuration: ' + configName);
-        }
-
-        /**
-         * Check the type of the config parameter. The expected type is either
-         * specified using the 'type' configuration or inferred from the default value.
-         */
-        var type = (localConfig[configName].type || typeof localConfig[configName].default);
-
-        if (typeof instanceConfig[configName] !== 'undefined' &&
-            type !== 'undefined' && type !== undefined && type !== null && type !== 'any' &&
-            typeof instanceConfig[configName] !== type) {
-            throw new TypeError('Expected ' + configName + ' to be of type ' + type);
-        }
-
-        if (typeof instanceConfig[configName] !== 'undefined' &&
-            localConfig[configName].assert &&
-            !localConfig[configName].assert.call(self, instanceConfig[configName])) {
-            throw new Error('Assertion failed for configuration parameter: ' + configName);
-        }
-
-        self.config[configName] = instanceConfig[configName] !== undefined ?
-            instanceConfig[configName] : localConfig[configName].default;
-    });
-
-    self._viewState = extend(true, {}, self.config);
+    self._viewState = extend(true, {}, self.args);
 
     self.components = createComponents(self, config.components || {});
 
@@ -377,8 +307,8 @@ function createProperties(self, config, instanceConfig) {
     self.connections = createConnections(self, config.connections || {});
 
     /* Send IIP */
-    Object.keys(config.config).forEach(function(configName) {
-        if (configName in self.inputs || configName === 'props') {
+    Object.keys(instanceConfig).forEach(function(configName) {
+        if (configName in self.inputs) {
             var obv = new Observable(function(observer) {
                 this.write = function(val) {
                     observer.onNext(val.value);
@@ -388,10 +318,9 @@ function createProperties(self, config, instanceConfig) {
 
             var dispose = obv.subscribe(self.inputs[configName]);
 
-            obv.write({ value: self.config[configName], dispose: dispose });
+            obv.write({ value: instanceConfig[configName], dispose: dispose });
         }
     });
-
 }
 
 var createComponent = function(config) {

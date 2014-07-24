@@ -7,14 +7,6 @@ require('./todoFilters.css');
 
 var TodoFilters = ub.createView({
 
-    config: {},
-
-    inputs: {},
-
-    outputs: {
-        value: 'valueExtractor.output'
-    },
-
     components: {
         allFilter: {
             type: ub.HtmlElement,
@@ -53,10 +45,16 @@ var TodoFilters = ub.createView({
         }
     },
 
-    connections: {
-        handleAll: [ 'allFilter.events.click', 'valueExtractor.input' ],
-        handleActive: [ 'activeFilter.events.click', 'valueExtractor.input' ],
-        handleCompleted: [ 'completedFilter.events.click', 'valueExtractor.input' ]
+    body: function () {
+        var allClickE       = this.apply('allFilter');
+        var activeClickE    = this.apply('activeFilter');
+        var completedClickE = this.apply('completedFilter');
+
+        return {
+            value: ub.apply('valueExtractor', {
+                input: [allClickE.click, activeClickE.click, completedClickE.click]
+            })
+        };
     },
 
     picture: function () {
