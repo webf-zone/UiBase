@@ -12,7 +12,8 @@ gulp.task('build-dev', function() {
     return browserify({
             entries: [ './views/todoapp.js' ],
             debug : true,
-            extensions: [ '.css' ]
+            extensions: [ '.css' ],
+            standalone: 'UIBCurrentViewConstructor'
         })
         /*
         .on('prebundle', function(bundle) {
@@ -27,7 +28,7 @@ gulp.task('build-dev', function() {
         .external('jquery')
         .transform(aliasify)
         .transform(cssify)
-        .bundle({ standalone: 'UIBCurrentViewConstructor' })
+        .bundle()
         .pipe(source('index.js'))
         .pipe(gulp.dest('./build'));
 });

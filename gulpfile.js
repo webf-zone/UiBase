@@ -26,7 +26,6 @@ var aliasify = require('aliasify').configure(aliases);
 
 var coreBrowserifyConfig = {
     debug : false,
-    transform: [ aliasify, cssify ],
     extensions: [ '.css' ],
     shim: {
         jquery: {
@@ -55,11 +54,12 @@ var getFilesInDir = function (dir) {
 /* Production build */
 gulp.task('build', function() {
     return browserify(_.merge(coreBrowserifyConfig, {
-            entries: [__dirname + '/src/core.js']
+            entries: [__dirname + '/src/core.js'],
+            standalone: 'uibase'
         }))
         .transform(aliasify)
         .transform(cssify)
-        .bundle({ standalone: 'uibase' })
+        .bundle()
         .pipe(source('uibase.min.js'))
         .pipe(buffer())
         .pipe(uglify())
@@ -67,17 +67,24 @@ gulp.task('build', function() {
 });
 
 gulp.task('build-dev', function() {
-    return browserify(_.merge(coreBrowserifyConfig, {
-            debug: true
-            /*
-            entries: [__dirname + '/src/core.js']
-            */
-        }))
+    return browserify({
+            debug : true,
+            transform: [ cssify ],
+            extensions: [ '.css' ],
+            shim: {
+                jquery: {
+                    path: 'node_modules/jquery/dist/jquery.js',
+                    exports: '$'
+                }
+            }
+        })
+        .transform(cssify)
         .require(__dirname + '/src/core.js', { expose: 'uibase' })
         .require('jquery', { expose: 'jquery' })
-        .transform(aliasify)
-        .transform(cssify)
-        .bundle(/*{ standalone: 'uibase' }*/)
+        .bundle(/*{ standalone: 'uibase' }*/).on('error', function errorHandler (error) {
+            console.log(error.toString());
+            this.emit('end');
+        })
         .pipe(source('uibase.js'))
         .pipe(gulp.dest('./dist'));
 });
