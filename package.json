@@ -29,7 +29,7 @@
   "devDependencies": {
     "mocha": "~1.12.0",
     "chai": "~1.7.0",
-    "mocha-phantomjs": "~3.3",
+    "mocha-phantomjs": "~3.5.0",
     "uglifyify": "",
     "gulp": "~3.8.7",
     "gulp-util": "~2",
@@ -46,10 +46,13 @@
     "vinyl-source-stream": "~0.1.1",
     "gulp-buffer": "0.0.2",
     "browserify": "~5.9.1",
-    "through": "~2.3.4"
+    "through": "~2.3.4",
+    "phantomjs": "~1.9.7-15"
   },
   "browserify": {
-    "transform": [ "cssify" ]
+    "transform": [
+      "cssify"
+    ]
   },
   "browser": {
     "view": "./src/view.js",
