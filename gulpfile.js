@@ -151,8 +151,7 @@ var components = getFilesInDir('./src/components')
 
 gulp.task('build-components-dev', function() {
     return browserify(_.merge(componentsBrowserifyConfig, {
-        debug: true,
-        entries: components
+        debug: true
     }))
     .external('uibase')
     .external('jquery')
