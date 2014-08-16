@@ -12,22 +12,10 @@ gulp.task('build-dev', function() {
     return browserify({
             entries: [ './views/todoapp.js' ],
             debug : true,
-            extensions: [ '.css' ],
             standalone: 'UIBCurrentViewConstructor'
         })
-        /*
-        .on('prebundle', function(bundle) {
-            Object.keys(aliases.aliases).forEach(function(alias) {
-                if (/^comp\./.test(alias)) {
-                    bundle.external(alias);
-                }
-            });
-        })
-        */
         .external('uibase')
         .external('jquery')
-        .transform(aliasify)
-        .transform(cssify)
         .bundle()
         .pipe(source('index.js'))
         .pipe(gulp.dest('./build'));
