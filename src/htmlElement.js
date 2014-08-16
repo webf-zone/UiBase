@@ -170,12 +170,8 @@ var HtmlElement = utils.Class({
      */
     _createElement: function() {
         var self = this,
-            props = this.props,
-            ret = $('<' + this.tag + '>');
-
-        function addEventListener(event) {
-            self.addOutput('events.' + event);
-        }
+            props = self.props,
+            ret = $('<' + self.tag + '>');
 
         for (var propKey in props) {
             if (!props.hasOwnProperty(propKey)) {
@@ -204,7 +200,7 @@ var HtmlElement = utils.Class({
             }
         }
 
-        return ret.attr(View.UBID_ATTR_NAME, this._rootId);
+        return ret.attr(View.UBID_ATTR_NAME, self._rootId);
     },
 
     /**

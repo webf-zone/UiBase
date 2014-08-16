@@ -36,6 +36,58 @@ var Observer = require('observer');
 
 var updateDepth = 0;
 
+function insertChildAt (parentNode, childNode, index) {
+    var childNodes = parentNode.childNodes;
+    if ($(childNodes[index]).prop('outerHTML') === $(childNode).prop('outerHTML')) {
+        return;
+    }
+    // If `childNode` is already a child of `parentNode`, remove it so that
+    // computing `childNodes[index]` takes into account the removal.
+    if (childNode.parentNode === parentNode) {
+        parentNode.removeChild(childNode);
+    }
+    if (index >= childNodes.length) {
+        parentNode.appendChild(childNode);
+    } else {
+        parentNode.insertBefore(childNode, childNodes[index]);
+    }
+}
+
+var textContentAccessor = 'textContent' in document.createElement('div') ?
+    'textContent' :
+    'innerText';
+
+var updateTextContent;
+if (textContentAccessor === 'textContent') {
+    /**
+     * Sets the text content of `node` to `text`.
+     *
+     * @param {DOMElement} node Node to change
+     * @param {string} text New text content
+     */
+    updateTextContent = function(node, text) {
+        node.textContent = text;
+    };
+} else {
+    /**
+     * Sets the text content of `node` to `text`.
+     *
+     * @param {DOMElement} node Node to change
+     * @param {string} text New text content
+     */
+    updateTextContent = function(node, text) {
+        // In order to preserve newlines correctly, we can't use .innerText to set
+        // the contents (see #1080), so we empty the element then append a text node
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
+        }
+        if (text) {
+            var doc = node.ownerDocument || document;
+            node.appendChild(doc.createTextNode(text));
+        }
+    };
+}
+
 /**
  * This is the main View class. It is Component that can be rendered.
  *
@@ -619,57 +671,5 @@ var View = utils.Class({
         }
     }
 });
-
-function insertChildAt (parentNode, childNode, index) {
-    var childNodes = parentNode.childNodes;
-    if ($(childNodes[index]).prop('outerHTML') === $(childNode).prop('outerHTML')) {
-        return;
-    }
-    // If `childNode` is already a child of `parentNode`, remove it so that
-    // computing `childNodes[index]` takes into account the removal.
-    if (childNode.parentNode === parentNode) {
-        parentNode.removeChild(childNode);
-    }
-    if (index >= childNodes.length) {
-        parentNode.appendChild(childNode);
-    } else {
-        parentNode.insertBefore(childNode, childNodes[index]);
-    }
-}
-
-var textContentAccessor = 'textContent' in document.createElement('div') ?
-    'textContent' :
-    'innerText';
-
-var updateTextContent;
-if (textContentAccessor === 'textContent') {
-    /**
-     * Sets the text content of `node` to `text`.
-     *
-     * @param {DOMElement} node Node to change
-     * @param {string} text New text content
-     */
-    updateTextContent = function(node, text) {
-        node.textContent = text;
-    };
-} else {
-    /**
-     * Sets the text content of `node` to `text`.
-     *
-     * @param {DOMElement} node Node to change
-     * @param {string} text New text content
-     */
-    updateTextContent = function(node, text) {
-        // In order to preserve newlines correctly, we can't use .innerText to set
-        // the contents (see #1080), so we empty the element then append a text node
-        while (node.firstChild) {
-            node.removeChild(node.firstChild);
-        }
-        if (text) {
-            var doc = node.ownerDocument || document;
-            node.appendChild(doc.createTextNode(text));
-        }
-    };
-}
 
 module.exports = View;
