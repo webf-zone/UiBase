@@ -209,7 +209,6 @@ gulp.task('build-test', ['lint'], function() {
     }))
     .external('uibase')
     .external('jquery')
-    .transform(aliasify)
     .transform(cssify)
     .bundle()
     .pipe(source('specs.js'))
