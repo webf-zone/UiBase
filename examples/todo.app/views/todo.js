@@ -47,19 +47,18 @@ var Todo = ub.createView({
             type: ub.HtmlElement,
             tag: 'div',
             props: {
-                children:[
+                children: [
                     {
                         type: ub.HtmlElement,
                         tag: 'span',
                         props: {
-                            cls: self.config.todo.get('completed') ? 'completed' : 'active',
                             children: self.config.todo.get('description')
                         },
                         text: self.config.todo.get('description')
                     },
                     self.components.destroyBtn
                 ],
-                cls: 'todo'
+                cls: 'todo ' + (self.config.todo.get('completed') ? 'completed' : 'active')
             }
         };
     }

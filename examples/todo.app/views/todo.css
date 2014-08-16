@@ -9,6 +9,10 @@
     position: relative;
 }
 
+.todo.completed {
+    text-decoration: line-through;
+}
+
 .todo .destroy {
     border: none;
     color: #A88A8A;
