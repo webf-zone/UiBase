@@ -5,6 +5,55 @@ var Map = require('comp.Map');
 
 require('./todoFilters.css');
 
+var SingleFilter = ub.createView({
+    config: {
+        text: {
+            optional :false
+        },
+        value: {
+            optional :false
+        }
+    },
+    inputs: {
+        filterValue: 'classNameGetter.input'
+    },
+    outputs: {
+        click: 'root.events.click'
+    },
+    connections: {
+        applyClass: [ 'classNameGetter.output', 'root.props.style' ]
+    },
+    components: {
+        classNameGetter: function () {
+            var self = this;
+            return {
+                type: Map,
+                mapper: function (value) {
+                    if (value !== self.config.value) {
+                        return { 'font-weight': 'normal' };
+                    } else {
+                        return { 'font-weight': 'bold' };
+                    }
+                }
+            };
+        },
+        root: function () {
+            return {
+                type: ub.HtmlElement,
+                tag: 'a',
+                props: {
+                    children: this.config.text,
+                    href: 'todos/#/' + this.config.value,
+                    events: [ 'click' ]
+                }
+            };
+        }
+    },
+    picture: function () {
+        return this.components.root;
+    }
+});
+
 var TodoFilters = ub.createView({
 
     config: {},
@@ -17,36 +66,31 @@ var TodoFilters = ub.createView({
 
     components: {
         allFilter: {
-            type: ub.HtmlElement,
-            tag: 'a',
-            props: {
-                children: 'All',
-                href: 'todos/#/',
-                events: [ 'click' ]
-            }
+            type: SingleFilter,
+            text: 'All',
+            value: 'all'
         },
         activeFilter: {
-            type: ub.HtmlElement,
+            type: SingleFilter,
             tag: 'a',
-            props: {
-                children: 'Active',
-                href: 'todos/#/active',
-                events: [ 'click' ]
-            }
+            text: 'Active',
+            value: 'active'
         },
         completedFilter: {
-            type: ub.HtmlElement,
+            type: SingleFilter,
             tag: 'a',
-            props: {
-                children: 'Completed',
-                href: 'todos/#/completed',
-                events: [ 'click' ]
-            }
+            text: 'Completed',
+            value: 'completed'
         },
         valueExtractor: {
             type: Map,
             mapper: function (e) {
-                var value = e.target.href.split('#')[1].split('/')[1];
+                var hash = location.href.split('#'),
+                    value = '';
+
+                if (hash.length > 1) {
+                    value = hash[1].split('/')[1];
+                }
 
                 return value === '' ? 'all' : value;
             }
@@ -54,9 +98,15 @@ var TodoFilters = ub.createView({
     },
 
     connections: {
-        handleAll: [ 'allFilter.events.click', 'valueExtractor.input' ],
-        handleActive: [ 'activeFilter.events.click', 'valueExtractor.input' ],
-        handleCompleted: [ 'completedFilter.events.click', 'valueExtractor.input' ]
+        calcFilterValOnLoad: [ 'this.load', 'valueExtractor.input' ],
+        handleAll: [ 'allFilter.click', 'valueExtractor.input' ],
+        handleActive: [ 'activeFilter.click', 'valueExtractor.input' ],
+        handleCompleted: [ 'completedFilter.click', 'valueExtractor.input' ],
+        listenToFilterChange: [ 'valueExtractor.output', [
+            'allFilter.filterValue',
+            'activeFilter.filterValue',
+            'completedFilter.filterValue'
+        ]]
     },
 
     picture: function () {
