@@ -101,6 +101,12 @@ var HtmlElement = utils.Class({
         }
     },
 
+    beforeInputConnect: function (port) {
+        if (!this.inputs[port]) {
+            this.addInput(port);
+        }
+    },
+
     addPropInput: function(propName) {
         var self = this;
 
