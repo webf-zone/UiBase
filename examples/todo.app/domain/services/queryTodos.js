@@ -27,8 +27,8 @@ var QueryTodos = ub.createComponent({
                     todos: function (done) {
                         self.config.repository.query(filters, function (todos) {
                             done(todos.filter(function (todo) {
-                                return filters === 'completed' ? todo.completed :
-                                    filters === 'active' ? !todo.completed : true;
+                                return filters === 'completed' ? todo.get('completed') :
+                                    filters === 'active' ? !todo.get('completed') : true;
                             }));
                         });
                     }
