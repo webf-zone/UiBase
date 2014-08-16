@@ -226,7 +226,7 @@ gulp.task('build-all', [
 ], function() {});
 
 gulp.task('test', ['build-test'], function(cb) {
-    var mochaPhantomjs = spawn('node_modules/.bin/mocha-phantomjs', ['tests/uibase-test.html']);
+    var mochaPhantomjs = spawn('node_modules/.bin/mocha-phantomjs', ['tests/uibase-test-phantomjs.html']);
     mochaPhantomjs.stdout.pipe(process.stdout);
     mochaPhantomjs.stderr.pipe(process.stderr);
     mochaPhantomjs.on('exit', function(code){
