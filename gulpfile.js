@@ -37,8 +37,6 @@ var coreBrowserifyConfig = {
 
 var componentsBrowserifyConfig = {
     debug : false,
-    transform: [ cssify ],
-    extensions: [ '.css' ],
     external: [
         'uibase',
         'jquery'
@@ -162,7 +160,6 @@ gulp.task('build-components-dev', function() {
             }
         });
     })
-    .transform(cssify)
     .bundle()
     .pipe(source('uibase-components.js'))
     .pipe(gulp.dest('./dist'));
@@ -208,7 +205,6 @@ gulp.task('build-test', ['lint'], function() {
     }))
     .external('uibase')
     .external('jquery')
-    .transform(cssify)
     .bundle()
     .pipe(source('specs.js'))
     .pipe(buffer())
