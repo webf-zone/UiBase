@@ -9,8 +9,9 @@ var Checkbox = ub.createView({
     components: {
         root: {
             type: ub.HtmlElement,
-            tag: 'checkbox',
+            tag: 'input',
             props: {
+                type: 'checkbox',
                 events: [
                     'change'
                 ]
@@ -31,8 +32,7 @@ var Checkbox = ub.createView({
     inputs: {},
 
     outputs: {
-        value: 'mapValue.output',
-        keypress: 'root.events.change'
+        value: 'mapValue.output'
     },
 
     picture: function() {
