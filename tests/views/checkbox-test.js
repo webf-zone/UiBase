@@ -20,6 +20,7 @@ describe('Checkbox', function() {
 
         setTimeout(function() {
             expect($('#test-container input')).to.have.length.to.be(1);
+            expect($('#test-container input').attr('type')).to.equal('checkbox');
             chk.removeView();
             done();
         }, 500);
