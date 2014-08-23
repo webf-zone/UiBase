@@ -3,6 +3,7 @@
 var ub = require('uibase');
 var Map = require('comp.Map');
 var Button = require('comp.Button');
+var Checkbox = require('comp.Checkbox');
 
 require('./todo.css');
 
@@ -15,6 +16,20 @@ var Todo = ub.createView({
     },
     
     components: {
+        markComplete: {
+            type: Checkbox,
+            props: {
+                cls: 'mark-complete'
+            }
+        },
+        completeMap: function(self) {
+            return {
+                type: Map,
+                mapper: function() {
+                    return self.config.todo
+                }
+            };
+        },
         destroyBtn: {
             type: Button,
             text: '✖',
@@ -33,6 +48,7 @@ var Todo = ub.createView({
     },
     
     connections: {
+        complete: [ 'markComplete.change', 'completeMap.input' ],
         destroy: [ 'destroyBtn.click', 'destroyMap.input' ]
     },
     
